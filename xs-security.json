@@ -1,0 +1,21 @@
+{
+  "xsappname": "pricingnotification",
+  "tenant-mode": "dedicated",
+  "description": "Security profile of called application",
+  "scopes": [
+    {
+      "name": "uaa.user",
+      "description": "UAA",
+      "grant-as-authority-to-apps": ["$XSSERVICENAME(dev_job_scheduler)"]
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "Token_Exchange",
+      "description": "UAA",
+      "scope-references": [
+        "uaa.user"
+      ]
+    }
+  ]
+}

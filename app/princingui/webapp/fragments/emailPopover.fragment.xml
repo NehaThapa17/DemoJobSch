@@ -1,0 +1,23 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<Popover
+		id="myPopover2"
+		showHeader="false"
+		contentWidth="320px"
+		contentHeight="500px"
+		placement="Bottom"
+		ariaLabelledBy="master-title">
+		<NavContainer>
+			<Page
+				class="sapUiResponsivePadding--header"
+				title="Emails">
+				<List items="{/}" >
+					<StandardListItem
+						title="{email}"/>
+				</List>
+			</Page>
+
+		</NavContainer>
+	</Popover>
+</core:FragmentDefinition>

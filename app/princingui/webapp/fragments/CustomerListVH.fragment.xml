@@ -1,0 +1,30 @@
+<core:FragmentDefinition xmlns="sap.ui.comp.valuehelpdialog"
+    xmlns:m="sap.m"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:core="sap.ui.core">
+    <ValueHelpDialog  title="Select Customer" ok=".onValueHelpOkPress" cancel=".onValueHelpCancelPress" 
+    afterClose=".onValueHelpAfterClose" supportRanges="false" key="Customer" descriptionKey="CustomerName">
+        <filterBar>
+            <fb:FilterBar advancedMode="true" search=".onFilterBarSearch" isRunningInValueHelpDialog="true">
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="CustomerId" label="Customer ID" visibleInFilterBar="false">
+                        <fb:control>
+                            <m:Input name="Customer ID" />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="Name" label="Customer Name" visibleInFilterBar="false">
+                        <fb:control>
+                            <m:Input name="Customer Name" />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+
+                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="Ship-To" label="Ship-To" visibleInFilterBar="false">
+                        <fb:control>
+                            <m:Input name="Ship-To" />
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+        </filterBar>
+    </ValueHelpDialog>
+</core:FragmentDefinition>

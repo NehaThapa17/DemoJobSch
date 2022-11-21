@@ -1,0 +1,1 @@
+sap.ui.define([],function(){"use strict";var t={INTZERO:0,httpPost:"POST",httpGet:"GET"};return t});

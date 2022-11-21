@@ -1,0 +1,165 @@
+{
+    "_version": "1.42.0",
+    "sap.app": {
+        "id": "marathon.pp.princingui",
+        "type": "application",
+        "i18n": "i18n/i18n.properties",
+        "applicationVersion": {
+            "version": "0.0.1"
+        },
+        "title": "{{appTitle}}",
+        "description": "{{appDescription}}",
+        "resources": "resources.json",
+        "sourceTemplate": {
+            "id": "@sap/generator-fiori:basic",
+            "version": "1.8.0",
+            "toolsId": "abf5fdeb-e50e-43a6-8c55-1695c5895564"
+        },
+        "dataSources": {
+            "mainService": {
+                "uri": "/v2/catalog/",
+                "type": "OData",
+                "settings": {
+                    "annotations": [],
+                    "localUri": "localService/metadata.xml",
+                    "odataVersion": "2.0"
+                }
+            }
+        },
+        "crossNavigation": {
+            "inbounds": {
+                "marathon-pp-princingui-inbound": {
+                    "signature": {
+                        "parameters": {},
+                        "additionalParameters": "allowed"
+                    },
+                    "semanticObject": "SEMOBJ",
+                    "action": "ACT1",
+                    "title": "{{flpTitle}}",
+                    "subTitle": "{{flpSubtitle}}",
+                    "icon": ""
+                }
+            }
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "icons": {
+            "icon": "",
+            "favIcon": "",
+            "phone": "",
+            "phone@2": "",
+            "tablet": "",
+            "tablet@2": ""
+        },
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": true,
+            "phone": true
+        }
+    },
+    "sap.ui5": {
+        "flexEnabled": false,
+        "dependencies": {
+            "minUI5Version": "1.102.1",
+            "libs": {
+                "sap.m": {},
+                "sap.ui.core": {},
+                "sap.f": {},
+                "sap.suite.ui.generic.template": {},
+                "sap.ui.comp": {},
+                "sap.ui.generic.app": {},
+                "sap.ui.table": {},
+                "sap.ushell": {}
+            }
+        },
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "marathon.pp.princingui.i18n.i18n"
+                }
+            },
+            "": {
+                "dataSource": "mainService",
+                "preload": true,
+                "settings": {}
+            }
+        },
+        "resources": {
+            "css": [
+                {
+                    "uri": "css/style.css"
+                }
+            ]
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "viewType": "XML",
+                "async": true,
+                "viewPath": "marathon.pp.princingui.view",
+                "controlAggregation": "pages",
+                "controlId": "app",
+                "clearControlAggregation": false
+            },
+            "routes": [
+                {
+                    "name": "RoutecontrolView",
+                    "pattern": ":?query:",
+                    "target": [
+                        "TargetcontrolView"
+                    ]
+                },
+                {
+                    "name": "RoutecreateView",
+                    "pattern": "RoutecreateView",
+                    "target": [
+                        "TargetcreateView"
+                    ]
+                }
+                ,
+                {
+                    "name": "RouteEditView",
+                    "pattern": "RouteEditView/{Data}",
+                    "target": [
+                        "TargeteditView"
+                    ]
+                }
+            ],
+            "targets": {
+                "TargetcontrolView": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "controlView",
+                    "viewName": "controlView"
+                }, 
+                "TargetcreateView": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "createCust",
+                    "viewName": "createCust"
+                }, 
+                "TargeteditView": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "editCust",
+                    "viewName": "editCust"
+                }
+            }
+        },
+        "rootView": {
+            "viewName": "marathon.pp.princingui.view.App",
+            "type": "XML",
+            "async": true,
+            "id": "App"
+        }
+    }
+}

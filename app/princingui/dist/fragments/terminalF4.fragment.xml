@@ -1,0 +1,15 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+	id="idDialogTerminalF4"
+		title="Terminal"
+		items="{oModel>/TerminalValHelp}"
+		search="_handleValueHelpSearchTerminal"
+		confirm="_handleValueHelpOKTerminal"
+		cancel="_handleValueHelpClose">
+		<StandardListItem
+			title="{oModel>Terminal}"
+			description="{oModel>Terminalname}" />
+	</SelectDialog>
+</core:FragmentDefinition>

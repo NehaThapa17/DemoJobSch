@@ -1,0 +1,138 @@
+_schema-version: "3.1"
+ID: pricingNotification
+description: A simple CAP project.
+version: 1.0.0
+modules:
+- name: pricingNotification-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: uaa_pricingNotification
+  - name: pricingNotification-destination-service
+  - name: pricingNotification-connectivity
+  - name: dev_job_scheduler
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+  build-parameters:
+    builder: npm-ci
+- name: pricingNotification-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: pricingNotification-destination-service
+    parameters:
+      content-target: true
+  - name: pricingNotification_html_repo_host
+    parameters:
+      service-key:
+        name: pricingNotification_html_repo_host-key
+  - name: uaa_pricingNotification
+    parameters:
+      service-key:
+        name: uaa_pricingNotification-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: PricingNotification_pricingNotification_html_repo_host
+          ServiceInstanceName: pricingNotification-html5-app-host-service
+          ServiceKeyName: pricingNotification_html_repo_host-key
+          sap.cloud.service: PricingNotification
+        - Authentication: OAuth2UserTokenExchange
+          Name: PricingNotification_uaa_pricingNotification
+          ServiceInstanceName: pricingNotification-xsuaa-service
+          ServiceKeyName: uaa_pricingNotification-key
+          sap.cloud.service: PricingNotification
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+- name: pricingNotification-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: pricingNotification_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - marathonppprincinguiprincingui.zip
+      name: marathonppprincinguiprincingui
+      target-path: resources/
+- name: marathonppprincinguiprincingui
+  type: html5
+  path: app/princingui
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: pricingNotification-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          - Authentication: NoAuthentication
+            HTML5.DynamicDestination: true
+            HTML5.ForwardAuthToken: true
+            Name: pricingNotification-srv-api
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{srv-api/srv-url}
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: pricingNotification-destination-service
+    service-plan: lite
+  requires:
+  - name: srv-api
+- name: pricingNotification_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: pricingNotification-html5-app-host-service
+    service-plan: app-host
+- name: uaa_pricingNotification
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: pricingNotification-xsuaa-service
+    service-plan: application
+- name: pricingNotification-connectivity
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: connectivity
+    service-name: pricingNotification-connectivity-service
+    service-plan: lite
+- name: dev_job_scheduler
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: jobscheduler
+    service-plan: standard
+    service-name: dev_job_scheduler
+    config:
+     enable-xsuaa-support: true 
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+  - builder: custom
+    commands:
+    - npx -p @sap/cds-dk cds build --production

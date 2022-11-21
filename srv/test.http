@@ -1,0 +1,104 @@
+GET http://localhost:4004/catalog/getTerminalDetails()
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+#####################
+GET http://localhost:4004/catalog/getOnCCEmail()
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+######################
+GET http://localhost:4004/catalog/getOnPremProductDetails()
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+########################################
+GET http://localhost:4004/catalog/getCustomerDetails()
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+##################
+POST http://localhost:4004/catalog/createProduct
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+{
+    "createData":"{\"Product\":\"200000001\",\"ProductName\":\"Product1\"}"
+}
+
+################
+POST http://localhost:4004/catalog/createTerminal
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+{
+    "createData":"{\"Terminal\":\"1235\",\"TerminalName\":\"text2\",\"DailyJob\":true,\"OnDemandJob\":false}"
+}
+
+#############
+POST http://localhost:4004/catalog/createCustomer
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+{
+    "createData":"{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"CustomerName\":\"CUST1\",\"ShipToName\":\"SHIPTONAME\",\"DailyJob\":true,\"OnDemandJob\":false,\"EmailTo\":\"var@gmail.com;alsf@gmail.com;wer@gmail.com\",\"ProductList\":[{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"Product\":\"200000001\"},{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"Product\":\"200000002\"},{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"Product\":\"200000003\"}]}"
+}
+
+#############
+POST http://localhost:4004/catalog/updateTerminal
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+{
+    "createData":"{\"Terminal\":\"1234\",\"TerminalName\":\"text2\",\"DailyJob\":true,\"OnDemandJob\":false}",
+    "terminal": "1234"
+}
+
+##############
+POST http://localhost:4004/catalog/updateCustomer
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+{
+    "createData":"{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"CustomerName\":\"TESTEDIT\",\"ShipToName\":\"SHIPTONAME\",\"DailyJob\":true,\"OnDemandJob\":false,\"EmailTo\":\"var@gmail.com;alsf@gmail.com;wer@gmail.com\",\"ProductList\":[{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"Product\":\"200000001\"},{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"Product\":\"200000002\"},{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"Product\":\"200000003\"}]}"
+}
+
+#######################
+
+POST http://localhost:4004/catalog/updateProduct
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+{
+    "createData":"{\"Product\":\"200000006\",\"ProductName\":\"TestEdit\"}",
+    "product": "200000006"
+}
+
+######################
+POST http://localhost:4004/catalog/deleteCustomer
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+{
+    "createData":"{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"CustomerName\":\"TESTEDIT\",\"ShipToName\":\"SHIPTONAME\",\"DailyJob\":true,\"OnDemandJob\":false,\"EmailTo\":\"var@gmail.com;alsf@gmail.com;wer@gmail.com\",\"ProductList\":[{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"Product\":\"200000001\"},{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"Product\":\"200000002\"},{\"Customer\":\"4728\",\"ShipTo\":\"4730\",\"Product\":\"200000003\"}]}"
+}
+
+###############################
+POST http://localhost:4004/catalog/deleteTerminal
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+{
+    "terminal": "200000006"
+}
+
+
+############################
+
+POST http://localhost:4004/catalog/createCCEmail
+# Authorization:Basic NThapa@marathonpetroleum.com:
+Content-Type: application/json;odata.metadata=minimal
+
+{
+    "createData":"{\"Key\":\"EMAILCC\",\"Value\":var@gm.com;v4@gm.com;v3@gm.com}"
+}

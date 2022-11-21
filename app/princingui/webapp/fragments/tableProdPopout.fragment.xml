@@ -1,0 +1,37 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:tnt="sap.tnt" xmlns:core="sap.ui.core">
+    <Dialog id="prodTable" title="Product">
+        <Table class="sapUiSizeCompact" id="idProdTablePopout" selectionChange="singlemode" 
+        mode="SingleSelectMaster" width="auto" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingScrollToLoad="true" growingThreshold="8" items="{oModel>/ProductData}">
+            <headerToolbar>
+                <Toolbar>
+                    <SearchField width="50%" change="onSearchProductPop" />
+                    <ToolbarSpacer />
+                    <Button icon="sap-icon://edit" press="handleEditProductPopout" />
+                    <Button icon="sap-icon://delete" press="onDeleteProduct" />
+                </Toolbar>
+            </headerToolbar>
+            <columns>
+                <Column mergeDuplicates="true" hAlign="Begin" width="15rem">
+                    <header>
+                        <Text text="Product ID" />
+                    </header>
+                </Column>
+                <Column demandPopin="true" hAlign="Begin" width="15rem">
+                    <header>
+                        <Text text="Product Name" />
+                    </header>
+                </Column>
+            </columns>
+            <ColumnListItem>
+                <Text text="{oModel>Product}" />
+                <Text text="{oModel>ProductName}" />
+            </ColumnListItem>
+        </Table>
+        <beginButton>
+            <Button text="Add New" type="Emphasized" press="handleProductSelectDialogPress" />
+        </beginButton>
+        <endButton>
+            <Button text="Cancel" press="onCloseProd" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
