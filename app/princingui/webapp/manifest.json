@@ -17,7 +17,7 @@
         },
         "dataSources": {
             "mainService": {
-                "uri": "/v2/catalog/",
+                "uri": "pricingNotification-srv-api/v2/catalog/",
                 "type": "OData",
                 "settings": {
                     "annotations": [],
@@ -33,10 +33,10 @@
                         "parameters": {},
                         "additionalParameters": "allowed"
                     },
-                    "semanticObject": "SEMOBJ",
-                    "action": "ACT1",
+                    "semanticObject": "SemobjPC",
+                    "action": "display",
                     "title": "{{flpTitle}}",
-                    "subTitle": "{{flpSubtitle}}",
+                    "subTitle": "",
                     "icon": ""
                 }
             }
@@ -161,5 +161,9 @@
             "async": true,
             "id": "App"
         }
+    },
+    "sap.cloud": {
+        "public": true,
+        "service": "PricingNotification"
     }
 }

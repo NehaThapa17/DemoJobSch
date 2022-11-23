@@ -1,7 +1,7 @@
 {
 	"name": "marathon.pp.princingui.princingui",
-	"version": "0.0.1",
-	"buildTimestamp": "202211210835",
+	"version": "0.0.2",
+	"buildTimestamp": "202211221342",
 	"scmRevision": "",
 	"libraries": []
 }

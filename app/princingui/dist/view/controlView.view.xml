@@ -49,7 +49,7 @@
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="On Demand Start Time" required="true" />
-                                <DateTimePicker id="idDatePickerOnDemand" timezone="CST" enabled="false" placeholder="Enter Date and Time" valueFormat="yyyy-MM-dd-HH-mm" change="handleChangeOnDemand" class="sapUiSmallMarginBottom" />
+                                <DateTimePicker id="idDatePickerOnDemand" timezone="CST" enabled="false" placeholder="Enter Date and Time" change="handleChangeOnDemand" class="sapUiSmallMarginBottom" />
                                 <Label text="Customer" required="true" />
                                 <MultiInput id="idMultiInputCustomer" enabled="false" valueHelpRequest=".onValueHelpRequested">
                                 </MultiInput>
@@ -74,6 +74,7 @@
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="Suspend From " required="true" />
                                 <DateTimePicker id="idDatePickerSuspend" timezone="CST" showTimezone="false" enabled="false" placeholder="Enter Date and Time" change="handleChangeSuspensStartTime" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" />
+                                <!-- <DateTimePicker id="idDatePickerSuspend" timezone="CST" placeholder="Enter Date and Time" change="handleChangeSuspensStartTime" class="sapUiSmallMarginBottom"/> -->
                                 <Label text="Suspend To" required="true" />
                                 <DateTimePicker id="idDatePicker2Suspend" timezone="CST" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend" change="handleChangeSuspensEndTime" class="sapUiSmallMarginBottom" valueStateText="From Date cannot be greater than To Date" />
                             </forms:SimpleForm>
@@ -118,7 +119,7 @@
                                         </OverflowToolbar>
                                     </headerToolbar>
                                     <columns>
-                                        <Column mergeDuplicates="false" width="18rem">
+                                        <Column mergeDuplicates="false" width="16rem">
                                             <header>
                                                 <Text text="Customer " />
                                             </header>
@@ -133,7 +134,7 @@
                                                 <Text text="Product" />
                                             </header>
                                         </Column>
-                                        <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="15rem">
+                                        <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="17rem">
                                             <header>
                                                 <Text text="Email" />
                                             </header>

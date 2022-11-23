@@ -3,13 +3,165 @@ const onPremData = require('./onpremise/onpremiseoperations.js');
 const SapCfAxios = require('sap-cf-axios').default;
 const SapCfAxiosObj = SapCfAxios('CPIDEV');
 const onPostData = require('./onpremise/onpremisePostOperations.js');
-const JobSchedulerClient = require('@sap/jobs-client');
-const axios = require('axios');
+
+//JOB SCHEDULING START//
+// const cds = require('@sap/cds');
+// const express = require('express');
+// const passport = require('passport');
+// const xsenv = require('@sap/xsenv');
+// const JWTStrategy = require('@sap/xssec').JWTStrategy;
+// //configure passport
+// const xsuaaService = xsenv.getServices({ myXsuaa: { tag: 'xsuaa' } });
+// const xsuaaCredentials = xsuaaService.myXsuaa;
+// const jwtStrategy = new JWTStrategy(xsuaaCredentials);
+// passport.use(jwtStrategy);
+// // configure express server with authentication middleware
+// const app = express();
+// app.use(passport.initialize());
+// app.use(passport.authenticate('JWT', { session: false }));
+// const https = require('https');
+// // access credentials from environment variable (alternatively use xsenv)
+// const VCAP_SERVICES = JSON.parse(process.env.VCAP_SERVICES)
+// const CREDENTIALS = VCAP_SERVICES.jobscheduler[0].credentials
+// // oauth
+// const UAA = CREDENTIALS.uaa
+// const OA_CLIENTID = UAA.clientid;
+// const OA_SECRET = UAA.clientsecret;
+// const OA_ENDPOINT = UAA.url;
 
 
-// const CREDENTIALS = VCAP_SERVICES.jobscheduler[0].credentials.uaa;
-// const CLIENTID = CREDENTIALS.clientid;
-// const CLIENTSECRET = CREDENTIALS.clientsecret;
+// module.exports = cds.service.impl(async function () {
+//  this.on('MasterUpload', async (req) => {
+//     try {
+//         req.notify(200, 'Accepted long running job.');
+//         // afterwards the actual processing
+//         let finalResult = await handleAsyncJob(req.headers, req);
+//         return finalResult;
+
+//         // return 'testing here in trial';
+//     }
+//     catch (error) {
+//         console.log(error);
+//     }
+// });
+
+
+// const handleAsyncJob = async function (headers, req) {
+//     try {
+//         let result = await operationMasterUpload(req)
+//         if ((typeof result !== 'undefined') && (result !== null)) {
+//             await doUpdateStatus(headers, true, result)
+//             return result;
+//         } else {
+//             await operationMasterUpload(req)
+//         }
+//     } catch (error) {
+//         doUpdateStatus(headers, false, error.message)
+//             .then(() => {
+//                 console.log('Successfully called REST api of Jobscheduler')
+//             }).catch((error) => {
+//                 console.log('Error occurred while calling REST api of Jobscheduler' + error)
+                
+//             })
+//     }
+// }
+
+// const operationMasterUpload = async function (req) {
+//     try {
+//         console.log('**********line 64*************');
+//         return 'tested from Job, success!!';
+//     }
+//     catch (error) {
+//         req.error({ code: 400, message: error.message });
+//     }
+// }
+
+
+// const fetchJwtToken = function (clientId, clientSecret) {
+//     return new Promise((resolve, reject) => {
+//         const options = {
+//             host: OA_ENDPOINT.replace('https://', ''),
+//             path: '/oauth/token?grant_type=client_credentials&response_type=token',
+//             headers: {
+//                 Authorization: "Basic " + Buffer.from(clientId + ':' + clientSecret).toString("base64")
+//             }
+//         }
+//         https.get(options, res => {
+//             res.setEncoding('utf8')
+//             let response = ''
+//             res.on('data', chunk => {
+//                 response += chunk
+//             })
+//             res.on('end', () => {
+//                 try {
+//                     const responseAsJson = JSON.parse(response)
+//                     const jwtToken = responseAsJson.access_token
+//                     if (!jwtToken) {
+//                         return reject(new Error('Error while fetching JWT token'))
+//                     }
+//                     resolve(jwtToken)
+//                 } catch (error) {
+//                     return reject(new Error('Error while fetching JWT token'))
+//                 }
+//             })
+//         })
+//             .on("error", (error) => {
+//                 console.log("Error: " + error.message);
+//                 return reject({ error: error })
+//             });
+//     })
+// }
+
+// /********************Set the status in Jobscheduler***********************/
+// const doUpdateStatus = function (headers, success, message) {
+//     return new Promise((resolve, reject) => {
+//         return fetchJwtToken(OA_CLIENTID, OA_SECRET)
+//             .then((jwtToken) => {
+//                 const jobId = headers['x-sap-job-id']
+//                 const scheduleId = headers['x-sap-job-schedule-id']
+//                 const runId = headers['x-sap-job-run-id']
+//                 const host = headers['x-sap-scheduler-host']
+//                 const data = JSON.stringify({ success: success, message: JSON.stringify(message) })
+//                 const options = {
+//                     host: host.replace('https://', ''),
+//                     path: `/scheduler/jobs/${jobId}/schedules/${scheduleId}/runs/${runId}`,
+//                     method: 'PUT',
+//                     headers: {
+//                         'Content-Type': 'application/json',
+//                         'Content-Length': data.length,
+//                         Authorization: 'Bearer ' + jwtToken
+//                     }
+//                 }
+//                 const req = https.request(options, (res) => {
+//                     res.setEncoding('utf8')
+//                     const status = res.statusCode
+//                     if (status !== 200 && status !== 201) {
+//                         return reject(new Error('Failed to update status of job'))
+//                     }
+//                     res.on('data', () => {
+//                         console.log('Successfully heating to jobschedular')
+//                         resolve(message)
+//                     })
+//                 });
+//                 req.on('error', (error) => {
+//                     console.log('error on heating to jobschedular')
+//                     return reject({ error: error })
+//                 });
+//                 req.write(data)
+//                 req.end()
+//             })
+//             .catch((error) => {
+//                 console.log(error)
+//                 reject(error)
+//             })
+//     })
+// }
+
+// });
+
+//JOB SCHEDULING END//
+
+
 
 //Calling onpremise operations
 module.exports =cds.service.impl(async function(){
@@ -1595,85 +1747,5 @@ this.on('triggerCPI',async(req) =>{
       })
   return response;
 });
-//JobScheduler
-// const VCAP_SERVICES = JSON.parse(process.env.VCAP_SERVICES);
-// const CREDENTIALS = VCAP_SERVICES.jobscheduler[0].credentials;
-// const userName = CREDENTIALS.user;
-// const password = CREDENTIALS.password;
-    this.on('createJob', async (req) => {
-      const token = await getAccessToken();
-      const options = {
-          baseURL: 'https://jobscheduler-rest.cfapps.us21.hana.ondemand.com',
-          token: token
-      };
-      // const options = {
-      //     baseURL: 'https://jobscheduler-rest.cfapps.us21.hana.ondemand.com',
-      //     user: userName,
-      //     password: password
-      // };
 
-      const scheduler = new JobSchedulerClient.Scheduler(options);
-
-      let jobID = await getJobId('pricingNotificationJobs', scheduler);
-      var scJob = {
-          jobId: jobID._id,
-          schedule: {
-              "time": "in 3 seconds",
-              "description": "Dynamic Job Test 002",
-              "data": {
-                  "JobId": "1234"
-              },
-              "active": true,
-              "endTime": { "date": "2030-W06-5" },
-          }
-      };
-      // var id = '';
-      return new Promise((resolve, reject) => {
-          scheduler.createJobSchedule(scJob, function (error, body) {
-              if (error) {
-                  reject(error.message);
-              }
-              // Job successfully created.
-              //  = body._id;
-              resolve('Job successfully created')
-          });
-      })
-  });
-
-  async function getJobId(name, scheduler) {
-      var req = {
-          name: name
-      };
-
-      return new Promise((resolve, reject) => {
-          scheduler.fetchJob(req, function (err, result) {
-              if (err) {
-                  console.log(err);
-                  reject(err.message);
-              }
-              resolve(result);
-              
-          });
-      });
-  }
-
-
-  async function getAccessToken() {
-      var clientid = 'sb-d8057bd6-7582-43e3-987c-b41338be5e40!b460|sap-jobscheduler!b4';
-      var clientsecret = 'e389e395-6a8f-4b57-addb-e363e159b0b0$4wwgaOw2FAUnM_TCsT2VBxaZSLcbtPPKEEju_2cBs-A=';
-      const sUaaCredentials = clientid + ':' + clientsecret;
-      const getAuthTokenRequest = {
-          url: 'https://mexicoerpdev.authentication.us21.hana.ondemand.com' + '/oauth/token?grant_type=client_credentials',
-          method: 'POST',
-          headers: {
-              'Authorization': 'Basic ' + Buffer.from(sUaaCredentials).toString('base64'),
-              'Content-type': 'application/x-www-form-urlencoded'
-          }
-      };
-      const authTokenResponse = await axios(getAuthTokenRequest).catch(error => {
-           console.log(error);
-      })
-      const jwtTokenFromMethod = authTokenResponse.data.access_token;
-      return jwtTokenFromMethod;
-  }
 });

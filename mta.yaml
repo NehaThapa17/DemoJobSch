@@ -6,6 +6,8 @@ modules:
 - name: pricingNotification-srv
   type: nodejs
   path: gen/srv
+  properties:
+    SAP_JWT_TRUST_ACL: '[{"clientid":"*","identityzone":"*"}]' 
   requires:
   - name: uaa_pricingNotification
   - name: pricingNotification-destination-service

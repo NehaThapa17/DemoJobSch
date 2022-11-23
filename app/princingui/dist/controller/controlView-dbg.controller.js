@@ -25,181 +25,170 @@ sap.ui.define([
         return Controller.extend("marathon.pp.princingui.controller.controlView", {
             formatter: formatter,
             onInit: function () {
+                debugger;
                 this.oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
                 this.oDataModelT = this.getOwnerComponent().getModel();
                 BusyIndicator.show();
 
                 var oModel = new JSONModel();
-                var oItemData = {
-                    "productF4": [{
-                        "Customer": "4725",
-                        "ShipTo": "4726",
-                        "Product": "200000001",
-                        "ProductName": "Product1",
-                        "Selected": "X"
-                    },
-                    {
-                        "Customer": "477845",
-                        "ShipTo": "4726",
-                        "Product": "200000041",
-                        "ProductName": "Product 41",
-                        "Selected": "X"
-                    },
-                    {
-                        "Customer": "477845",
-                        "ShipTo": "4726",
-                        "Product": "200000461",
-                        "ProductName": "Product 461",
-                        "Selected": "X"
-                    }
-                    ],
-                    "terminalF4": [{
-                        "Terminal": "TV67",
-                        "TerminalName": "text Name1",
-                    },
-                    {
-                        "Terminal": "TV69",
-                        "TerminalName": "text3",
-                    },
-                    {
-                        "Terminal": "TV70",
-                        "TerminalName": "TV Name",
-                    },
-                    {
-                        "Terminal": "TV675",
-                        "TerminalName": "Ter21 Name",
-                    }],
-                    "products": [{
-                        "id": "1284",
-                        "name": "CLEAR PREMIUM GAS EXP MX"
+                var oItemData = [] ;
+                // {
+                //     "productF4": [{
+                //         "Customer": "4725",
+                //         "ShipTo": "4726",
+                //         "Product": "200000001",
+                //         "ProductName": "Product1",
+                //         "Selected": "X"
+                //     },
+                //     {
+                //         "Customer": "477845",
+                //         "ShipTo": "4726",
+                //         "Product": "200000041",
+                //         "ProductName": "Product 41",
+                //         "Selected": "X"
+                //     },
+                //     {
+                //         "Customer": "477845",
+                //         "ShipTo": "4726",
+                //         "Product": "200000461",
+                //         "ProductName": "Product 461",
+                //         "Selected": "X"
+                //     }
+                //     ],
+                //     "terminalF4": [{
+                //         "Terminal": "TV67",
+                //         "TerminalName": "text Name1",
+                //     },
+                //     {
+                //         "Terminal": "TV69",
+                //         "TerminalName": "text3",
+                //     },
+                //     {
+                //         "Terminal": "TV70",
+                //         "TerminalName": "TV Name",
+                //     },
+                //     {
+                //         "Terminal": "TV675",
+                //         "TerminalName": "Ter21 Name",
+                //     }],
+                //     "products": [{
+                //         "id": "1284",
+                //         "name": "CLEAR PREMIUM GAS EXP MX"
 
-                    },
-                    {
-                        "id": "1285",
-                        "name": "ARCO PREMIUM ZMM"
+                //     },
+                //     {
+                //         "id": "1285",
+                //         "name": "ARCO PREMIUM ZMM"
 
-                    },
-                    {
-                        "id": "1286",
-                        "name": "ARCO PREMIUM GAS EXP MX"
+                //     },
+                //     {
+                //         "id": "1286",
+                //         "name": "ARCO PREMIUM GAS EXP MX"
 
-                    }],
-                    "emails": [{
-                        "id": "hgdyei@address.com"
-
-
-                    },
-                    {
-                        "id": "aert@address.com"
-
-                    },
-                    {
-                        "id": "emailuioaf@address.com"
-
-                    }],
-                    "producttbl": [{
-                        "code": "1284",
-                        "name": "CLEAR PREMIUM GAS EXP MX"
-
-                    },
-                    {
-                        "code": "1285",
-                        "name": "ARCO PREMIUM ZMM"
-
-                    },
-                    {
-                        "code": "1286",
-                        "name": "ARCO PREMIUM GAS EXP MX"
-
-                    }],
-                    "terminaltbl": [{
-                        "termid": "TV17",
-                        "name": "MX VT ELPASO",
-                        "DailyJob": true,
-                        "OnDemandJob": false,
-
-                    },
-                    {
-                        "termid": "TM25",
-                        "name": "LK VM ELPASO",
-                        "DailyJob": true,
-                        "OnDemandJob": true,
-
-                    }],
-                    "custtbl": [{
-                        "Customer": "1000022",
-                        "ShipTo": "702268",
-                        "CustomerName": "ALMACENES DISTRIBUIDORES DE LA FRONTERA",
-                        "ShipToName": "702268-PARAJE DE ORIENTE-8070",
-                        "DailyJob": true,
-                        "OnDemandJob": false,
-                        "Product": "ARCO PREMIUM GAS EXP MX",
-                        "email": "almacenesemail@address.com",
-                        "EmailTo": "almacenesemail@address.com;hjuemail2@address.com"
-                    },
-                    {
-                        "Customer": "1000029",
-                        "ShipTo": "705170",
-                        "CustomerName": "PETROTAL/RAFAEL PEREZ SERNA",
-                        "ShipToName": "Customer2",
-                        "DailyJob": true,
-                        "OnDemandJob": false,
-                        "Product": "ARCO Regular Gas",
-                        "email": "hjuemail2@address.com",
-                        "EmailTo": "almacenesemail@address.com;hjuemail2@address.com"
-                    },
-                    {
-                        "Customer": "1000024",
-                        "ShipTo": "72269",
-                        "CustomerName": "ALMACENES DISTRIBUIDORES DE LA",
-                        "ShipToName": "Pulatarco[TotalGas - 5170]",
-                        "DailyJob": true,
-                        "OnDemandJob": false,
-                        "Product": "ARCO Regular Gas",
-                        "email": "kiteemail2@address.com",
-                        "EmailTo": "almacenesemail@address.com;hjuemail2@address.com"
+                //     }],
+                //     "emails": [{
+                //         "id": "hgdyei@address.com"
 
 
-                    }],
-                    "custtblMain": [{
-                        "Customer": "1000022",
-                        "ShipTo": "702268",
-                        "CustomerName": "ALMACENES DISTRIBUIDORES DE LA FRONTERA",
-                        "ShipToName": "702268-PARAJE DE ORIENTE-8070",
-                        "DailyJob": true,
-                        "OnDemandJob": false,
-                        "Email": "almacenesemail@address.com",
-                        "EmailTo": "var@gmail.com;alsf@gmail.com;wer@gmail.com",
-                        "ProductList": [
-                            {
-                                "Product": "200000001",
-                                "ProductName": "Product1",
-                            },
-                            {
-                                "Product": "200000001",
-                                "ProductName": "Product1",
-                            },
-                            {
-                                "Product": "200000001",
-                                "ProductName": "Product1",
-                            }
-                        ]
-                    }
-                    ],
-                    "emailsCC": [{
-                        "id": "hgdyei@address.com",
-                        "key": ""
+                //     },
+                //     {
+                //         "id": "aert@address.com"
 
-                    },
-                    {
-                        "id": "aert@address.com",
-                        "key": ""
-                    },
-                    {
-                        "id": "emailuioaf@address.com",
-                        "key": ""
-                    }],
-                };
+                //     },
+                //     {
+                //         "id": "emailuioaf@address.com"
+
+                //     }],
+                //     "producttbl": [{
+                //         "code": "1284",
+                //         "name": "CLEAR PREMIUM GAS EXP MX"
+
+                //     },
+                //     {
+                //         "code": "1285",
+                //         "name": "ARCO PREMIUM ZMM"
+
+                //     },
+                //     {
+                //         "code": "1286",
+                //         "name": "ARCO PREMIUM GAS EXP MX"
+
+                //     }],
+                //     "terminaltbl": [{
+                //         "termid": "TV17",
+                //         "name": "MX VT ELPASO",
+                //         "DailyJob": true,
+                //         "OnDemandJob": false,
+
+                //     },
+                //     {
+                //         "termid": "TM25",
+                //         "name": "LK VM ELPASO",
+                //         "DailyJob": true,
+                //         "OnDemandJob": true,
+
+                //     }],
+                //     "custtbl": [{
+                //         "Customer": "1000022",
+                //         "ShipTo": "702268",
+                //         "CustomerName": "ALMACENES DISTRIBUIDORES DE LA FRONTERA",
+                //         "ShipToName": "702268-PARAJE DE ORIENTE-8070",
+                //         "DailyJob": true,
+                //         "OnDemandJob": false,
+                //         "Product": "ARCO PREMIUM GAS EXP MX",
+                //         "email": "almacenesemail@address.com",
+                //         "EmailTo": "almacenesemail@address.com;hjuemail2@address.com"
+                //     },
+                //     {
+                //         "Customer": "1000029",
+                //         "ShipTo": "705170",
+                //         "CustomerName": "PETROTAL/RAFAEL PEREZ SERNA",
+                //         "ShipToName": "Customer2",
+                //         "DailyJob": true,
+                //         "OnDemandJob": false,
+                //         "Product": "ARCO Regular Gas",
+                //         "email": "hjuemail2@address.com",
+                //         "EmailTo": "almacenesemail@address.com;hjuemail2@address.com"
+                //     },
+                //     {
+                //         "Customer": "1000024",
+                //         "ShipTo": "72269",
+                //         "CustomerName": "ALMACENES DISTRIBUIDORES DE LA",
+                //         "ShipToName": "Pulatarco[TotalGas - 5170]",
+                //         "DailyJob": true,
+                //         "OnDemandJob": false,
+                //         "Product": "ARCO Regular Gas",
+                //         "email": "kiteemail2@address.com",
+                //         "EmailTo": "almacenesemail@address.com;hjuemail2@address.com"
+
+
+                //     }],
+                //     "custtblMain": [{
+                //         "Customer": "1000022",
+                //         "ShipTo": "702268",
+                //         "CustomerName": "ALMACENES DISTRIBUIDORES DE LA FRONTERA",
+                //         "ShipToName": "702268-PARAJE DE ORIENTE-8070",
+                //         "DailyJob": true,
+                //         "OnDemandJob": false,
+                //         "Email": "almacenesemail@address.com",
+                //         "EmailTo": "var@gmail.com;alsf@gmail.com;wer@gmail.com",
+                //         "ProductList": [
+                //             {
+                //                 "Product": "200000001",
+                //                 "ProductName": "Product1",
+                //             },
+                //             {
+                //                 "Product": "200000001",
+                //                 "ProductName": "Product1",
+                //             },
+                //             {
+                //                 "Product": "200000001",
+                //                 "ProductName": "Product1",
+                //             }
+                //         ]
+                //     }
+                //     ]
+                // };
                 oModel.setData(oItemData);
                 this.getView().setModel(oModel, "oModel");
                 sap.ui.getCore().setModel(oModel, "oModel");
@@ -247,11 +236,14 @@ sap.ui.define([
                 })
             },
             getTerminalDetails: function () {
+                debugger;
                 var that = this;
                 this.oDataModelT.callFunction("/getTerminalDetails", {
                     method: 'GET',
                     success: function (oData) {
-                        if (oData.getTerminalDetails.data) {
+                       
+                        debugger;
+                         if (oData.getTerminalDetails.data) {
                             that.getView().getModel("oModel").setProperty("/TerminalData", oData.getTerminalDetails.data);
                             that.getView().byId("idTitleTerminal").setText(that.oBundle.getText("comTerText", [oData.getTerminalDetails.data.length]));
                         }
@@ -268,10 +260,11 @@ sap.ui.define([
             },
             getProductDetails: function () {
                 var that = this;
-
+                debugger;
                 this.oDataModelT.callFunction("/getOnPremProductDetails", {
                     method: 'GET',
                     success: function (oData) {
+                        debugger;
                         if (oData.getOnPremProductDetails.data) {
                             that.getView().getModel("oModel").setProperty("/ProductData", oData.getOnPremProductDetails.data);
                             that.getView().byId("idTitleProduct").setText(that.oBundle.getText("comProText", [oData.getOnPremProductDetails.data.length]));
@@ -341,10 +334,11 @@ sap.ui.define([
             },
             getF4Customer: function () {
                 var that = this;
-
+                debugger;
                 this.oDataModelT.callFunction("/getOnPremCustomerF4", {
                     method: 'GET',
                     success: function (oData) {
+                        debugger;
                         that.getView().getModel("oModel").setProperty("/CustValHelp", oData.getOnPremCustomerF4.data);
                         BusyIndicator.hide();
                     },
@@ -1208,10 +1202,12 @@ sap.ui.define([
             onEmailCCSelectDialogPress: function (oEvent) {
                 var oView = this.getView(), aTokens = [],
                     oDataCC = oView.getModel("oModel").getProperty("/emailsCC");
+                    if(oDataCC){
                 for (var e = constants.INTZERO; e < oDataCC.length; e++) {
                     var otoken1 = new sap.m.Token({ key: oDataCC[e], text: oDataCC[e] });
                     aTokens.push(otoken1);
                 }
+            }
 
                 // var otoken2 = new sap.m.Token({ key: "002", text: 'almacenesemail@address.com' });
                 // aTokens = [otoken1, otoken2];
@@ -1747,7 +1743,7 @@ sap.ui.define([
             },
             handleChangeOnDemand: function (oEvent) {
                 var showondemanttime = this.getView().byId("idTextOnDemandST");
-                showondemanttime.setText(this.getView().byId("idDatePickerOnDemand").getValue());
+                // showondemanttime.setText(this.getView().byId("idDatePickerOnDemand").getValue());
                 const date = new Date(this.getView().byId("idDatePickerOnDemand").getValue());
                 //  convert date to CST (Central Standard Time)
                 showondemanttime.setText(date.toLocaleString('en-US', {

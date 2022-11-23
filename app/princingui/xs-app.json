@@ -3,8 +3,8 @@
   "authenticationMethod": "route",
   "routes": [
     {
-      "source": "^/catalog/(.*)$",
-      "target": "/catalog/$1",
+      "source": "^/pricingNotification-srv-api/(.*)$", 
+      "target": "$1",
       "destination": "pricingNotification-srv-api",
       "authenticationType": "xsuaa",
       "csrfProtection": false

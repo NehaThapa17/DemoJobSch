@@ -7,6 +7,13 @@
       "name": "uaa.user",
       "description": "UAA",
       "grant-as-authority-to-apps": ["$XSSERVICENAME(dev_job_scheduler)"]
+    },
+    {
+      "name": "$XSAPPNAME.scopeformyapp",
+      "description": "Test Job",
+      "grant-as-authority-to-apps": [
+        "dev_job_scheduler"
+      ]
     }
   ],
   "role-templates": [
@@ -17,5 +24,14 @@
         "uaa.user"
       ]
     }
-  ]
+  ],
+  "role-collections": [
+    {
+      "name": "app_job_schedular_MPC_app",
+      "description": "job schedular",
+      "role-template-references": [
+        "$XSAPPNAME.scopeformyapp"
+      ]
+    }
+  ]  
 }

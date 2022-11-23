@@ -119,7 +119,7 @@
                                         </OverflowToolbar>
                                     </headerToolbar>
                                     <columns>
-                                        <Column mergeDuplicates="false" width="18rem">
+                                        <Column mergeDuplicates="false" width="16rem">
                                             <header>
                                                 <Text text="Customer " />
                                             </header>
@@ -134,7 +134,7 @@
                                                 <Text text="Product" />
                                             </header>
                                         </Column>
-                                        <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="15rem">
+                                        <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="17rem">
                                             <header>
                                                 <Text text="Email" />
                                             </header>
