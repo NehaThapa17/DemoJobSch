@@ -206,6 +206,27 @@ sap.ui.define([
                         success: function (oData) {
                             debugger;
                             BusyIndicator.hide();
+
+                            if(oData.createCustomer === undefined)
+                            {
+                                if(oData.updateCustomer.data[constants.INTZERO]){
+                                    MessageBox.success(that.oBundle.getText("customerCreated",[oData.createCustomer.data[constants.INTZERO].data.Customer]), { 
+                                        onClose: function (sAction) {
+                                            if (sAction === MessageBox.Action.OK) {
+                                                that.onBack();
+                                                
+                                            }
+                                        }
+                                    
+                                    
+                                    });
+                                }
+                                else {
+                                    MessageBox.error(oData.createCustomer.data.message);
+                                    
+                                } 
+
+                            }else{
                             if(oData.createCustomer.data[constants.INTZERO]){
                             MessageBox.success(that.oBundle.getText("customerCreated",[oData.createCustomer.data[constants.INTZERO].data.Customer]), { 
                                 onClose: function (sAction) {
@@ -217,10 +238,13 @@ sap.ui.define([
                             
                             
                             });
-                        } else {
+                        }
+                        else {
                             MessageBox.error(oData.createCustomer.data.message);
                             
-                        }
+                        } 
+                    }
+                        
                         },
                         error: function (err) {
                             BusyIndicator.hide();

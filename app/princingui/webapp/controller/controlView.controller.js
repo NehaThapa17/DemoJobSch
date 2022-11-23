@@ -569,6 +569,7 @@ sap.ui.define([
                 this._oValueHelpDialogCust.destroy();
             },
             handleTableSelectDialogPress: function (oEvent) {
+                debugger;
                 var oButton = oEvent.getSource(),
                     oView = this.getView();
                 if (!this.byId("custTable")) {
