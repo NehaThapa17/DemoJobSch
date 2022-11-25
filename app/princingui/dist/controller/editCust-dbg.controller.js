@@ -6,14 +6,14 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/ui/core/BusyIndicator",
-    "sap/ui/core/routing/Route",
+    "sap/m/Token",
     "marathon/pp/princingui/utils/constants",
     "sap/m/SearchField"
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, MessageBox, JSONModel, Fragment, Filter, FilterOperator, BusyIndicator, Route, constants,SearchField) {
+    function (Controller, MessageBox, JSONModel, Fragment, Filter, FilterOperator, BusyIndicator, Token, constants,SearchField) {
         "use strict";
 
         return Controller.extend("marathon.pp.princingui.controller.editCust", {
@@ -28,7 +28,8 @@ sap.ui.define([
             onRouteEditCustomer: function (oEvent) {
                
                 var oModel = new JSONModel();
-                var aArray = JSON.parse(oEvent.getParameter("arguments").Data);
+                var fgModel = this.getOwnerComponent().getModel("oModel");
+                var aArray = fgModel.oData.selectedRow; //JSON.parse(oEvent.getParameter("arguments").Data);
                 this.getView().byId("idInputCustomerID").setValue(aArray[constants.INTZERO].Customer);
                 this.getView().byId("idInputCustomerName").setValue(aArray[constants.INTZERO].CustomerName);
                 this.getView().byId("idInputShipToID").setValue(aArray[constants.INTZERO].ShipTo);
@@ -38,7 +39,7 @@ sap.ui.define([
                 if (aArray[constants.INTZERO].ProductList.length != constants.INTZERO) {
                     for (var i = constants.INTZERO; i < aArray[constants.INTZERO].ProductList.length; i++) {
                         var otokenProduct = new sap.m.Token({ key: aArray[constants.INTZERO].ProductList[i].Product, text: aArray[constants.INTZERO].ProductList[i].ProductName });
-                        tokenArray = [otokenProduct];
+                        tokenArray.push(otokenProduct);
                     }
                     this.getView().byId("idMultiComboBoxProducts").setTokens(tokenArray);
                 }
@@ -47,26 +48,27 @@ sap.ui.define([
                 this.getView().byId("idInputEmail").setModel(oModel, "detailModel");
                 this.getView().byId("idCheckBoxDaily").setSelected(aArray[constants.INTZERO].DailyJob);
                 this.getView().byId("idCheckBoxOnDemand").setSelected(aArray[constants.INTZERO].OnDemandJob);
-                this.getF4Product2();
+                this.getView().getModel("detailModel").setProperty("/ProductData", fgModel.oData.ProductData);
+                // this.getF4Product2();
             },
-            getF4Product2: function () {
-                var that = this;
-                this.oDataModelE.callFunction("/getOnPremProductF4", {
-                    method: 'GET',
-                    success: function (oData) {
-                        debugger;
-                        that.getView().getModel("detailModel").setProperty("/ProductValHelp", oData.getOnPremProductF4.data);
-                        BusyIndicator.hide();
-                    },
-                    error: function (err) {
-                        BusyIndicator.hide();
-                        MessageBox.error("Technical error has occurred ", {
-                            details: err
-                        });
+            // getF4Product2: function () {
+            //     var that = this;
+            //     this.oDataModelE.callFunction("/getOnPremProductDetails", {
+            //         method: 'GET',
+            //         success: function (oData) {
+                        
+            //             that.getView().getModel("detailModel").setProperty("/ProductData", oData.getOnPremProductDetails.data);
+            //             BusyIndicator.hide();
+            //         },
+            //         error: function (err) {
+            //             BusyIndicator.hide();
+            //             MessageBox.error("Technical error has occurred ", {
+            //                 details: err
+            //             });
 
-                    }
-                })
-            },
+            //         }
+            //     })
+            // },
             handleSearch: function (oEvent) {
                 var sQuery = oEvent.getParameter("value");
                 var aFilters = [], aFiltersCombo = [];
@@ -103,8 +105,8 @@ sap.ui.define([
                         var objProd = {
                             "Customer": oCustID,
                             "ShipTo": oSh,
-                            "Product": oProd[i].getKey(),
-                            "ProductName": oProd[i].getText()
+                            "Product": oProd[i].getKey()
+                            
                         };
                         oProdArray.push(objProd);
                     }
@@ -135,7 +137,8 @@ sap.ui.define([
                             createData: oPayloadCus
                         },
                         success: function (oData) {
-                            if(oData.createCustomer.data[constants.INTZERO]){
+                            BusyIndicator.hide();
+                            if(oData.updateCustomer !== undefined){
                             MessageBox.success(that.oBundle.getText("savedSucc"), {
                                 onClose: function (sAction) {
                                     if (sAction === MessageBox.Action.OK) {
@@ -146,8 +149,15 @@ sap.ui.define([
                                 }
                             });
                         } else {
-                            MessageBox.error(oData.createCustomer.data.message); 
+                            MessageBox.error(oData.updateCustomer.data.message); 
                         }
+                        },
+                        error: function (err) {
+                            BusyIndicator.hide();
+                            MessageBox.error("Technical error has occurred ", {
+                                details: err
+                            });
+    
                         }
                     });
                 } else {
@@ -158,20 +168,23 @@ sap.ui.define([
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RoutecontrolView");
             },
-            onEmailChangeEditCust: function () {
+            onEmailChangeEditCust: function (oEvt) {
                 var oMultiInput1 = this.getView().byId("idInputEmail");
+                var sVal = oEvt.getParameters().value;
                 var fnValidator = function (args) {
                     var email = args.text;
-                    var eArr = email.split('@');
-
+                    // var eArr = email.split('@');
                     var mailregex = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
-                    if (!mailregex.test(email) || eArr[1] !== "marathonpetroleum.com") {
+                    if (!mailregex.test(email)) {
                         oMultiInput1.setValueState(sap.ui.core.ValueState.Error);
                     } else {
                         oMultiInput1.setValueState(sap.ui.core.ValueState.None);
                         return new Token({ key: email, text: email });
                     }
                 };
+                if (sVal === ""){
+                    oMultiInput1.setValueState(sap.ui.core.ValueState.None);
+                } 
                 oMultiInput1.addValidator(fnValidator);
             },
             onProductsValueHelpRequested: function () {
@@ -191,27 +204,7 @@ sap.ui.define([
                 };
                 
                 this.oProductsModel  = this.getView().getModel("detailModel");
-                //Delete//
-                // var oF4Data = {
-                //     "ProductValHelp": [{
-                //         "Customer": "4725",
-                //         "ShipTo": "4726",
-                //         "Product": "1286",
-                //         "ProductName": "ARCO PREMIUM GAS EXP MX",
-                //         "Selected": "X"
-                //     },
-                //     {
-                //         "Customer": "4725",
-                //         "ShipTo": "4726",
-                //         "Product": "1287",
-                //         "ProductName": "CLEAR PREMIUM GAS EXP MX",
-                //         "Selected": "X"
-                //     }
-                //     ]
-                // }
-                // this.oProductsModel = new JSONModel();
-                // this.oProductsModel.setData(oF4Data);
-                //
+
                 this.oColModel.setData(aCols);
                 this._oValueHelpDialog = sap.ui.xmlfragment("marathon.pp.princingui.fragments.productListVH", this);
                 this.getView().addDependent(this._oValueHelpDialog);
@@ -229,11 +222,11 @@ sap.ui.define([
                     oTable.setModel(this.oColModel, "columns");
 
                     if (oTable.bindRows) {
-                        oTable.bindAggregation("rows", "/ProductValHelp");
+                        oTable.bindAggregation("rows", "/ProductData");
                     }
 
                     if (oTable.bindItems) {
-                        oTable.bindAggregation("items", "/ProductValHelp", function () {
+                        oTable.bindAggregation("items", "/ProductData", function () {
                             return new ColumnListItem({
                                 cells: aCols.map(function (column) {
                                     return new Label({ text: "{" + column.template + "}" });

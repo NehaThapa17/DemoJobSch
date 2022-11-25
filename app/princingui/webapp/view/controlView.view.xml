@@ -6,7 +6,7 @@
                     <tnt:InfoLabel id="idInfoLabel" text="Active" />
                 </uxap:heading>
                 <uxap:actions>
-                    <Label text="All times are in Central Time Zone (US)" design="Bold" />
+                    <Label text="{i18n>allTimesInCentralZone}" design="Bold" />
                 </uxap:actions>
             </uxap:ObjectPageDynamicHeaderTitle>
         </uxap:headerTitle>
@@ -14,11 +14,11 @@
             <FlexBox wrap="Wrap" fitContainer="true">
                 <l:VerticalLayout class="sapUiSmallMarginEnd">
                     <l:HorizontalLayout class="sapUiSmallMarginBeginEnd">
-                        <Label text="Daily Processing Start Time:" />
+                        <Label text="{i18n>dailyProcessingStartTime}:" />
                         <Text id="idTextDailyST" />
                     </l:HorizontalLayout>
                     <l:HorizontalLayout class="sapUiSmallMarginBeginEnd">
-                        <Label text="On Demand Start Time:" />
+                        <Label text="{i18n>onDemandStartTime}:" />
                         <Text id="idTextOnDemandST" />
                     </l:HorizontalLayout>
                 </l:VerticalLayout>
@@ -30,12 +30,12 @@
         </uxap:headerContent>
 
         <uxap:sections>
-            <uxap:ObjectPageSection titleUppercase="true" showTitle="true" title="Daily Processing">
+            <uxap:ObjectPageSection titleUppercase="true" showTitle="true" title="{i18n>dailyProcessing}">
                 <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="Daily Processing " titleUppercase="true">
+                    <uxap:ObjectPageSubSection title="{i18n>dailyProcessing}" titleUppercase="true">
                         <uxap:blocks>
                             <forms:SimpleForm layout="ResponsiveGridLayout" class="sapUiSizeCompact">
-                                <Label text="Daily Processing Start Time" />
+                                <Label text="{i18n>dailyProcessingStartTime}" />
                                 <TimePicker id="idTimePickerInput" value="5:00 AM" displayFormat="hh:mm a" valueFormat="hh:mm a" width="60%" enabled="false" change="handleChange"/>
                                 <Switch state="true" change="onSwtichChange" />
                             </forms:SimpleForm>
@@ -43,53 +43,53 @@
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
             </uxap:ObjectPageSection>
-            <uxap:ObjectPageSection titleUppercase="true" showTitle="true" title="On Demand ">
+            <uxap:ObjectPageSection titleUppercase="true" showTitle="true" title="{i18n>onDemandProcessignlbl}">
                 <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="On Demand Processing" titleUppercase="true">
+                    <uxap:ObjectPageSubSection title="{i18n>onDemandProcessignlbl}" titleUppercase="true">
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
-                                <Label text="On Demand Start Time" required="true" />
+                                <Label text="{i18n>onDemandStartTime}" required="true" />
                                 <DateTimePicker id="idDatePickerOnDemand" timezone="CST" enabled="false" placeholder="Enter Date and Time" change="handleChangeOnDemand" class="sapUiSmallMarginBottom" />
-                                <Label text="Customer" required="true" />
+                                <Label text="{i18n>customer}" required="true" />
                                 <MultiInput id="idMultiInputCustomer" enabled="false" valueHelpRequest=".onValueHelpRequested">
                                 </MultiInput>
-                                <Label text="Terminal" required="true" />
+                                <Label text="{i18n>terminal}" required="true" />
                                 <MultiComboBox id="idMultiInputTerminal" enabled="false" showSecondaryValues= "true" selectionChange="handleSelectionChangeTerF4" selectionFinish="handleSelectionFinishTerF4" showSelectAll="true" width="350px" items="{oModel>/TerminalValHelp}" >
                             	<core:ListItem key="{oModel>Terminal}" text="{oModel>Terminalname}" additionalText="{oModel>Terminal}"/>
                                 </MultiComboBox>
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
-                            <Button id="idButtonEdit" text="Edit" type="Emphasized" press="onPressEditOnDemand" />
-                            <Button id="idButtonSave" text="Save" type="Emphasized" visible="false" press="onPressSaveOnDemand" />
-                            <Button id="idButtonCancel" text="Cancel" type="Emphasized" visible="false" press="onPressCancelOnDemand" />
+                            <Button id="idButtonEdit" text="{i18n>edit}" type="Emphasized" press="onPressEditOnDemand" />
+                            <Button id="idButtonSave" text="{i18n>save}" type="Emphasized" visible="false" press="onPressSaveOnDemand" />
+                            <Button id="idButtonCancel" text="{i18n>cancel}" type="Emphasized" visible="false" press="onPressCancelOnDemand" />
                         </uxap:actions>
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
             </uxap:ObjectPageSection>
-            <uxap:ObjectPageSection titleUppercase="true" showTitle="true" title="Suspend ">
+            <uxap:ObjectPageSection titleUppercase="true" showTitle="true" title="{i18n>suspend}">
                 <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="Suspend " titleUppercase="true">
+                    <uxap:ObjectPageSubSection title="{i18n>suspend}" titleUppercase="true">
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
-                                <Label text="Suspend From " required="true" />
+                                <Label text="{i18n>suspendFrom}" required="true" />
                                 <DateTimePicker id="idDatePickerSuspend" timezone="CST" showTimezone="false" enabled="false" placeholder="Enter Date and Time" change="handleChangeSuspensStartTime" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" />
                                 <!-- <DateTimePicker id="idDatePickerSuspend" timezone="CST" placeholder="Enter Date and Time" change="handleChangeSuspensStartTime" class="sapUiSmallMarginBottom"/> -->
-                                <Label text="Suspend To" required="true" />
+                                <Label text="{i18n>suspendTo}" required="true" />
                                 <DateTimePicker id="idDatePicker2Suspend" timezone="CST" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend" change="handleChangeSuspensEndTime" class="sapUiSmallMarginBottom" valueStateText="From Date cannot be greater than To Date" />
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
-                            <Button id="idButtonSuspendEdit" text="Edit" type="Emphasized" press="onPressSuspendEdit" />
-                            <Button id="idButtonSuspendSave" text="Save" type="Emphasized" visible="false" press="onPressSuspendSave" />
-                            <Button id="idButtonSuspendCancel" text="Cancel" type="Emphasized" press="onPressSuspendClear" visible="false" />
+                            <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="onPressSuspendEdit" />
+                            <Button id="idButtonSuspendSave" text="{i18n>save}" type="Emphasized" visible="false" press="onPressSuspendSave" />
+                            <Button id="idButtonSuspendCancel" text="{i18n>cancel}" type="Emphasized" press="onPressSuspendClear" visible="false" />
                         </uxap:actions>
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
             </uxap:ObjectPageSection>
-            <uxap:ObjectPageSection titleUppercase="false" title="Processing Data">
+            <uxap:ObjectPageSection titleUppercase="false" title="{i18n>processingData}">
                 <uxap:subSections>
-                    <uxap:ObjectPageSubSection id="personalSS1" title="Customer" showTitle="false" titleUppercase="false">
+                    <uxap:ObjectPageSubSection id="personalSS1" title="{i18n>customer}" showTitle="false" titleUppercase="false">
                         <uxap:blocks>
                             <VBox>
                                 <Table
@@ -113,40 +113,40 @@
                                             <Button id="btnadd" icon="sap-icon://add" press="onCreateCustomer" />
                                             <Button id="btnedit" icon="sap-icon://edit" press="onEditCustomer" />
                                             <Button icon="sap-icon://delete" press="onDeleteCustomer" />
-                                            <Button text="CC" type="Emphasized" press="onEmailCCSelectDialogPress" />
+                                            <Button text="{i18n>ccButton}" type="Emphasized" press="onEmailCCSelectDialogPress" />
                                             <Button  press="handleTableSelectDialogPress" type="Emphasized" icon="sap-icon://full-screen" />
                                         
                                         </OverflowToolbar>
                                     </headerToolbar>
                                     <columns>
-                                        <Column mergeDuplicates="false" width="16rem">
+                                        <Column mergeDuplicates="true" width="16rem">
                                             <header>
-                                                <Text text="Customer " />
+                                                <Text text="{i18n>customer}" />
                                             </header>
                                         </Column>
                                         <Column demandPopin="true" hAlign="Begin" width="15rem">
                                             <header>
-                                                <Text text="Ship-To" />
+                                                <Text text="{i18n>shipTo}" />
                                             </header>
                                         </Column>
                                         <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="15rem">
                                             <header>
-                                                <Text text="Product" />
+                                                <Text text="{i18n>product}" />
                                             </header>
                                         </Column>
                                         <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="17rem">
                                             <header>
-                                                <Text text="Email" />
+                                                <Text text="{i18n>email}" />
                                             </header>
                                         </Column>
                                         <Column hAlign="Center">
                                             <header>
-                                                <Text text="Daily" />
+                                                <Text text="{i18n>daily}" />
                                             </header>
                                         </Column>
                                         <Column hAlign="Center" width="6rem">
                                             <header>
-                                                <Text text="On-Demand" />
+                                                <Text text="{i18n>onDemand}" />
                                             </header>
                                         </Column>
                                     </columns>
@@ -154,7 +154,7 @@
                                         <ObjectIdentifier title="{oModel>Customer}" text="{oModel>CustomerName}" />
                                         <ObjectIdentifier title="{oModel>ShipTo}" text="{oModel>ShipToName}" />
                                         <HBox>
-                                            <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog" />
+                                            <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog"  />
                                             <tnt:InfoLabel text="{oModel>CountProduct}" colorScheme="1" renderMode="Narrow" />
                                         </HBox>
                                         <HBox>
@@ -168,7 +168,7 @@
                             </VBox>
                         </uxap:blocks>
                     </uxap:ObjectPageSubSection>
-                    <uxap:ObjectPageSubSection id="personalSS2" title="Terminal" showTitle="false" titleUppercase="false">
+                    <uxap:ObjectPageSubSection id="personalSS2" title="{i18n>terminal}" showTitle="false" titleUppercase="false">
                         <uxap:blocks>
                             <VBox>
                                 <Table id="idTableTerminal" class="sapUiSizeCompact" items="{oModel>/TerminalData}" 
@@ -189,22 +189,22 @@
                                     <columns>
                                         <Column demandPopin="true" hAlign="Begin">
                                             <header>
-                                                <Text text="Terminal ID " />
+                                                <Text text="{i18n>terminalID} " />
                                             </header>
                                         </Column>
                                         <Column demandPopin="true" hAlign="Begin">
                                             <header>
-                                                <Text text="Terminal Name " />
+                                                <Text text="{i18n>terminalName}" />
                                             </header>
                                         </Column>
                                         <Column>
                                             <header>
-                                                <Text text="Daily " />
+                                                <Text text="{i18n>daily}" />
                                             </header>
                                         </Column>
                                         <Column>
                                             <header>
-                                                <Text text="On-Demand " />
+                                                <Text text="{i18n>onDemand}" />
                                             </header>
                                         </Column>
                                     </columns>
@@ -218,7 +218,7 @@
                             </VBox>
                         </uxap:blocks>
                     </uxap:ObjectPageSubSection>
-                    <uxap:ObjectPageSubSection id="personalSS3" title="Product" showTitle="false" titleUppercase="false">
+                    <uxap:ObjectPageSubSection id="personalSS3" title="{i18n>product}" showTitle="false" titleUppercase="false">
                         <uxap:blocks>
                             <VBox>
                                 <Table id="producttbl" class="sapUiSizeCompact" items="{oModel>/ProductData}" 
@@ -239,12 +239,12 @@
                                     <columns>
                                         <Column demandPopin="true" hAlign="Begin">
                                             <header>
-                                                <Text text="Product ID" />
+                                                <Text text="{i18n>productID}" />
                                             </header>
                                         </Column>
                                         <Column demandPopin="true" hAlign="Begin">
                                             <header>
-                                                <Text text="Product Name " />
+                                                <Text text="{i18n>productName}" />
                                             </header>
                                         </Column>
                                     </columns>

@@ -10,6 +10,6 @@
 		cancel="_handleValueHelpCloseProduct">
 		<StandardListItem
 			title="{oModel>Product}"
-			description="{oModel>Productname}" />
+			description="{oModel>ProductName}" />
 	</SelectDialog>
 </core:FragmentDefinition>

@@ -14,7 +14,7 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, MessageBox, JSONModel, Fragment, Filter, FilterOperator, BusyIndicator, Route, Token,constants,SearchField) {
+    function (Controller, MessageBox, JSONModel, Fragment, Filter, FilterOperator, BusyIndicator, Route, Token, constants, SearchField) {
         "use strict";
         var aTokens;
 
@@ -22,34 +22,20 @@ sap.ui.define([
             onInit: function () {
                 this.oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
                 this.oDataModel = this.getOwnerComponent().getModel();
+                // var fgModel = this.getOwnerComponent().getModel("oModel");
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.getRoute("RoutecreateView").attachPatternMatched(this.onRouteCustomer, this);
                 var oModel = new JSONModel();
 
-                var oItemData = {
-                    "ProductValHelp": [{
-                        "Customer": "4725",
-                        "ShipTo": "4726",
-                        "Product": "200000001",
-                        "ProductName": "Product1",
-                        "Selected": "X"
-                    },
-                    {
-                        "Customer": "4725",
-                        "ShipTo": "4726",
-                        "Product": "200000001",
-                        "ProductName": "Product1",
-                        "Selected": "X"
-                    }
-                    ]
-                };
+                var oItemData = [];
                 oModel.setData(oItemData);
-                debugger;
                 this.getView().setModel(oModel, "oCustModel");
+                // this.getView().getModel("oCustModel").setProperty("/CustValHelp", fgModel.oData.CustValHelp);
+                // this.getView().getModel("oCustModel").setProperty("/ProductData", fgModel.oData.ProductData);
                 this.getCustomerDetails2();
                 this.getF4Product2();
             },
-            getCustomerDetails2:function(){
+            getCustomerDetails2: function () {
                 var that = this;
                 debugger;
                 this.oDataModel.callFunction("/getOnPremCustomerF4", {
@@ -69,11 +55,11 @@ sap.ui.define([
             },
             getF4Product2: function () {
                 var that = this;
-                this.oDataModel.callFunction("/getOnPremProductF4", {
+                this.oDataModel.callFunction("/getOnPremProductDetails", {
                     method: 'GET',
                     success: function (oData) {
                         debugger;
-                        that.getView().getModel("oCustModel").setProperty("/ProductValHelp", oData.getOnPremProductF4.data);
+                        that.getView().getModel("oCustModel").setProperty("/ProductData", oData.getOnPremProductDetails.data);
                         BusyIndicator.hide();
                     },
                     error: function (err) {
@@ -85,34 +71,34 @@ sap.ui.define([
                     }
                 })
             },
-            onRouteCustomer:function(){
+            onRouteCustomer: function () {
                 this.getView().byId("idInputCustomerIDAdd").setValue(""),
-                this.getView().byId("idInputCustomerNameAdd").setValue(""),
-                this.getView().byId("idInputSHAdd").setValue(""),
-                this.getView().byId("idInputSHNameAdd").setValue(""),
-                this.getView().byId("idMultiComboBoxProductsAdd").removeAllTokens(),
-                this.getView().byId("idInputEmailAdd").removeAllTokens(),
-                this.getView().byId("daily_distribution").setSelected(false),
-                this.getView().byId("on_demand_distribution").setSelected(false);
+                    this.getView().byId("idInputCustomerNameAdd").setValue(""),
+                    this.getView().byId("idInputSHAdd").setValue(""),
+                    this.getView().byId("idInputSHNameAdd").setValue(""),
+                    this.getView().byId("idMultiComboBoxProductsAdd").removeAllTokens(),
+                    this.getView().byId("idInputEmailAdd").removeAllTokens(),
+                    this.getView().byId("daily_distribution").setSelected(false),
+                    this.getView().byId("on_demand_distribution").setSelected(false);
             },
             handleSearch: function (oEvent) {
                 var sQuery = oEvent.getParameter("value");
                 var aFilters = [], aFiltersCombo = [];
                 if (sQuery && sQuery.length > constants.INTZERO) {
-                aFilters.push(new Filter({
-                    filters: [
-                        new Filter({ path: "Customer", operator: FilterOperator.Contains, value1: sQuery }),
-                        new Filter({ path: "CustomerName", operator: FilterOperator.Contains, value1: sQuery }),
-                        new Filter({ path: "Shipto", operator: FilterOperator.Contains, value1: sQuery }),
-                        new Filter({ path: "ShiptoName", operator: FilterOperator.Contains, value1: sQuery })
-                    ],
-                    and: false
-                }));
-                aFiltersCombo.push(new Filter({
-                    filters: aFilters,
-                    and: true
-                }));
-            }
+                    aFilters.push(new Filter({
+                        filters: [
+                            new Filter({ path: "Customer", operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: "CustomerName", operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: "Shipto", operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: "ShiptoName", operator: FilterOperator.Contains, value1: sQuery })
+                        ],
+                        and: false
+                    }));
+                    aFiltersCombo.push(new Filter({
+                        filters: aFilters,
+                        and: true
+                    }));
+                }
                 var oBinding = oEvent.getSource().getBinding("items");
                 oBinding.filter([aFiltersCombo]);
             },
@@ -165,27 +151,26 @@ sap.ui.define([
                     oSh = this.getView().byId("idInputSHAdd").getValue(),
                     oSHName = this.getView().byId("idInputSHNameAdd").getValue(),
                     oProd = this.getView().byId("idMultiComboBoxProductsAdd").getTokens(),
-                    oEmail = this.getView().byId("idInputEmailAdd").getTokens(),that=this,
-                    oDaily = this.getView().byId("daily_distribution").getSelected(),oProdArray=[],
-                    oDemand = this.getView().byId("on_demand_distribution").getSelected(),oEmailString="";
+                    oEmail = this.getView().byId("idInputEmailAdd").getTokens(), that = this,
+                    oDaily = this.getView().byId("daily_distribution").getSelected(), oProdArray = [],
+                    oDemand = this.getView().byId("on_demand_distribution").getSelected(), oEmailString = "";
                 if (oCustID !== "" && oCustName !== "" && oSh !== "" && oSHName !== "" && oProd.length !== constants.INTZERO && oEmail.length !== constants.INTZERO) {
                     for (var i = constants.INTZERO; i < oProd.length; i++) {
                         var objProd = {
                             "Customer": oCustID,
                             "ShipTo": oSh,
-                            "Product": oProd[i].getKey(),
-                            "ProductName": oProd[i].getText()
+                            "Product": oProd[i].getKey()
                         };
                         oProdArray.push(objProd);
                     }
                     for (var j = constants.INTZERO; j < oEmail.length; j++) {
                         var objEmail = oEmail[j].getKey();
-                        if(j === constants.INTZERO){
-                            oEmailString=objEmail;
-                        }else{
-                            oEmailString=oEmailString+";"+objEmail;
+                        if (j === constants.INTZERO) {
+                            oEmailString = objEmail;
+                        } else {
+                            oEmailString = oEmailString + ";" + objEmail;
                         }
-                        
+
                     }
                     var oJsonData = {
                         "Customer": oCustID,
@@ -204,59 +189,30 @@ sap.ui.define([
                             createData: oPayloadCus
                         },
                         success: function (oData) {
-                            debugger;
                             BusyIndicator.hide();
-
-                            if(oData.createCustomer === undefined)
-                            {
-                                if(oData.updateCustomer.data[constants.INTZERO]){
-                                    MessageBox.success(that.oBundle.getText("customerCreated",[oData.createCustomer.data[constants.INTZERO].data.Customer]), { 
-                                        onClose: function (sAction) {
-                                            if (sAction === MessageBox.Action.OK) {
-                                                that.onBack();
-                                                
-                                            }
+                            // if(oData.createCustomer != undefined)
+                            // {
+                            if (oData.createCustomer.data[constants.INTZERO]) {
+                                MessageBox.success(that.oBundle.getText("customerCreated", [oData.createCustomer.data[constants.INTZERO].data.Customer]), {
+                                    onClose: function (sAction) {
+                                        if (sAction === MessageBox.Action.OK) {
+                                            that.onBack();
                                         }
-                                    
-                                    
-                                    });
-                                }
-                                else {
-                                    MessageBox.error(oData.createCustomer.data.message);
-                                    
-                                } 
-
-                            }else{
-                            if(oData.createCustomer.data[constants.INTZERO]){
-                            MessageBox.success(that.oBundle.getText("customerCreated",[oData.createCustomer.data[constants.INTZERO].data.Customer]), { 
-                                onClose: function (sAction) {
-                                    if (sAction === MessageBox.Action.OK) {
-                                        that.onBack();
-                                        
                                     }
-                                }
-                            
-                            
-                            });
-                        }
-                        else {
-                            MessageBox.error(oData.createCustomer.data.message);
-                            
-                        } 
-                    }
-                        
+                                });
+                            }
+                            else {
+                                MessageBox.error(oData.createCustomer.data.message);
+                            }
                         },
                         error: function (err) {
                             BusyIndicator.hide();
                             MessageBox.error("Technical error has occurred ", {
                                 details: err
                             });
-    
+
                         }
                     });
-                    var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                    oRouter.navTo("RoutecontrolView");
-                    MessageBox.success("Saved Successfully");
                 } else {
                     MessageBox.error("Kindly fill the mandatory fields");
                 }
@@ -276,7 +232,7 @@ sap.ui.define([
                         }
                     ]
                 };
-                this.oProductsModel  = this.getView().getModel("oCustModel");
+                this.oProductsModel = this.getView().getModel("oCustModel");
                 //***Delete Start */
                 // var oF4Data = {
                 //     "productF4": [{
@@ -295,32 +251,32 @@ sap.ui.define([
                 //     }
                 //     ]
                 // }
-                
+
                 // this.oProductsModel = new JSONModel();
                 // this.oProductsModel.setData(oF4Data);
                 //***Delete ENd */
                 this.oColModel.setData(aCols);
                 this._oValueHelpDialog = sap.ui.xmlfragment("marathon.pp.princingui.fragments.productListVH", this);
                 this.getView().addDependent(this._oValueHelpDialog);
-	// Set Basic Search for FilterBar
-    var oFilterBar = this._oValueHelpDialog.getFilterBar();
-    oFilterBar.setFilterBarExpanded(false);
-    oFilterBar.setBasicSearch(this._oBasicSearchField);
+                // Set Basic Search for FilterBar
+                var oFilterBar = this._oValueHelpDialog.getFilterBar();
+                oFilterBar.setFilterBarExpanded(false);
+                oFilterBar.setBasicSearch(this._oBasicSearchField);
 
-    // Trigger filter bar search when the basic search is fired
-    this._oBasicSearchField.attachSearch(function() {
-        oFilterBar.search();
-    });
+                // Trigger filter bar search when the basic search is fired
+                this._oBasicSearchField.attachSearch(function () {
+                    oFilterBar.search();
+                });
                 this._oValueHelpDialog.getTableAsync().then(function (oTable) {
                     oTable.setModel(this.oProductsModel);
                     oTable.setModel(this.oColModel, "columns");
 
                     if (oTable.bindRows) {
-                        oTable.bindAggregation("rows", "/ProductValHelp");
+                        oTable.bindAggregation("rows", "/ProductData");
                     }
 
                     if (oTable.bindItems) {
-                        oTable.bindAggregation("items", "/ProductValHelp", function () {
+                        oTable.bindAggregation("items", "/ProductData", function () {
                             return new ColumnListItem({
                                 cells: aCols.map(function (column) {
                                     return new Label({ text: "{" + column.template + "}" });
@@ -331,7 +287,7 @@ sap.ui.define([
                     this._oValueHelpDialog.update();
                 }.bind(this));
 
-                // this._oValueHelpDialog.setTokens(this.getView().byId("idMultiComboBoxProductsAdd").getTokens());
+
                 this._oValueHelpDialog.open();
             },
             onFilterBarSearchProd: function (oEvent) {
@@ -339,19 +295,19 @@ sap.ui.define([
                     aSelectionSet = oEvent.getParameter("selectionSet");
                 var aFilters = aSelectionSet.reduce(function (aResult, oControl) {
                     if (oControl.getValue()) {
-                        if(oControl.getName() === "Product ID"){
-                        aResult.push(new Filter({
-                            path: "Product",
-                            operator: FilterOperator.Contains,
-                            value1: oControl.getValue()
-                        }));
-                        } else if(oControl.getName() === "Product Name"){
+                        if (oControl.getName() === "Product ID") {
+                            aResult.push(new Filter({
+                                path: "Product",
+                                operator: FilterOperator.Contains,
+                                value1: oControl.getValue()
+                            }));
+                        } else if (oControl.getName() === "Product Name") {
                             aResult.push(new Filter({
                                 path: "ProductName",
                                 operator: FilterOperator.Contains,
                                 value1: oControl.getValue()
                             }));
-                            }
+                        }
                     }
                     return aResult;
                 }, []);
@@ -389,8 +345,9 @@ sap.ui.define([
                 this._oValueHelpDialog.close();
                 this._oValueHelpDialog.destroy();
             },
-            onEmailChangeAddCust: function () {
+            onEmailChangeAddCust: function (oEvt) {
                 var oMultiInput1 = this.getView().byId("idInputEmailAdd");
+                var sVal = oEvt.getParameters().value;
                 var fnValidator = function (args) {
                     var email = args.text;
                     var mailregex = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
@@ -401,23 +358,24 @@ sap.ui.define([
                         return new Token({ key: email, text: email });
                     }
                 };
+                if (sVal === "") {
+                    oMultiInput1.setValueState(sap.ui.core.ValueState.None);
+                }
                 oMultiInput1.addValidator(fnValidator);
             },
-            onEmailChangeAddCust: function () {
-                var oMultiInput1 = this.getView().byId("idInputEmailAdd");
-                var fnValidator = function (args) {
-                    var email = args.text;
-                    var eArr = email.split('@');
+            onEmailEnter: function (oEvent) {
+                debugger;
+                if (oEvent.getSource().getValue().includes('\n')) {
+                    this.onEmailChangeAddCust(oEvent);
+                }
+            }
+            // onBackCancel: function(){
+            //     debugger;
+            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            //     oRouter.navTo("RoutecontrolView", {
+            //         Data: "Cancel"
+            //     });
+            // }
 
-                    var mailregex = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
-                    if (!mailregex.test(email) || eArr[1] !== "marathonpetroleum.com") {
-                        oMultiInput1.setValueState(sap.ui.core.ValueState.Error);
-                    } else {
-                        oMultiInput1.setValueState(sap.ui.core.ValueState.None);
-                        return new Token({ key: email, text: email });
-                    }
-                };
-                oMultiInput1.addValidator(fnValidator);
-            },
         });
     });

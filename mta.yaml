@@ -1,26 +1,34 @@
 _schema-version: "3.1"
 ID: pricingNotification
-description: A simple CAP project.
 version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npx -p @sap/cds-dk cds build --production
 modules:
 - name: pricingNotification-srv
   type: nodejs
   path: gen/srv
   properties:
     SAP_JWT_TRUST_ACL: '[{"clientid":"*","identityzone":"*"}]' 
+  parameters:
+    buildpack: nodejs_buildpack  
+  build-parameters:
+    builder: npm-ci 
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}         
   requires:
   - name: uaa_pricingNotification
   - name: pricingNotification-destination-service
   - name: pricingNotification-connectivity
   - name: dev_job_scheduler
-  provides:
-  - name: srv-api
-    properties:
-      srv-url: ${default-url}
-  parameters:
-    buildpack: nodejs_buildpack
-  build-parameters:
-    builder: npm-ci
 - name: pricingNotification-destination-content
   type: com.sap.application.content
   requires:
@@ -48,7 +56,7 @@ modules:
           ServiceInstanceName: pricingNotification-xsuaa-service
           ServiceKeyName: uaa_pricingNotification-key
           sap.cloud.service: PricingNotification
-        existing_destinations_policy: ignore
+        existing_destinations_policy: update
   build-parameters:
     no-source: true
 - name: pricingNotification-app-content
@@ -125,16 +133,9 @@ resources:
 - name: dev_job_scheduler
   type: org.cloudfoundry.managed-service
   parameters:
-    service: jobscheduler
-    service-plan: standard
-    service-name: dev_job_scheduler
     config:
-     enable-xsuaa-support: true 
-parameters:
-  deploy_mode: html5-repo
-  enable-parallel-deployments: true
-build-parameters:
-  before-all:
-  - builder: custom
-    commands:
-    - npx -p @sap/cds-dk cds build --production
+        enable-xsuaa-support: true
+    service: jobscheduler
+    service-name: dev_job_scheduler
+    service-plan: standard
+

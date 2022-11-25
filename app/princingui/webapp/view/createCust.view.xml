@@ -22,7 +22,7 @@
                       <MultiInput id="idMultiComboBoxProductsAdd" 	valueHelpOnly="true"
 						valueHelpRequest=".onProductsValueHelpRequestedAdd" width="360px"/>
                     <Label text="To Email" required="true"/>
-                     <MultiInput id="idInputEmailAdd"  showValueHelp="false" width="500px" change= "onEmailChangeAddCust"></MultiInput>
+                     <MultiInput id="idInputEmailAdd"  width="500px" showValueHelp="false" change= "onEmailChangeAddCust" />
                     <Label text="Daily" />
                     <CheckBox id="daily_distribution" enabled="true"></CheckBox>
                     <Label text="On Demand" />

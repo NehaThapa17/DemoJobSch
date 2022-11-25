@@ -4,7 +4,7 @@
         growing="true" growingScrollToLoad="true" selectionChange="singlemode" growingThreshold="8" items="{oModel>/CustomerData}" mode="SingleSelectMaster">
             <headerToolbar>
                 <Toolbar>
-                    <SearchField width="50%" change="onSearchCustomerPop" />
+                    <SearchField width="50%" change="onSearchCustomerPop" placeholder="Search by Customer or Ship-To"/>
                     <ToolbarSpacer />
                     <Button icon="sap-icon://edit" press="onEditCustomerPopout" />
                     <Button icon="sap-icon://delete" press="onDeleteCustomerPopout" />

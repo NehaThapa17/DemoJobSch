@@ -25,191 +25,30 @@ sap.ui.define([
         return Controller.extend("marathon.pp.princingui.controller.controlView", {
             formatter: formatter,
             onInit: function () {
-                debugger;
+
                 this.oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
                 this.oDataModelT = this.getOwnerComponent().getModel();
                 BusyIndicator.show();
-
                 var oModel = new JSONModel();
                 var oItemData = [] ;
-                // {
-                //     "productF4": [{
-                //         "Customer": "4725",
-                //         "ShipTo": "4726",
-                //         "Product": "200000001",
-                //         "ProductName": "Product1",
-                //         "Selected": "X"
-                //     },
-                //     {
-                //         "Customer": "477845",
-                //         "ShipTo": "4726",
-                //         "Product": "200000041",
-                //         "ProductName": "Product 41",
-                //         "Selected": "X"
-                //     },
-                //     {
-                //         "Customer": "477845",
-                //         "ShipTo": "4726",
-                //         "Product": "200000461",
-                //         "ProductName": "Product 461",
-                //         "Selected": "X"
-                //     }
-                //     ],
-                //     "terminalF4": [{
-                //         "Terminal": "TV67",
-                //         "TerminalName": "text Name1",
-                //     },
-                //     {
-                //         "Terminal": "TV69",
-                //         "TerminalName": "text3",
-                //     },
-                //     {
-                //         "Terminal": "TV70",
-                //         "TerminalName": "TV Name",
-                //     },
-                //     {
-                //         "Terminal": "TV675",
-                //         "TerminalName": "Ter21 Name",
-                //     }],
-                //     "products": [{
-                //         "id": "1284",
-                //         "name": "CLEAR PREMIUM GAS EXP MX"
-
-                //     },
-                //     {
-                //         "id": "1285",
-                //         "name": "ARCO PREMIUM ZMM"
-
-                //     },
-                //     {
-                //         "id": "1286",
-                //         "name": "ARCO PREMIUM GAS EXP MX"
-
-                //     }],
-                //     "emails": [{
-                //         "id": "hgdyei@address.com"
-
-
-                //     },
-                //     {
-                //         "id": "aert@address.com"
-
-                //     },
-                //     {
-                //         "id": "emailuioaf@address.com"
-
-                //     }],
-                //     "producttbl": [{
-                //         "code": "1284",
-                //         "name": "CLEAR PREMIUM GAS EXP MX"
-
-                //     },
-                //     {
-                //         "code": "1285",
-                //         "name": "ARCO PREMIUM ZMM"
-
-                //     },
-                //     {
-                //         "code": "1286",
-                //         "name": "ARCO PREMIUM GAS EXP MX"
-
-                //     }],
-                //     "terminaltbl": [{
-                //         "termid": "TV17",
-                //         "name": "MX VT ELPASO",
-                //         "DailyJob": true,
-                //         "OnDemandJob": false,
-
-                //     },
-                //     {
-                //         "termid": "TM25",
-                //         "name": "LK VM ELPASO",
-                //         "DailyJob": true,
-                //         "OnDemandJob": true,
-
-                //     }],
-                //     "custtbl": [{
-                //         "Customer": "1000022",
-                //         "ShipTo": "702268",
-                //         "CustomerName": "ALMACENES DISTRIBUIDORES DE LA FRONTERA",
-                //         "ShipToName": "702268-PARAJE DE ORIENTE-8070",
-                //         "DailyJob": true,
-                //         "OnDemandJob": false,
-                //         "Product": "ARCO PREMIUM GAS EXP MX",
-                //         "email": "almacenesemail@address.com",
-                //         "EmailTo": "almacenesemail@address.com;hjuemail2@address.com"
-                //     },
-                //     {
-                //         "Customer": "1000029",
-                //         "ShipTo": "705170",
-                //         "CustomerName": "PETROTAL/RAFAEL PEREZ SERNA",
-                //         "ShipToName": "Customer2",
-                //         "DailyJob": true,
-                //         "OnDemandJob": false,
-                //         "Product": "ARCO Regular Gas",
-                //         "email": "hjuemail2@address.com",
-                //         "EmailTo": "almacenesemail@address.com;hjuemail2@address.com"
-                //     },
-                //     {
-                //         "Customer": "1000024",
-                //         "ShipTo": "72269",
-                //         "CustomerName": "ALMACENES DISTRIBUIDORES DE LA",
-                //         "ShipToName": "Pulatarco[TotalGas - 5170]",
-                //         "DailyJob": true,
-                //         "OnDemandJob": false,
-                //         "Product": "ARCO Regular Gas",
-                //         "email": "kiteemail2@address.com",
-                //         "EmailTo": "almacenesemail@address.com;hjuemail2@address.com"
-
-
-                //     }],
-                //     "custtblMain": [{
-                //         "Customer": "1000022",
-                //         "ShipTo": "702268",
-                //         "CustomerName": "ALMACENES DISTRIBUIDORES DE LA FRONTERA",
-                //         "ShipToName": "702268-PARAJE DE ORIENTE-8070",
-                //         "DailyJob": true,
-                //         "OnDemandJob": false,
-                //         "Email": "almacenesemail@address.com",
-                //         "EmailTo": "var@gmail.com;alsf@gmail.com;wer@gmail.com",
-                //         "ProductList": [
-                //             {
-                //                 "Product": "200000001",
-                //                 "ProductName": "Product1",
-                //             },
-                //             {
-                //                 "Product": "200000001",
-                //                 "ProductName": "Product1",
-                //             },
-                //             {
-                //                 "Product": "200000001",
-                //                 "ProductName": "Product1",
-                //             }
-                //         ]
-                //     }
-                //     ]
-                // };
                 oModel.setData(oItemData);
                 this.getView().setModel(oModel, "oModel");
-                sap.ui.getCore().setModel(oModel, "oModel");
+                this.getOwnerComponent().setModel(oModel, "oModel");
                 this.getView().byId("idMultiInputTerminal").setModel(oModel, "oModel");
                 this.getView().byId("idDatePickerOnDemand").setMinDate(new Date());
                 this.getView().byId("idDatePickerSuspend").setMinDate(new Date());
                 this.getView().byId("idDatePicker2Suspend").setMinDate(new Date());
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.getRoute("RoutecontrolView").attachPatternMatched(this.onRouteControl, this);
-                // this.getCustomerDetails();
                 this.getTerminalDetails();
                 this.getProductDetails();
                 this.getF4Customer();
                 this.getF4Terminal();
                 this.getF4Product();
                 this.getCCEmails();
-                // this.getF4ShipTo();
-
             },
-            onRouteControl: function () {
-
+            onRouteControl: function (oEvent) {
+                // var t = oEvent.getParameter("arguments").Data;
                 this.getCustomerDetails();
             },
             getCCEmails: function () {
@@ -218,9 +57,11 @@ sap.ui.define([
                     method: 'GET',
                     success: function (oData) {
                         var dataTmp = oData.getOnCCEmail.data, oEmailArray;
+                        if(dataTmp != undefined){
                         if (dataTmp.length != constants.INTZERO) {
                             oEmailArray = dataTmp[constants.INTZERO].Value.split(";");
                         }
+                    }
                         that.getView().getModel("oModel").setProperty("/emailsCC", oEmailArray);
 
                         // that.getView().byId("idTitleTerminal").setText(that.oBundle.getText("comTerText", [oData.getTerminalDetails.data.length]));
@@ -236,13 +77,11 @@ sap.ui.define([
                 })
             },
             getTerminalDetails: function () {
-                debugger;
+                
                 var that = this;
                 this.oDataModelT.callFunction("/getTerminalDetails", {
                     method: 'GET',
                     success: function (oData) {
-                       
-                        debugger;
                          if (oData.getTerminalDetails.data) {
                             that.getView().getModel("oModel").setProperty("/TerminalData", oData.getTerminalDetails.data);
                             that.getView().byId("idTitleTerminal").setText(that.oBundle.getText("comTerText", [oData.getTerminalDetails.data.length]));
@@ -260,11 +99,9 @@ sap.ui.define([
             },
             getProductDetails: function () {
                 var that = this;
-                debugger;
                 this.oDataModelT.callFunction("/getOnPremProductDetails", {
                     method: 'GET',
                     success: function (oData) {
-                        debugger;
                         if (oData.getOnPremProductDetails.data) {
                             that.getView().getModel("oModel").setProperty("/ProductData", oData.getOnPremProductDetails.data);
                             that.getView().byId("idTitleProduct").setText(that.oBundle.getText("comProText", [oData.getOnPremProductDetails.data.length]));
@@ -334,11 +171,9 @@ sap.ui.define([
             },
             getF4Customer: function () {
                 var that = this;
-                debugger;
                 this.oDataModelT.callFunction("/getOnPremCustomerF4", {
                     method: 'GET',
                     success: function (oData) {
-                        debugger;
                         that.getView().getModel("oModel").setProperty("/CustValHelp", oData.getOnPremCustomerF4.data);
                         BusyIndicator.hide();
                     },
@@ -376,7 +211,7 @@ sap.ui.define([
                 this.oDataModelT.callFunction("/getOnPremProductF4", {
                     method: 'GET',
                     success: function (oData) {
-                        debugger;
+                        
                         that.getView().getModel("oModel").setProperty("/ProductValHelp", oData.getOnPremProductF4.data);
                         BusyIndicator.hide();
                     },
@@ -484,15 +319,36 @@ sap.ui.define([
             onSwtichChange: function (oEvent) {
                 var oState = oEvent.getSource().getState(),
                     oDaily = this.getView().byId("idTimePickerInput").getValue();
+                    debugger;
                 if (oState === false) {
                     this.getView().byId("idTimePickerInput").setEnabled(true);
                     this.getView().byId("idInfoLabel").setText("InActive");
                     this.getView().byId("idInfoLabel").setColorScheme(1);
                 } else {
+                    BusyIndicator.show();
                     this.getView().byId("idTimePickerInput").setEnabled(false);
                     this.getView().byId("idInfoLabel").setColorScheme(7);
                     this.getView().byId("idInfoLabel").setText("Active");
                     this.getView().byId("idTextDailyST").setText(oDaily);
+                    ///neha
+                    this.oDataModelT.callFunction("/createSchedule", {
+                        method: "GET",
+                        urlParameters: {
+                            time: "8:00pm"
+                        },
+                        success: function (oData) {
+                            BusyIndicator.hide();
+                            MessageBox.success(oData.createSchedule);
+                            debugger;
+                        },
+                        error: function (err) {
+                            BusyIndicator.hide();
+                            MessageBox.error("Technical error has occurred ", {
+                                details: err
+                            });
+
+                        }
+                    });
                 }
 
             },
@@ -569,7 +425,7 @@ sap.ui.define([
                 this._oValueHelpDialogCust.destroy();
             },
             handleTableSelectDialogPress: function (oEvent) {
-                debugger;
+                
                 var oButton = oEvent.getSource(),
                     oView = this.getView();
                 if (!this.byId("custTable")) {
@@ -625,7 +481,8 @@ sap.ui.define([
             handleEmailPopoverPress: function (oEvent) {
                 var oButton2 = oEvent.getSource(),
                     oView = this.getView(),
-                    oB_ID = oButton2.getId(),
+                    // oB_ID = oButton2.getId(),
+                    oB_ID = oEvent.getSource().getParent().getParent().getBindingContextPath(),
                     oB_len = oB_ID.length,
                     olen = oB_len - 1,
                     oB_Indx = oB_ID.slice(olen),
@@ -651,7 +508,8 @@ sap.ui.define([
             handlePopoverPress: function (oEvent) {
                 var oButton = oEvent.getSource(),
                     oView = this.getView(),
-                    oB_ID = oButton.getId(),
+                    oB_ID = oEvent.getSource().getParent().getParent().getBindingContextPath(),
+                    // oButton.getId(),
                     oB_len = oB_ID.length,
                     olen = oB_len - 1,
                     oB_Indx = oB_ID.slice(olen),
@@ -998,10 +856,10 @@ sap.ui.define([
                         DailyJob: value.DailyJob,
                         OnDemandJob: value.OnDemandJob
                     });
+                    this.getView().getModel("oModel").setProperty("/selectedRow",oArray);
                     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-
                     oRouter.navTo("RouteEditView", {
-                        Data: JSON.stringify(oArray)
+                        Data: "1"//JSON.stringify(oArray)
                     });
 
                 } else {
@@ -1109,6 +967,7 @@ sap.ui.define([
                                         BusyIndicator.hide();
                                         MessageToast.show(that.oBundle.getText("delSucc"));
                                         that.getProductDetails();
+                                        that.getCustomerDetails();
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
@@ -1229,7 +1088,6 @@ sap.ui.define([
                         var fnValidator = function (args) {
                             var email = args.text;
                             var eArr = email.split('@');
-
                             var mailregex = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
                             if (!mailregex.test(email) || eArr[1] !== "marathonpetroleum.com") {
                                 oMultiInput1.setValueState(sap.ui.core.ValueState.Error);
@@ -1246,6 +1104,28 @@ sap.ui.define([
                 } else {
                     this.byId("addEmail").open();
                 }
+            },
+            onEmailChangeCC: function (oEvt) {
+                var oMultiInput1 = this.getView().byId(oEvt.getSource().getId());
+                var sVal = oEvt.getParameters().value;
+                var fnValidator = function (args) {
+                    var email = args.text;
+                    var eArr = email.split('@');
+                    var mailregex = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
+                    if (!mailregex.test(email) ) {
+                        oMultiInput1.setValueState(sap.ui.core.ValueState.Error);
+                    } else {
+                        oMultiInput1.setValueState(sap.ui.core.ValueState.None);
+                        return new Token({ key: email, text: email });
+                    }
+                };
+                if (sVal === ""){
+                    oMultiInput1.setValueState(sap.ui.core.ValueState.None);
+                } 
+                // else {
+                    oMultiInput1.addValidator(fnValidator);
+                // }
+                
             },
             onCCEmailClose: function () {
                 this.byId("addEmail").close();
@@ -1457,6 +1337,7 @@ sap.ui.define([
                     that = this;
 
                 if (oTerID !== "" && oTerName !== "") {
+                    BusyIndicator.show();
                     oJsonData = {
                         "Terminal": oTerID,
                         "TerminalName": oTerName,
@@ -1506,11 +1387,15 @@ sap.ui.define([
                             },
 
                             success: function (oData) {
-
+                                BusyIndicator.hide();
+                                if (oData.updateTerminal.data[constants.INTZERO]) {
                                 MessageBox.success(that.oBundle.getText("savedSucc"));
                                 that.onTerminalClose();
                                 that.getTerminalDetails();
-                                BusyIndicator.hide();
+                                }else {
+                                    MessageBox.error(oData.updateTerminal.data.message);
+                                }
+                                
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
@@ -1575,8 +1460,6 @@ sap.ui.define([
                     }
                     var oPayloadPro = JSON.stringify(oJsonData)
                     if (oInputStatus === true) {
-
-
                         // this.openBusyDialog(this.oBundle.getText("placingOrder"));
                         this.oDataModelT.callFunction("/createProduct", {
                             method: constants.httpPost,
@@ -1584,16 +1467,15 @@ sap.ui.define([
                                 createData: oPayloadPro
                             },
                             success: function (oData) {
+                                BusyIndicator.hide();
                                 if (oData.createProduct.data[constants.INTZERO]) {
                                     MessageBox.success(that.oBundle.getText("productCreated", [oData.createProduct.data[constants.INTZERO].data.Product]), { //
                                         onClose: function (sAction) {
                                             if (sAction === MessageBox.Action.OK) {
                                                 that.onProductClose();
-                                                that.getProductDetails();
-                                                BusyIndicator.hide();
+                                                that.getProductDetails();   
                                             }
                                         }
-
                                     });
                                 } else {
                                     MessageBox.error(oData.createProduct.data.message);
@@ -1617,11 +1499,14 @@ sap.ui.define([
                             },
 
                             success: function (oData) {
-
+                                BusyIndicator.hide();
+                            if(oData.updateProduct.data[constants.INTZERO]){
                                 MessageBox.success(that.oBundle.getText("savedSucc"));
                                 that.onProductClose();
                                 that.getProductDetails();
-                                BusyIndicator.hide();
+                                } else {
+                                    MessageBox.error(oData.updateProduct.data.message);
+                                }
                             },
                             error: function (err) {
                                 BusyIndicator.hide();

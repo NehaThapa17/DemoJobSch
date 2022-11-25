@@ -1,5 +1,5 @@
 GET http://localhost:4004/catalog/getTerminalDetails()
-# Authorization:Basic NThapa@marathonpetroleum.com:
+Authorization:Basic NThapa@marathonpetroleum.com:
 Content-Type: application/json;odata.metadata=minimal
 
 #####################

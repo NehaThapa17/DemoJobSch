@@ -3,18 +3,18 @@
     <Page floatingFooter="true">
         <f:SimpleForm editable="true" class="sapUiSizeCompact" layout="ColumnLayout" title="Edit Customer" columnsXL="2" columnsL="1" columnsM="1">
             <f:content>
-                <Label text="Customer ID" required="true"/>
+                <Label text="Customer ID" required="true" />
                 <Input id="idInputCustomerID" maxLength="10" width="360px" enabled="false" />
-                <Label text="Customer Name" required="true"/>
+                <Label text="Customer Name" required="true" />
                 <Input id="idInputCustomerName" maxLength="40" width="360px" />
-                <Label text="Ship-to ID" required="true"/>
+                <Label text="Ship-to ID" required="true" />
                 <Input id="idInputShipToID" maxLength="10" width="360px" enabled="false" />
-                <Label text="Ship-to Name" required="true"/>
+                <Label text="Ship-to Name" required="true" />
                 <Input id="idInputShipToName" maxLength="40" width="360px" />
-                <Label text="Products" required="true"/>
+                <Label text="Products" required="true" />
                 <MultiInput id="idMultiComboBoxProducts" valueHelpOnly="true" valueHelpRequest=".onProductsValueHelpRequested" width="360px" />
-                <Label text="Email" required="true"/>
-                <MultiInput id="idInputEmail" change="onEmailChangeEditCust" showValueHelp="false" width="360px" tokens="{
+                <Label text="Email" required="true" />
+                <MultiInput id="idInputEmail" change="onEmailChangeEditCust" showValueHelp="false" width="500px" tokens="{
 			path: 'detailModel>/items'
 		}">
                     <tokens>

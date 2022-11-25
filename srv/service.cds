@@ -1,8 +1,10 @@
-service CatalogService 
+service CatalogService @(requires : 'authenticated-user')
  {
     type response{
         data : String
     };
+    action MasterUpload() returns String;
+    function createSchedule(time:String) returns String;
     function getTerminalDetails() returns response;
     function getCustomerDetails() returns response;
     function getOnPremProductDetails() returns response;
@@ -21,7 +23,8 @@ service CatalogService
     action deleteTerminal(terminal:String) returns response;
     action deleteProduct(product:String) returns response;
     function triggerCPI() returns String;
-    function createJob() returns String
+    
+  
 }
 
 //@(requires : 'authenticated-user')

@@ -13,7 +13,7 @@ applications:
   memory: 256M
   buildpack: nodejs_buildpack
   services:
-    - uaa_pricingNotification
+    - pricingNotification-xsuaa-service
     - dev_job_scheduler
   env:
     SAP_JWT_TRUST_ACL: >

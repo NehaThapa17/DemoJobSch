@@ -1,12 +1,14 @@
 const core = require('@sap-cloud-sdk/core');
 const constants = require("../util/constants-util.js");
 
+
 async function getOnPremTerminalDetails(sUrl){
     try{
 
         let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAME }, {
             method: 'GET',
             url: sUrl,
+            // get:sGetURL,
             headers: {
                 "content-type": "application/json",
                 'x-csrf-token': 'fetch'

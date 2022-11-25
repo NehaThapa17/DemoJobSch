@@ -1,37 +1,44 @@
 {
-  "xsappname": "pricingnotification",
-  "tenant-mode": "dedicated",
+  "xsappname": "pricingNotification-srv",
+  "tenant-mode": "shared",
   "description": "Security profile of called application",
   "scopes": [
     {
       "name": "uaa.user",
-      "description": "UAA",
-      "grant-as-authority-to-apps": ["$XSSERVICENAME(dev_job_scheduler)"]
+      "description": "UAA"
     },
     {
       "name": "$XSAPPNAME.scopeformyapp",
-      "description": "Test Job",
+      "description": "scope for pricingNotification App",
       "grant-as-authority-to-apps": [
-        "dev_job_scheduler"
-      ]
+        "$XSSERVICENAME(dev_job_scheduler)"
+    ]
     }
   ],
   "role-templates": [
     {
-      "name": "Token_Exchange",
-      "description": "UAA",
-      "scope-references": [
-        "uaa.user"
-      ]
-    }
-  ],
-  "role-collections": [
+        "name": "Token_Exchange",
+        "description": "UAA",
+        "scope-references": [
+            "uaa.user"
+        ]
+    },
     {
-      "name": "app_job_schedular_MPC_app",
-      "description": "job schedular",
-      "role-template-references": [
-        "$XSAPPNAME.scopeformyapp"
-      ]
+        "name": "RoleTemplateForMPCJob",
+        "description": "Users of Test1 Job app need this special role",
+        "default-role-name": "Test Job Role",
+        "scope-references": [
+            "$XSAPPNAME.scopeformyapp"
+        ]
     }
-  ]  
+],
+"role-collections": [
+    {
+        "name": "app_job_schedular_MPC_Job",
+        "description": "job schedular",
+        "role-template-references": [
+            "$XSAPPNAME.scopeformyapp"
+        ]
+    }
+]
 }
