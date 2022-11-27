@@ -331,10 +331,11 @@ sap.ui.define([
                     this.getView().byId("idInfoLabel").setText("Active");
                     this.getView().byId("idTextDailyST").setText(oDaily);
                     ///neha
+                    var oPayloadSCH = JSON.stringify("4:00am");
                     this.oDataModelT.callFunction("/createSchedule", {
                         method: "GET",
                         urlParameters: {
-                            time: "8:00pm"
+                            time: oPayloadSCH
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
