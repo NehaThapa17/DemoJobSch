@@ -11,7 +11,7 @@
       "name": "$XSAPPNAME.scopeformyapp",
       "description": "scope for pricingNotification App",
       "grant-as-authority-to-apps": [
-        "$XSSERVICENAME(dev_job_scheduler)"
+        "$XSSERVICENAME(JS_PricingNotification)"
     ]
     }
   ],

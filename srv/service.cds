@@ -4,7 +4,9 @@ service CatalogService @(requires : 'authenticated-user')
         data : String
     };
     action MasterUpload() returns String;
-    function createSchedule(time:String) returns String;
+    function createSchedule(time:String,desc:String) returns String;
+    function getJobDetails() returns String;
+    function getEmailDetails() returns response;
     function getTerminalDetails() returns response;
     function getCustomerDetails() returns response;
     function getOnPremProductDetails() returns response;

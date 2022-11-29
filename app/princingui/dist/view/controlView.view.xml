@@ -36,7 +36,7 @@
                         <uxap:blocks>
                             <forms:SimpleForm layout="ResponsiveGridLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>dailyProcessingStartTime}" />
-                                <TimePicker id="idTimePickerInput" value="5:00 AM" displayFormat="hh:mm a" valueFormat="hh:mm a" width="60%" enabled="false" change="handleChange"/>
+                                <TimePicker id="idTimePickerInput" displayFormat="hh:mm a" valueFormat="hh:mm a" width="60%" enabled="false"/>
                                 <Switch state="true" change="onSwtichChange" />
                             </forms:SimpleForm>
                         </uxap:blocks>

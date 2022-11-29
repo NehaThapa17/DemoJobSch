@@ -46,6 +46,49 @@ sap.ui.define([
                 this.getF4Terminal();
                 this.getF4Product();
                 this.getCCEmails();
+                this.getTime();
+            },
+            getTime:function(){
+                var that = this;
+                
+                this.oDataModelT.callFunction("/getJobDetails", {
+                    method: "GET",
+                    success: function (oData) {
+                        BusyIndicator.hide();
+                        debugger;
+                        var oDataArr2 = JSON.parse(oData.getJobDetails);
+                        var date = new Date(),
+                        index = oDataArr2.DISPLAY.indexOf(":"),
+                        hours = oDataArr2.DISPLAY.substring(0, index),
+                        minutes = oDataArr2.DISPLAY.substring(index + 1);
+                        date.setHours(hours);
+                        date.setMinutes(minutes);
+                        var sTime = date.toLocaleString('en-US', {
+                            timeZone: 'CST',
+                            hour: 'numeric', 
+                            minute: 'numeric', 
+                            hour12: true
+                          });
+                        //   var timzone = new Date().toLocaleDateString(undefined, {day:'2-digit',timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
+                        //   var finalTime = sTime.toLocaleString('en-US', {
+                        //     timeZone: timzone,
+                        //     hour: 'numeric', 
+                        //     minute: 'numeric', 
+                        //     hour12: true
+                        //   });
+                        //   var sTime = date.getHours() +":"+ date.getMinutes();
+                        that.getView().byId("idTextDailyST").setText(sTime);
+                        that.getView().byId("idTimePickerInput").setValue(sTime);
+                    },
+                    error: function (err) {
+                        debugger;
+                        BusyIndicator.hide();
+                        MessageBox.error("Technical error has occurred ", {
+                            details: err
+                        });
+
+                    }
+                });
             },
             onRouteControl: function (oEvent) {
                 // var t = oEvent.getParameter("arguments").Data;
@@ -122,7 +165,7 @@ sap.ui.define([
                 this.oDataModelT.callFunction("/getCustomerDetails", {
                     method: 'GET',
                     success: function (oData) {
-                        debugger;
+                        
                         var finalArray = [];
                         var oDataCust = oData.getCustomerDetails.data;
                         if (oDataCust) {
@@ -318,8 +361,21 @@ sap.ui.define([
             },
             onSwtichChange: function (oEvent) {
                 var oState = oEvent.getSource().getState(),
-                    oDaily = this.getView().byId("idTimePickerInput").getValue();
+                    oDaily = this.getView().byId("idTimePickerInput").getValue(),
+                    // oDate = this.getView().byId("idTimePickerInput").getDateValue();
+                    oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue());
+                    var oTime = oDate.getUTCHours() +":"+ oDate.getUTCMinutes();
                     debugger;
+                // var sTime = oDate.toLocaleString('en-US', {
+                //         timeZone: 'CST'
+                //       });
+                    //   var oTime = oDate.toLocaleString('en-US', {
+                    //     timeZone: 'UTC',
+                    //     hour: 'numeric', 
+                    //     minute: 'numeric', 
+                    //     hour12: false
+                    //   });
+                   
                 if (oState === false) {
                     this.getView().byId("idTimePickerInput").setEnabled(true);
                     this.getView().byId("idInfoLabel").setText("InActive");
@@ -331,11 +387,13 @@ sap.ui.define([
                     this.getView().byId("idInfoLabel").setText("Active");
                     this.getView().byId("idTextDailyST").setText(oDaily);
                     ///neha
-                    var oPayloadSCH = JSON.stringify("4:00am");
+                    // var oPayloadSCH = JSON.stringify(oDaily);
+                    // oDESC = JSON.stringify(DAILY);
                     this.oDataModelT.callFunction("/createSchedule", {
                         method: "GET",
                         urlParameters: {
-                            time: oPayloadSCH
+                            time: oTime,
+                            desc:"DAILY"
                         },
                         success: function (oData) {
                             BusyIndicator.hide();

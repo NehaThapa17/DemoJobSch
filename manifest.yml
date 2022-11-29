@@ -14,7 +14,7 @@ applications:
   buildpack: nodejs_buildpack
   services:
     - pricingNotification-xsuaa-service
-    - dev_job_scheduler
+    - JS_PricingNotification
   env:
     SAP_JWT_TRUST_ACL: >
         [

@@ -25,7 +25,6 @@ sap.ui.define(
  * @returns {String} single email 
  */
 getFirstEmail: function (sNum) {
-    debugger;
     var oEmailArray = sNum.split(";");
     return oEmailArray[0];
      }

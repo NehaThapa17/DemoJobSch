@@ -7,7 +7,7 @@
                     <SearchField width="50%" change="onSearchProductPop" />
                     <ToolbarSpacer />
                     <Button icon="sap-icon://edit" press="handleEditProductPopout" />
-                    <Button icon="sap-icon://delete" press="onDeleteProduct" />
+                    <Button icon="sap-icon://delete" press="onDeleteProductPopout" />
                 </Toolbar>
             </headerToolbar>
             <columns>

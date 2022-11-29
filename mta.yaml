@@ -28,7 +28,8 @@ modules:
   - name: uaa_pricingNotification
   - name: pricingNotification-destination-service
   - name: pricingNotification-connectivity
-  - name: dev_job_scheduler
+  - name: JS_PricingNotification
+  - name: al_pricingnotification
 - name: pricingNotification-destination-content
   type: com.sap.application.content
   requires:
@@ -130,12 +131,17 @@ resources:
     service: connectivity
     service-name: pricingNotification-connectivity-service
     service-plan: lite
-- name: dev_job_scheduler
+- name: JS_PricingNotification
   type: org.cloudfoundry.managed-service
   parameters:
     config:
         enable-xsuaa-support: true
     service: jobscheduler
-    service-name: dev_job_scheduler
+    service-name: JS_PricingNotification
     service-plan: standard
+- name: al_pricingnotification
+  type:  org.cloudfoundry.existing-service
+  parameters: 
+   service: application-logs
+   service-plan: lite
 
