@@ -7,7 +7,15 @@
       "target": "$1",
       "destination": "pricingNotification-srv-api",
       "authenticationType": "xsuaa",
-      "csrfProtection": false
+      "csrfProtection": false,
+      "scope":{
+        "GET":["$XSAPPNAME.pricinganalyst"],
+        "PATCH":["$XSAPPNAME.pricinganalyst"],
+        "POST":["$XSAPPNAME.pricinganalyst"],
+        "PUT":["$XSAPPNAME.pricinganalyst"],
+        "DELETE":["$XSAPPNAME.pricinganalyst"],
+        "default":["$XSAPPNAME.pricinganalyst"]
+      }
     },
     {
       "source": "^/resources/(.*)$",

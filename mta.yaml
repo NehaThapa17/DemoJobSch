@@ -29,7 +29,7 @@ modules:
   - name: pricingNotification-destination-service
   - name: pricingNotification-connectivity
   - name: JS_PricingNotification
-  - name: al_pricingnotification
+  - name: AL_PricingNotification
 - name: pricingNotification-destination-content
   type: com.sap.application.content
   requires:
@@ -139,7 +139,7 @@ resources:
     service: jobscheduler
     service-name: JS_PricingNotification
     service-plan: standard
-- name: al_pricingnotification
+- name: AL_PricingNotification
   type:  org.cloudfoundry.existing-service
   parameters: 
    service: application-logs

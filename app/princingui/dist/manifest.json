@@ -164,5 +164,10 @@
     "sap.cloud": {
         "public": true,
         "service": "PricingNotification"
+    },
+    "sap.platform.cf": {
+        "oAuthScopes": [
+            "$XSAPPNAME.pricinganalyst"
+        ]
     }
 }

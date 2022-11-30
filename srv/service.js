@@ -1,3 +1,4 @@
+const constants = require("./util/constants-util.js");
 const log = require('cf-nodejs-logging-support');
 const cds = require('@sap/cds');
 const axios = require('axios');
@@ -59,8 +60,6 @@ module.exports = cds.service.impl(async function () {
       "ONDEMAND":sdemandT
     };
 
-    // return resultData;
-console.log
     return JSON.stringify(msg);
 
   });
@@ -81,10 +80,9 @@ console.log
     
     if(resultJob){
       for(var i=0; i<resultJob.length; i++ ){
-        // console.log("NEHA " +sDesc +" / "+resultJob[i].description);
         if(resultJob[i].description.localeCompare(sDesc) == 0){
           sSId = resultJob[i].scheduleId;
-          sFlag = "Update";
+       
           var req = {
             jobId: jobID._id,
             scheduleId: sSId
@@ -94,66 +92,12 @@ console.log
               return logger.log('Error deleting schedule: %s', err);
             }
             //Schedule deleted successfully
-            console.log("SCH DELETED");
+            log.info("Schedule Deleted");
           });
           break;
-        }else {
-          sFlag = "Create";
-        } 
+        }
       };
     }
-  //   if(sFlag === "Update"){
-  //     var scJob = {
-  //       jobId: jobID._id,
-  //       scheduleId: sSId,
-  //       schedule: {
-  //          "repeatAt": sTime,
-  //          "type": "recurring",
-  //         // "time": sTime,
-  //         "data": {
-  //           "JobId": "Test"
-  //         },
-  //         "active": true
-  //         // "endTime": { "date": "2030-W06-5" },
-  //       }
-  //     };
-  //     console.log("NEHA " +JSON.stringify(scJob));
-  //     return new Promise((resolve, reject) => {
-  //     scheduler.updateJobSchedule(scJob, function(err, result) {
-  //       if(err){
-  //         reject(err.message);
-  //       }
-  //       //Schedule updated successfully
-  //       resolve('Job successfully updated')
-  //     });
-  //   });
-  //   } else {
-  //   var scJob = {
-  //     jobId: jobID._id,
-  //     schedule: {
-  //        "repeatAt": sTime,
-  //        "type": "recurring",
-  //       // "time": sTime,
-  //       "description": sDesc,
-  //       "data": {
-  //         "JobId": "1234"
-  //       },
-  //       "active": true
-  //       // "endTime": { "date": "2030-W06-5" },
-  //     }
-  //   };
-  //   return new Promise((resolve, reject) => {
-  //     scheduler.createJobSchedule(scJob, function (error, body) {
-  //       if (error) {
-  //         reject(error.message);
-  //       }
-  //       // Job successfully created.
-  //       resolve('Job successfully created')
-  //     });
-  //   })
-  // }
-
-    // console.log(jobDetails);
 
     var scJob = {
       jobId: jobID._id,
