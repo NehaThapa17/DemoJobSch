@@ -30,7 +30,7 @@ sap.ui.define([
                 this.oDataModelT = this.getOwnerComponent().getModel();
                 BusyIndicator.show();
                 var oModel = new JSONModel();
-                var oItemData = [] ;
+                var oItemData = [];
                 oModel.setData(oItemData);
                 this.getView().setModel(oModel, "oModel");
                 this.getOwnerComponent().setModel(oModel, "oModel");
@@ -46,49 +46,61 @@ sap.ui.define([
                 this.getF4Terminal();
                 this.getF4Product();
                 this.getCCEmails();
-                this.getTime();
+                // this.getTime();
             },
-            getTime:function(){
+            getTime: function () {
+                debugger;
                 var that = this;
-                
-                this.oDataModelT.callFunction("/getJobDetails", {
-                    method: "GET",
-                    success: function (oData) {
-                        BusyIndicator.hide();
-                        debugger;
-                        var oDataArr2 = JSON.parse(oData.getJobDetails);
-                        var date = new Date(),
-                        index = oDataArr2.DISPLAY.indexOf(":"),
-                        hours = oDataArr2.DISPLAY.substring(0, index),
-                        minutes = oDataArr2.DISPLAY.substring(index + 1);
-                        date.setHours(hours);
-                        date.setMinutes(minutes);
-                        var sTime = date.toLocaleString('en-US', {
-                            timeZone: 'CST',
-                            hour: 'numeric', 
-                            minute: 'numeric', 
-                            hour12: true
-                          });
-                        //   var timzone = new Date().toLocaleDateString(undefined, {day:'2-digit',timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
-                        //   var finalTime = sTime.toLocaleString('en-US', {
-                        //     timeZone: timzone,
-                        //     hour: 'numeric', 
-                        //     minute: 'numeric', 
-                        //     hour12: true
-                        //   });
-                        //   var sTime = date.getHours() +":"+ date.getMinutes();
-                        that.getView().byId("idTextDailyST").setText(sTime);
-                        that.getView().byId("idTimePickerInput").setValue(sTime);
-                    },
-                    error: function (err) {
-                        debugger;
-                        BusyIndicator.hide();
-                        MessageBox.error("Technical error has occurred ", {
-                            details: err
-                        });
+                var oDTArray = that.getView().getModel("oModel").getProperty("/emailsCC");
 
-                    }
-                });
+                // this.oDataModelT.callFunction("/getJobDetails", {
+                //     method: "GET",
+                //     success: function (oData) {
+                //         BusyIndicator.hide();
+                //         debugger;
+                //         var oDataArr2 = JSON.parse(oData.getJobDetails);
+                //         if (oDataArr2.DISPLAY !== undefined) {
+                //             var date = new Date(),
+                //                 index = oDataArr2.DISPLAY.indexOf(":"),
+                //                 hours = oDataArr2.DISPLAY.substring(0, index),
+                //                 minutes = oDataArr2.DISPLAY.substring(index + 1);
+                //                 var sTime1 =date.toUTCString();
+                //                 date.setHours(hours);
+                //                 date.setMinutes(minutes);
+                //                 var sTime = new Date(date.toLocaleString("en-US", {
+                //                     timeZone: "UTC",
+                //                     dateStyle: "medium",
+                //                     timeStyle: "medium"
+                //                 }) );
+                //             var oUTCdate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+                //             var timzone = new Date().toLocaleDateString(undefined, { day: '2-digit', timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
+                //             var sTime = date.toLocaleString('en-US', {
+                //                 timeZone: timzone,
+                //                 hour: 'numeric',
+                //                 minute: 'numeric',
+                //                 hour12: true
+                //             });
+                //             //   var timzone = new Date().toLocaleDateString(undefined, {day:'2-digit',timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
+                //             //   var finalTime = sTime.toLocaleString('en-US', {
+                //             //     timeZone: timzone,
+                //             //     hour: 'numeric', 
+                //             //     minute: 'numeric', 
+                //             //     hour12: true
+                //             //   });
+                //             //   var sTime = date.getHours() +":"+ date.getMinutes();
+                //             that.getView().byId("idTextDailyST").setText(sTime);
+                //             that.getView().byId("idTimePickerInput").setValue(sTime);
+                //         }
+                //     },
+                //     error: function (err) {
+                //         debugger;
+                //         BusyIndicator.hide();
+                //         MessageBox.error("Technical error has occurred ", {
+                //             details: err
+                //         });
+
+                //     }
+                // });
             },
             onRouteControl: function (oEvent) {
                 // var t = oEvent.getParameter("arguments").Data;
@@ -100,14 +112,20 @@ sap.ui.define([
                     method: 'GET',
                     success: function (oData) {
                         var dataTmp = oData.getOnCCEmail.data, oEmailArray;
-                        if(dataTmp != undefined){
-                        if (dataTmp.length != constants.INTZERO) {
-                            oEmailArray = dataTmp[constants.INTZERO].Value.split(";");
+                        debugger;
+                        if (dataTmp != undefined) {
+                            if (dataTmp.length != constants.INTZERO) {
+                                for (var u = 0; u < dataTmp.length; u++) {
+                                    if (dataTmp[u].Key === "EMAILCC") {
+                                        oEmailArray = dataTmp[u].Value.split(";");
+                                    } else if (dataTmp[u].Key === "DAILYT") {
+                                        that.getView().byId("idTextDailyST").setText(dataTmp[u].Value);
+                                        that.getView().byId("idTimePickerInput").setValue(dataTmp[u].Value);
+                                    }
+                                }
+                            }
                         }
-                    }
                         that.getView().getModel("oModel").setProperty("/emailsCC", oEmailArray);
-
-                        // that.getView().byId("idTitleTerminal").setText(that.oBundle.getText("comTerText", [oData.getTerminalDetails.data.length]));
                         BusyIndicator.hide();
                     },
                     error: function (err) {
@@ -120,12 +138,12 @@ sap.ui.define([
                 })
             },
             getTerminalDetails: function () {
-                
+
                 var that = this;
                 this.oDataModelT.callFunction("/getTerminalDetails", {
                     method: 'GET',
                     success: function (oData) {
-                         if (oData.getTerminalDetails.data) {
+                        if (oData.getTerminalDetails.data) {
                             that.getView().getModel("oModel").setProperty("/TerminalData", oData.getTerminalDetails.data);
                             that.getView().byId("idTitleTerminal").setText(that.oBundle.getText("comTerText", [oData.getTerminalDetails.data.length]));
                         }
@@ -165,7 +183,7 @@ sap.ui.define([
                 this.oDataModelT.callFunction("/getCustomerDetails", {
                     method: 'GET',
                     success: function (oData) {
-                        
+
                         var finalArray = [];
                         var oDataCust = oData.getCustomerDetails.data;
                         if (oDataCust) {
@@ -254,7 +272,7 @@ sap.ui.define([
                 this.oDataModelT.callFunction("/getOnPremProductF4", {
                     method: 'GET',
                     success: function (oData) {
-                        
+
                         that.getView().getModel("oModel").setProperty("/ProductValHelp", oData.getOnPremProductF4.data);
                         BusyIndicator.hide();
                     },
@@ -360,22 +378,12 @@ sap.ui.define([
 
             },
             onSwtichChange: function (oEvent) {
-                var oState = oEvent.getSource().getState(),
+                var oState = oEvent.getSource().getState(), that = this,
                     oDaily = this.getView().byId("idTimePickerInput").getValue(),
-                    // oDate = this.getView().byId("idTimePickerInput").getDateValue();
                     oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue());
-                    var oTime = oDate.getUTCHours() +":"+ oDate.getUTCMinutes();
-                    debugger;
-                // var sTime = oDate.toLocaleString('en-US', {
-                //         timeZone: 'CST'
-                //       });
-                    //   var oTime = oDate.toLocaleString('en-US', {
-                    //     timeZone: 'UTC',
-                    //     hour: 'numeric', 
-                    //     minute: 'numeric', 
-                    //     hour12: false
-                    //   });
-                   
+                var oTime = oDate.getUTCHours() + ":" + oDate.getUTCMinutes();
+                debugger;
+
                 if (oState === false) {
                     this.getView().byId("idTimePickerInput").setEnabled(true);
                     this.getView().byId("idInfoLabel").setText("InActive");
@@ -386,19 +394,40 @@ sap.ui.define([
                     this.getView().byId("idInfoLabel").setColorScheme(7);
                     this.getView().byId("idInfoLabel").setText("Active");
                     this.getView().byId("idTextDailyST").setText(oDaily);
-                    ///neha
-                    // var oPayloadSCH = JSON.stringify(oDaily);
-                    // oDESC = JSON.stringify(DAILY);
+
                     this.oDataModelT.callFunction("/createSchedule", {
                         method: "GET",
                         urlParameters: {
                             time: oTime,
-                            desc:"DAILY"
+                            desc: "DAILY"
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            MessageBox.success(oData.createSchedule);
-                            debugger;
+                            if (oData.createSchedule) {
+                                var jsonDT = {
+                                    "Key": "DAILYT",
+                                    "Value": oDaily
+                                }
+                                var oPayloadDT = JSON.stringify(jsonDT);
+                                debugger;
+                                that.oDataModelT.callFunction("/createCCEmail", {
+                                    method: constants.httpPost,
+                                    urlParameters: {
+                                        createData: oPayloadDT
+                                    },
+                                    success: function (oData) {
+                                        debugger;
+                                    },
+                                    error: function (err) {
+                                        BusyIndicator.hide();
+                                        MessageBox.error("Technical error has occurred ", {
+                                            details: err
+                                        });
+
+                                    }
+                                });
+                            }
+                            MessageBox.success(that.oBundle.getText("succJS"));
                         },
                         error: function (err) {
                             BusyIndicator.hide();
@@ -484,7 +513,7 @@ sap.ui.define([
                 this._oValueHelpDialogCust.destroy();
             },
             handleTableSelectDialogPress: function (oEvent) {
-                
+
                 var oButton = oEvent.getSource(),
                     oView = this.getView();
                 if (!this.byId("custTable")) {
@@ -915,7 +944,7 @@ sap.ui.define([
                         DailyJob: value.DailyJob,
                         OnDemandJob: value.OnDemandJob
                     });
-                    this.getView().getModel("oModel").setProperty("/selectedRow",oArray);
+                    this.getView().getModel("oModel").setProperty("/selectedRow", oArray);
                     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                     oRouter.navTo("RouteEditView", {
                         Data: "1"//JSON.stringify(oArray)
@@ -1121,12 +1150,12 @@ sap.ui.define([
             onEmailCCSelectDialogPress: function (oEvent) {
                 var oView = this.getView(), aTokens = [],
                     oDataCC = oView.getModel("oModel").getProperty("/emailsCC");
-                    if(oDataCC){
-                for (var e = constants.INTZERO; e < oDataCC.length; e++) {
-                    var otoken1 = new sap.m.Token({ key: oDataCC[e], text: oDataCC[e] });
-                    aTokens.push(otoken1);
+                if (oDataCC) {
+                    for (var e = constants.INTZERO; e < oDataCC.length; e++) {
+                        var otoken1 = new sap.m.Token({ key: oDataCC[e], text: oDataCC[e] });
+                        aTokens.push(otoken1);
+                    }
                 }
-            }
 
                 // var otoken2 = new sap.m.Token({ key: "002", text: 'almacenesemail@address.com' });
                 // aTokens = [otoken1, otoken2];
@@ -1171,20 +1200,20 @@ sap.ui.define([
                     var email = args.text;
                     var eArr = email.split('@');
                     var mailregex = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
-                    if (!mailregex.test(email) ) {
+                    if (!mailregex.test(email)) {
                         oMultiInput1.setValueState(sap.ui.core.ValueState.Error);
                     } else {
                         oMultiInput1.setValueState(sap.ui.core.ValueState.None);
                         return new Token({ key: email, text: email });
                     }
                 };
-                if (sVal === ""){
+                if (sVal === "") {
                     oMultiInput1.setValueState(sap.ui.core.ValueState.None);
-                } 
+                }
                 // else {
-                    oMultiInput1.addValidator(fnValidator);
+                oMultiInput1.addValidator(fnValidator);
                 // }
-                
+
             },
             onCCEmailClose: function () {
                 this.byId("addEmail").close();
@@ -1448,13 +1477,13 @@ sap.ui.define([
                             success: function (oData) {
                                 BusyIndicator.hide();
                                 if (oData.updateTerminal.data[constants.INTZERO]) {
-                                MessageBox.success(that.oBundle.getText("savedSucc"));
-                                that.onTerminalClose();
-                                that.getTerminalDetails();
-                                }else {
+                                    MessageBox.success(that.oBundle.getText("savedSucc"));
+                                    that.onTerminalClose();
+                                    that.getTerminalDetails();
+                                } else {
                                     MessageBox.error(oData.updateTerminal.data.message);
                                 }
-                                
+
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
@@ -1532,7 +1561,7 @@ sap.ui.define([
                                         onClose: function (sAction) {
                                             if (sAction === MessageBox.Action.OK) {
                                                 that.onProductClose();
-                                                that.getProductDetails();   
+                                                that.getProductDetails();
                                             }
                                         }
                                     });
@@ -1559,10 +1588,10 @@ sap.ui.define([
 
                             success: function (oData) {
                                 BusyIndicator.hide();
-                            if(oData.updateProduct.data[constants.INTZERO]){
-                                MessageBox.success(that.oBundle.getText("savedSucc"));
-                                that.onProductClose();
-                                that.getProductDetails();
+                                if (oData.updateProduct.data[constants.INTZERO]) {
+                                    MessageBox.success(that.oBundle.getText("savedSucc"));
+                                    that.onProductClose();
+                                    that.getProductDetails();
                                 } else {
                                     MessageBox.error(oData.updateProduct.data.message);
                                 }
@@ -1698,7 +1727,7 @@ sap.ui.define([
                 }));
             },
             //Suspend From
-            handleChangeSuspensStartTime: function (oEvent){
+            handleChangeSuspensStartTime: function (oEvent) {
                 this.getView().byId("idDatePicker2Suspend").setValueState("None");
                 var suspendstarttime = this.getView().byId("idObjStatusS1");
                 suspendstarttime.setText(this.getView().byId("idDatePickerSuspend").getValue());
@@ -1712,11 +1741,11 @@ sap.ui.define([
 
                     timeStyle: 'medium',
 
-                  }));
+                }));
 
             },
-             //Suspend End
-             handleChangeSuspensEndTime: function (oEvent){
+            //Suspend End
+            handleChangeSuspensEndTime: function (oEvent) {
                 this.getView().byId("idDatePicker2Suspend").setValueState("None");
                 var suspendendtime = this.getView().byId("idObjStatusS2");
                 const date = new Date(this.getView().byId("idDatePicker2Suspend").getValue());
@@ -1725,11 +1754,11 @@ sap.ui.define([
                     timeZone: 'CST',
                     dateStyle: 'medium',
                     timeStyle: 'medium',
-                  }));
+                }));
 
             },
-             // Daily Processing Start Time
-             handleChange: function (oEvent) {
+            // Daily Processing Start Time
+            handleChange: function (oEvent) {
                 var showondailytime = this.getView().byId("idTextDailyST");
                 showondailytime.setText(this.getView().byId("idTimePickerInput").getValue());
                 const date = new Date(this.getView().byId("idTimePickerInput").getValue());
@@ -1738,7 +1767,7 @@ sap.ui.define([
                     timeZone: 'CST',
                     dateStyle: 'medium',
                     timeStyle: 'medium',
-                  }));
+                }));
             },
         });
     });
