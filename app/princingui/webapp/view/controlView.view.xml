@@ -3,7 +3,7 @@
         <uxap:headerTitle>
             <uxap:ObjectPageDynamicHeaderTitle>
                 <uxap:heading>
-                    <tnt:InfoLabel id="idInfoLabel" text="Active" />
+                    <tnt:InfoLabel id="idInfoLabel"/>
                 </uxap:heading>
                 <uxap:actions>
                     <Label text="{i18n>allTimesInCentralZone}" design="Bold" />
@@ -36,8 +36,8 @@
                         <uxap:blocks>
                             <forms:SimpleForm layout="ResponsiveGridLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>dailyProcessingStartTime}" />
-                                <TimePicker id="idTimePickerInput" displayFormat="hh:mm a" valueFormat="hh:mm a" width="60%" enabled="false"/>
-                                <Switch state="true" change="onSwtichChange" />
+                                <TimePicker id="idTimePickerInput" displayFormat="hh:mm a" valueFormat="hh:mm a" width="60%" />
+                                <Switch id="idSwitchInput" change="onSwtichChange" />
                             </forms:SimpleForm>
                         </uxap:blocks>
                     </uxap:ObjectPageSubSection>
@@ -49,7 +49,7 @@
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>onDemandStartTime}" required="true" />
-                                <DateTimePicker id="idDatePickerOnDemand" timezone="CST" enabled="false" placeholder="Enter Date and Time" change="handleChangeOnDemand" class="sapUiSmallMarginBottom" />
+                                <DateTimePicker id="idDatePickerOnDemand" timezone="CST" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
                                 <Label text="{i18n>customer}" required="true" />
                                 <MultiInput id="idMultiInputCustomer" enabled="false" valueHelpRequest=".onValueHelpRequested">
                                 </MultiInput>

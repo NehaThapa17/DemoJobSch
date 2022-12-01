@@ -63,26 +63,23 @@ module.exports = cds.service.impl(async function () {
     return JSON.stringify(msg);
 
   });
-  this.on('createSchedule', async (req) => {
+  this.on('deleteSchedule', async (req) => {
     const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);//getAccessToken;
     const options = {
       baseURL: 'https://jobscheduler-rest.cfapps.us21.hana.ondemand.com',
       token: token
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
-
     let jobID = await getJobId('pricingNotificationJobs', scheduler);
     let jobDetails = await getJobDetals(jobID,scheduler);
-    let sTime= req.data.time;
     let sDesc= req.data.desc;
-    let sSId,sFlag;
+    let sSId;
     let resultJob = jobDetails.results;
     
     if(resultJob){
       for(var i=0; i<resultJob.length; i++ ){
-        if(resultJob[i].description.localeCompare(sDesc) == 0){
+        if(resultJob[i].description === sDesc){
           sSId = resultJob[i].scheduleId;
-       
           var req = {
             jobId: jobID._id,
             scheduleId: sSId
@@ -98,6 +95,39 @@ module.exports = cds.service.impl(async function () {
         }
       };
     }
+  });  
+  this.on('createSchedule', async (req) => {
+    const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);//getAccessToken;
+    const options = {
+      baseURL: 'https://jobscheduler-rest.cfapps.us21.hana.ondemand.com',
+      token: token
+    };
+    const scheduler = new JobSchedulerClient.Scheduler(options);
+    let jobID = await getJobId('pricingNotificationJobs', scheduler);
+    let jobDetails = await getJobDetals(jobID,scheduler);
+    let sTime= req.data.time;
+    let sDesc= req.data.desc;
+    // let sSId;
+    // let resultJob = jobDetails.results;
+    // if(resultJob){
+    //   for(var i=0; i<resultJob.length; i++ ){
+    //     if(resultJob[i].description.localeCompare(sDesc) == 0){
+    //       sSId = resultJob[i].scheduleId;
+    //       var req = {
+    //         jobId: jobID._id,
+    //         scheduleId: sSId
+    //       };
+    //       scheduler.deleteJobSchedule(req, function(err, result) {
+    //         if(err){
+    //           return logger.log('Error deleting schedule: %s', err);
+    //         }
+    //         //Schedule deleted successfully
+    //         log.info("Schedule Deleted");
+    //       });
+    //       break;
+    //     }
+    //   };
+    // }
 
     var scJob = {
       jobId: jobID._id,
@@ -194,10 +224,6 @@ const handleAsyncJob = async function (headers, req) {
     try {
       let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq 'D'";
       let responseData = await onPremData.getOnPremDetails(sUrl);
-      // let resultData = {
-      //   data: responseData.data.d.results
-      // }
-      console.log("NEHA " +JSON.stringify(responseData.data));
       let response = await SapCfAxiosObj({
         method: 'POST',
         url: "/http/httpendpoint",

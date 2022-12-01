@@ -46,61 +46,68 @@ sap.ui.define([
                 this.getF4Terminal();
                 this.getF4Product();
                 this.getCCEmails();
-                // this.getTime();
+                this.getTime();
             },
             getTime: function () {
                 debugger;
                 var that = this;
-                var oDTArray = that.getView().getModel("oModel").getProperty("/emailsCC");
+                this.oDataModelT.callFunction("/getJobDetails", {
+                    method: "GET",
+                    success: function (oData) {
+                        BusyIndicator.hide();
+                        debugger;
+                        var oDataArr2 = JSON.parse(oData.getJobDetails);
+                        if (oDataArr2.DISPLAY !== undefined) {
+                            var date = new Date(),
+                                index = oDataArr2.DISPLAY.indexOf(":"),
+                                hours = oDataArr2.DISPLAY.substring(0, index),
+                                minutes = oDataArr2.DISPLAY.substring(index + 1);
+                            date.setHours(hours);
+                            date.setMinutes(minutes);
+                            // Get dates for January and July
+                            var dateJan = new Date(date.getFullYear(), 0, 1);
+                            var dateJul = new Date(date.getFullYear(), 6, 1);
+                            // Get timezone offset
+                            var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                            // var oTempDate = new Date(date.getTime() + ((1 * 60 * 60 * 1000) * 6));
+                            if (date.getTimezoneOffset() < timezoneOffset) {
+                                // Adjust date by 5 hours
+                                date = new Date(date.getTime() - ((1 * 60 * 60 * 1000) * 5));
+                            }
+                            else {
+                                // Adjust date by 6 hours
+                                date = new Date(date.getTime() - ((1 * 60 * 60 * 1000) * 6));
+                            }
+                            // var timzone = new Date().toLocaleDateString(undefined, { day: '2-digit', timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
+                            var sTime = date.toLocaleString('en-US', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true
+                            });
+                            that.getView().byId("idTextDailyST").setText(sTime);
+                            that.getView().byId("idTimePickerInput").setValue(sTime);
+                            that.getView().byId("idSwitchInput").setState(true);
+                            that.getView().byId("idInfoLabel").setColorScheme(7);
+                            that.getView().byId("idInfoLabel").setText("Active");
+                            that.getView().byId("idTimePickerInput").setEnabled(false);
+                        } else {
+                            that.getView().byId("idTextDailyST").setText(" ");
+                            that.getView().byId("idTimePickerInput").setValue(" ");
+                            that.getView().byId("idSwitchInput").setState(false);
+                            that.getView().byId("idTimePickerInput").setEnabled(true);
+                            that.getView().byId("idInfoLabel").setText("InActive");
+                            that.getView().byId("idInfoLabel").setColorScheme(1);
+                        }
+                    },
+                    error: function (err) {
+                        debugger;
+                        BusyIndicator.hide();
+                        MessageBox.error("Technical error has occurred ", {
+                            details: err
+                        });
 
-                // this.oDataModelT.callFunction("/getJobDetails", {
-                //     method: "GET",
-                //     success: function (oData) {
-                //         BusyIndicator.hide();
-                //         debugger;
-                //         var oDataArr2 = JSON.parse(oData.getJobDetails);
-                //         if (oDataArr2.DISPLAY !== undefined) {
-                //             var date = new Date(),
-                //                 index = oDataArr2.DISPLAY.indexOf(":"),
-                //                 hours = oDataArr2.DISPLAY.substring(0, index),
-                //                 minutes = oDataArr2.DISPLAY.substring(index + 1);
-                //                 var sTime1 =date.toUTCString();
-                //                 date.setHours(hours);
-                //                 date.setMinutes(minutes);
-                //                 var sTime = new Date(date.toLocaleString("en-US", {
-                //                     timeZone: "UTC",
-                //                     dateStyle: "medium",
-                //                     timeStyle: "medium"
-                //                 }) );
-                //             var oUTCdate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-                //             var timzone = new Date().toLocaleDateString(undefined, { day: '2-digit', timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
-                //             var sTime = date.toLocaleString('en-US', {
-                //                 timeZone: timzone,
-                //                 hour: 'numeric',
-                //                 minute: 'numeric',
-                //                 hour12: true
-                //             });
-                //             //   var timzone = new Date().toLocaleDateString(undefined, {day:'2-digit',timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
-                //             //   var finalTime = sTime.toLocaleString('en-US', {
-                //             //     timeZone: timzone,
-                //             //     hour: 'numeric', 
-                //             //     minute: 'numeric', 
-                //             //     hour12: true
-                //             //   });
-                //             //   var sTime = date.getHours() +":"+ date.getMinutes();
-                //             that.getView().byId("idTextDailyST").setText(sTime);
-                //             that.getView().byId("idTimePickerInput").setValue(sTime);
-                //         }
-                //     },
-                //     error: function (err) {
-                //         debugger;
-                //         BusyIndicator.hide();
-                //         MessageBox.error("Technical error has occurred ", {
-                //             details: err
-                //         });
-
-                //     }
-                // });
+                    }
+                });
             },
             onRouteControl: function (oEvent) {
                 // var t = oEvent.getParameter("arguments").Data;
@@ -116,11 +123,14 @@ sap.ui.define([
                         if (dataTmp != undefined) {
                             if (dataTmp.length != constants.INTZERO) {
                                 for (var u = 0; u < dataTmp.length; u++) {
-                                    if (dataTmp[u].Key === "EMAILCC") {
-                                        oEmailArray = dataTmp[u].Value.split(";");
-                                    } else if (dataTmp[u].Key === "DAILYT") {
-                                        that.getView().byId("idTextDailyST").setText(dataTmp[u].Value);
-                                        that.getView().byId("idTimePickerInput").setValue(dataTmp[u].Value);
+                                    switch (dataTmp[u].Key) {
+                                        case "EMAILCC":
+                                            oEmailArray = dataTmp[u].Value.split(";");
+                                            break;
+                                        case "ONDEMANDT":
+                                            // that.getView().byId("idTextOnDemandST").setText(dataTmp[u].Value);
+                                            // that.getView().byId("idDatePickerOnDemand").setValue(dataTmp[u].Value);
+                                            break;
                                     }
                                 }
                             }
@@ -285,18 +295,6 @@ sap.ui.define([
                     }
                 })
             },
-            handleSelectionChangeTerF4: function () {
-                //     var changedItem = oEvent.getParameter("changedItem");
-                // var isSelected = oEvent.getParameter("selected");
-
-                // var state = "Selected";
-                // if (!isSelected) {
-                // 	state = "Deselected";
-                // }
-            },
-            handleSelectionFinishTerF4: function () {
-
-            },
             //Delete Customer
             onDeleteCustomer: function () {
                 var oTable = this.getView().byId("idProductsTable"), that = this;
@@ -379,55 +377,44 @@ sap.ui.define([
             },
             onSwtichChange: function (oEvent) {
                 var oState = oEvent.getSource().getState(), that = this,
-                    oDaily = this.getView().byId("idTimePickerInput").getValue(),
-                    oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue());
-                var oTime = oDate.getUTCHours() + ":" + oDate.getUTCMinutes();
-                debugger;
-
+                    oDaily = this.getView().byId("idTimePickerInput").getValue();
                 if (oState === false) {
                     this.getView().byId("idTimePickerInput").setEnabled(true);
                     this.getView().byId("idInfoLabel").setText("InActive");
                     this.getView().byId("idInfoLabel").setColorScheme(1);
-                } else {
-                    BusyIndicator.show();
-                    this.getView().byId("idTimePickerInput").setEnabled(false);
-                    this.getView().byId("idInfoLabel").setColorScheme(7);
-                    this.getView().byId("idInfoLabel").setText("Active");
-                    this.getView().byId("idTextDailyST").setText(oDaily);
-
-                    this.oDataModelT.callFunction("/createSchedule", {
+                    //Delete Schedule
+                    var emptyString = " ";
+                    this.oDataModelT.callFunction("/deleteSchedule", {
                         method: "GET",
                         urlParameters: {
-                            time: oTime,
                             desc: "DAILY"
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            if (oData.createSchedule) {
-                                var jsonDT = {
-                                    "Key": "DAILYT",
-                                    "Value": oDaily
-                                }
-                                var oPayloadDT = JSON.stringify(jsonDT);
-                                debugger;
-                                that.oDataModelT.callFunction("/createCCEmail", {
-                                    method: constants.httpPost,
-                                    urlParameters: {
-                                        createData: oPayloadDT
-                                    },
-                                    success: function (oData) {
-                                        debugger;
-                                    },
-                                    error: function (err) {
-                                        BusyIndicator.hide();
-                                        MessageBox.error("Technical error has occurred ", {
-                                            details: err
-                                        });
+                            // if (oData.createSchedule) {
+                            //     var jsonDT = {
+                            //         "Key": "DAILYT",
+                            //         "Value": emptyString
+                            //     }
+                            //     var oPayloadDT = JSON.stringify(jsonDT);
+                            //     debugger;
+                            //     that.oDataModelT.callFunction("/createCCEmail", {
+                            //         method: constants.httpPost,
+                            //         urlParameters: {
+                            //             createData: oPayloadDT
+                            //         },
+                            //         success: function (oData) {
+                            //             debugger;
+                            //         },
+                            //         error: function (err) {
+                            //             BusyIndicator.hide();
+                            //             MessageBox.error("Technical error has occurred ", {
+                            //                 details: err
+                            //             });
 
-                                    }
-                                });
-                            }
-                            MessageBox.success(that.oBundle.getText("succJS"));
+                            //         }
+                            //     });
+                            // }
                         },
                         error: function (err) {
                             BusyIndicator.hide();
@@ -437,9 +424,86 @@ sap.ui.define([
 
                         }
                     });
+                } else {
+                    if (oDaily !== " " || oDaily !== undefined) {
+                        BusyIndicator.show();
+                        var oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue()),
+                            dateH = oDate.getHours(),
+                            dateM = oDate.getMinutes(),
+                            dateValue = new Date();
+                        dateValue.setHours(dateH);
+                        dateValue.setMinutes(dateM);
+                        // Get dates for January and July
+                        var dateJan = new Date(dateValue.getFullYear(), 0, 1);
+                        var dateJul = new Date(dateValue.getFullYear(), 6, 1);
+                        // Get timezone offset
+                        var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                        // var oTempDate = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
+                        if (dateValue.getTimezoneOffset() < timezoneOffset) {
+                            // Adjust date by 5 hours
+                            dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 5));
+                        }
+                        else {
+                            // Adjust date by 6 hours
+                            dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
+                        }
+                        var oTime = dateValue.getHours() + ":" + dateValue.getMinutes();
+                        
+                        this.getView().byId("idTimePickerInput").setEnabled(false);
+                        this.getView().byId("idInfoLabel").setColorScheme(7);
+                        this.getView().byId("idInfoLabel").setText("Active");
+                        this.getView().byId("idTextDailyST").setText(oDaily);
+
+                        this.oDataModelT.callFunction("/createSchedule", {
+                            method: "GET",
+                            urlParameters: {
+                                time: oTime,
+                                desc: "DAILY"
+                            },
+                            success: function (oData) {
+                                BusyIndicator.hide();
+                                // if (oData.createSchedule) {
+                                //     var jsonDT = {
+                                //         "Key": "DAILYT",
+                                //         "Value": oDaily
+                                //     }
+                                //     var oPayloadDT = JSON.stringify(jsonDT);
+                                //     debugger;
+                                //     that.oDataModelT.callFunction("/createCCEmail", {
+                                //         method: constants.httpPost,
+                                //         urlParameters: {
+                                //             createData: oPayloadDT
+                                //         },
+                                //         success: function (oData) {
+                                //             debugger;
+                                //         },
+                                //         error: function (err) {
+                                //             BusyIndicator.hide();
+                                //             MessageBox.error("Technical error has occurred ", {
+                                //                 details: err
+                                //             });
+
+                                //         }
+                                //     });
+                                // }
+                                MessageBox.success(that.oBundle.getText("succJS"));
+                            },
+                            error: function (err) {
+                                BusyIndicator.hide();
+                                MessageBox.error("Technical error has occurred ", {
+                                    details: err
+                                });
+
+                            }
+                        });
+                    } else {
+                        MessageBox.error(that.oBundle.getText("manTime"));
+                    }
                 }
 
+
             },
+
             //Customer ID & Ship To Value Help
             onValueHelpRequested: function () {
                 this._oBasicSearchField = new SearchField();
@@ -1290,12 +1354,32 @@ sap.ui.define([
 
             },
             onPressSaveOnDemand: function () {
+                debugger;
                 var oDate = this.getView().byId("idDatePickerOnDemand").getDateValue(),
-                    oCust = this.getView().byId("idMultiInputCustomer").getValue(),
-                    oTer = this.getView().byId("idMultiInputTerminal").getValue(),
+                    oDate1 = this.getView().byId("idDatePickerOnDemand").getValue(),
+                    dateValue = new Date();
+                // index = oDataArr2.DISPLAY.indexOf(":"),
+                //             hours = oDataArr2.DISPLAY.substring(0, index),
+                //             minutes = oDataArr2.DISPLAY.substring(index + 1);
+                oCust = this.getView().byId("idMultiInputCustomer").getTokens(),
+                    oTer = this.getView().byId("idMultiInputTerminal").getTokens(),
                     x = oDate.toDateString().length,
                     result = oDate.toDateString() + oDate.toString().substring(x, x + 9);
-                if (oDate && oCust !== "" && oTer !== "") {
+                // Get dates for January and July
+                var dateJan = new Date(dateValue.getFullYear(), 0, 1);
+                var dateJul = new Date(dateValue.getFullYear(), 6, 1);
+                // Get timezone offset
+                var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                // var oTempDate = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
+                if (dateValue.getTimezoneOffset() < timezoneOffset) {
+                    // Adjust date by 5 hours
+                    dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 5));
+                }
+                else {
+                    // Adjust date by 6 hours
+                    dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
+                }
+                if (oDate && oCust.length !== constants.INTZERO && oTer.length !== constants.INTZERO) {
                     this.getView().byId("idMultiInputCustomer").setEnabled(false);
                     this.getView().byId("idDatePickerOnDemand").setEnabled(false);
                     this.getView().byId("idMultiInputTerminal").setEnabled(false);
@@ -1303,7 +1387,48 @@ sap.ui.define([
                     this.getView().byId("idButtonCancel").setVisible(false);
                     this.getView().byId("idButtonEdit").setVisible(true);
                     this.getView().byId("idTextOnDemandST").setText(result);
+                    this.oDataModelT.callFunction("/createSchedule", {
+                        method: "GET",
+                        urlParameters: {
+                            time: result,
+                            desc: "ONDEMAND"
+                        },
+                        success: function (oData) {
+                            BusyIndicator.hide();
+                            if (oData.createSchedule) {
+                                var jsonDT = {
+                                    "Key": "ONDEMANDT",
+                                    "Value": oDate1
+                                }
+                                var oPayloadDT = JSON.stringify(jsonDT);
+                                debugger;
+                                that.oDataModelT.callFunction("/createCCEmail", {
+                                    method: constants.httpPost,
+                                    urlParameters: {
+                                        createData: oPayloadDT
+                                    },
+                                    success: function (oData) {
+                                        debugger;
+                                    },
+                                    error: function (err) {
+                                        BusyIndicator.hide();
+                                        MessageBox.error("Technical error has occurred ", {
+                                            details: err
+                                        });
 
+                                    }
+                                });
+                            }
+                            MessageBox.success(that.oBundle.getText("succJS"));
+                        },
+                        error: function (err) {
+                            BusyIndicator.hide();
+                            MessageBox.error("Technical error has occurred ", {
+                                details: err
+                            });
+
+                        }
+                    });
 
                 } else {
                     MessageBox.error("Kindly fill the mandatory fields");
@@ -1720,11 +1845,12 @@ sap.ui.define([
                 // showondemanttime.setText(this.getView().byId("idDatePickerOnDemand").getValue());
                 const date = new Date(this.getView().byId("idDatePickerOnDemand").getValue());
                 //  convert date to CST (Central Standard Time)
-                showondemanttime.setText(date.toLocaleString('en-US', {
-                    timeZone: 'CST',
-                    dateStyle: 'medium',
-                    timeStyle: 'medium',
-                }));
+                // showondemanttime.setText(date);
+                // showondemanttime.setText(date.toLocaleString('en-US', {
+                //     timeZone: 'CST',
+                //     dateStyle: 'medium',
+                //     timeStyle: 'medium',
+                // }));
             },
             //Suspend From
             handleChangeSuspensStartTime: function (oEvent) {
