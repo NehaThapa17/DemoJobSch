@@ -29,7 +29,7 @@ const OA_ENDPOINT = UAA.url;
 const core = require('@sap-cloud-sdk/core');
 const onPremData = require('./onpremise/onpremiseoperations.js');
 const SapCfAxios = require('sap-cf-axios').default;
-const SapCfAxiosObj = SapCfAxios('CPIDEV');
+const SapCfAxiosObj = SapCfAxios('CPI');
 const onPostData = require('./onpremise/onpremisePostOperations.js');
 const JobSchedulerClient = require('@sap/jobs-client');
 
@@ -37,7 +37,7 @@ module.exports = cds.service.impl(async function () {
   this.on('getJobDetails', async (req) => {
     const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET); //getAccessToken; 
     const options = {
-      baseURL: 'https://jobscheduler-rest.cfapps.us21.hana.ondemand.com',
+      baseURL: 'https://jobscheduler-rest.cfapps.us10.hana.ondemand.com',
       token: token
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
@@ -66,7 +66,7 @@ module.exports = cds.service.impl(async function () {
   this.on('deleteSchedule', async (req) => {
     const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);//getAccessToken;
     const options = {
-      baseURL: 'https://jobscheduler-rest.cfapps.us21.hana.ondemand.com',
+      baseURL: 'https://jobscheduler-rest.cfapps.us10.hana.ondemand.com',
       token: token
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
@@ -99,7 +99,7 @@ module.exports = cds.service.impl(async function () {
   this.on('createSchedule', async (req) => {
     const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);//getAccessToken;
     const options = {
-      baseURL: 'https://jobscheduler-rest.cfapps.us21.hana.ondemand.com',
+      baseURL: 'https://jobscheduler-rest.cfapps.us10.hana.ondemand.com',
       token: token
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);

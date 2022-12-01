@@ -77,19 +77,19 @@
       "CPIDest": {
         "kind": "destination",
         "credentials": {
-          "destination": "CPIDEV"
+          "destination": "CPI"
         }
       },
       "data": {
         "kind": "odata",
         "credentials": {
-          "destination": "ds4rt"
+          "destination": "s4rt"
         }
       },
       "testSys": {
         "kind": "odata",
         "credentials": {
-          "destination": "ds4rt_120"
+          "destination": "s4rt"
         }
       }
     }
