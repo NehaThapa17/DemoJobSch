@@ -25,6 +25,7 @@ const UAA = CREDENTIALS.uaa
 const OA_CLIENTID = UAA.clientid;
 const OA_SECRET = UAA.clientsecret;
 const OA_ENDPOINT = UAA.url;
+// let oDesc="";
 //***END Comment Before running in Local */
 const core = require('@sap-cloud-sdk/core');
 const onPremData = require('./onpremise/onpremiseoperations.js');
@@ -34,6 +35,7 @@ const onPostData = require('./onpremise/onpremisePostOperations.js');
 const JobSchedulerClient = require('@sap/jobs-client');
 
 module.exports = cds.service.impl(async function () {
+  
   this.on('getJobDetails', async (req) => {
     const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET); //getAccessToken; 
     const options = {
@@ -104,9 +106,10 @@ module.exports = cds.service.impl(async function () {
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
     let jobID = await getJobId('pricingNotificationJobs', scheduler);
-    let jobDetails = await getJobDetals(jobID,scheduler);
     let sTime= req.data.time;
     let sDesc= req.data.desc;
+    // oDesc = sDesc;
+    // oDesc = sDesc;
     // let sSId;
     // let resultJob = jobDetails.results;
     // if(resultJob){
@@ -135,6 +138,120 @@ module.exports = cds.service.impl(async function () {
          "repeatAt": sTime,
          "type": "recurring",
         // "time": sTime,
+        "description": sDesc,
+        "data": {
+          "headers":{"Content-Type":"application/json"},
+          "sDesc":sDesc
+        },
+        "active": true
+      }
+    };
+    return new Promise((resolve, reject) => {
+      scheduler.createJobSchedule(scJob, function (error, body) {
+        if (error) {
+          reject(error.message);
+        }
+        // Job successfully created.
+        resolve('Job successfully created')
+      });
+    })
+
+  });
+  this.on('createOnDemandSchedule', async (req) => {
+    const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);//getAccessToken;
+    const options = {
+      baseURL: 'https://jobscheduler-rest.cfapps.us10.hana.ondemand.com',
+      token: token
+    };
+    const scheduler = new JobSchedulerClient.Scheduler(options);
+    let jobID = await getJobId('pricingNotificationJobs', scheduler);
+    let jobDetails = await getJobDetals(jobID,scheduler);
+    let sTime= req.data.time;
+    let sDesc= req.data.desc;
+    let sSId;
+    let resultJob = jobDetails.results;
+    if(resultJob){
+      for(var i=0; i<resultJob.length; i++ ){
+        if(resultJob[i].description === sDesc){
+          sSId = resultJob[i].scheduleId;
+          var req = {
+            jobId: jobID._id,
+            scheduleId: sSId
+          };
+          scheduler.deleteJobSchedule(req, function(err, result) {
+            if(err){
+              return logger.log('Error deleting schedule: %s', err);
+            }
+            //Schedule deleted successfully
+            log.info("Schedule Deleted");
+          });
+          break;
+        }
+      };
+    }
+
+    var scJob = {
+      jobId: jobID._id,
+      schedule: {
+        "time": sTime,
+        "description": sDesc,
+        "data": {
+          "headers":{"Content-Type":"application/json"}
+        },
+        "active": true
+      }
+    };
+    return new Promise((resolve, reject) => {
+      scheduler.createJobSchedule(scJob, function (error, body) {
+        if (error) {
+          reject(error.message);
+        }
+        // Job successfully created.
+        resolve('Job successfully created')
+      });
+    })
+
+  });
+  this.on('suspendSchedule', async (req) => {
+    const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);
+    const options = {
+      baseURL: 'https://jobscheduler-rest.cfapps.us10.hana.ondemand.com',
+      token: token
+    };
+    const scheduler = new JobSchedulerClient.Scheduler(options);
+    let jobID = await getJobId('pricingNotificationJobs', scheduler);
+    let jobDetails = await getJobDetals(jobID,scheduler);
+    let sTime= req.data.timeS;
+    let eTime = req.data.timeE;
+    
+    let sSId;
+    let resultJob = jobDetails.results;
+    if(resultJob){
+      for(var i=0; i<resultJob.length; i++ ){
+          sSId = resultJob[i].scheduleId;
+          var req = {
+            jobId: jobID._id,
+            scheduleId: sSId,
+            schedule: {
+              "active": false
+            }
+          };
+          scheduler.updateJobSchedule(req, function(err, result) {
+            if(err){
+              return logger.log('Error deleting schedule: %s', err);
+            }
+            //Schedule deleted successfully
+            log.info("Schedule Deleted");
+          });
+          break;
+        
+      };
+    }
+
+    var scJob = {
+      jobId: jobID._id,
+      schedule: {
+        "time": sTime,
         "description": sDesc,
         "data": {
           "headers":{"Content-Type":"application/json"}
@@ -170,6 +287,25 @@ module.exports = cds.service.impl(async function () {
     })
 
   }
+  async function getScheduleDetals(job_Id,schedule_Id,scheduler) {
+    var req = {
+      jobId: job_Id,
+      scheduleId:schedule_Id,
+      displayLogs: false
+    };
+      return new Promise((resolve, reject) => {
+        scheduler.fetchJobSchedule(req, function(err, result) {
+          if(err){
+            // return logger.log('Error retrieving job: %s', err);
+            reject(err.message);
+          }
+          //job details retrieved successfully
+          resolve(result)
+          // return logger.log('Fetched Job Details', req);
+        });
+    })
+
+  }
   async function getJobId(name, scheduler) {
     var req = {
       name: name
@@ -188,9 +324,18 @@ module.exports = cds.service.impl(async function () {
   }
   this.on('MasterUpload', async (req) => {
     try {
-        req.notify(200, 'Accepted long running job.');
+      const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);
+      const options = {
+        baseURL: 'https://jobscheduler-rest.cfapps.us10.hana.ondemand.com',
+        token: token
+      };
+        const scheduler = new JobSchedulerClient.Scheduler(options);
+        let job_Id = req.headers['x-sap-job-id'];
+        let schedule_Id = req.headers['x-sap-job-schedule-id'];
+        let jobDetails = await getScheduleDetals(job_Id,schedule_Id,scheduler);
+        let oDesc = jobDetails.description;
         // afterwards the actual processing
-        let finalResult = await handleAsyncJob(req.headers, req);
+        let finalResult = await handleAsyncJob(req.headers, req,oDesc);
         return finalResult;
 
         // return 'testing here in trial';
@@ -201,14 +346,14 @@ module.exports = cds.service.impl(async function () {
 });
 
 
-const handleAsyncJob = async function (headers, req) {
+const handleAsyncJob = async function (headers, req,oDesc) {
     try {
-        let result = await operationMasterUpload(req)
+        let result = await operationMasterUpload(req,oDesc)
         if ((typeof result !== 'undefined') && (result !== null)) {
             await doUpdateStatus(headers, true, result)
             return result;
         } else {
-            await operationMasterUpload(req)
+            await operationMasterUpload(req,oDesc)
         }
     } catch (error) {
         doUpdateStatus(headers, false, error.message)
@@ -220,8 +365,9 @@ const handleAsyncJob = async function (headers, req) {
             })
     }
 }
-  const operationMasterUpload = async function (req) {
+  const operationMasterUpload = async function (req,oDesc) {
     try {
+      console.log("NEHA5 "+oDesc);
       let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq 'D'";
       let responseData = await onPremData.getOnPremDetails(sUrl);
       let response = await SapCfAxiosObj({
@@ -239,8 +385,6 @@ const handleAsyncJob = async function (headers, req) {
       }).catch(async (error) => {
         return error;
       })
-      // return response;
-      console.log("NEHA "+JSON.stringify(response));
       return 'tested from Job, success!!';
     }
     catch (error) {

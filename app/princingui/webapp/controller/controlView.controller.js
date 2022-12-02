@@ -30,6 +30,7 @@ sap.ui.define([
                 this.oDataModelT = this.getOwnerComponent().getModel();
                 BusyIndicator.show();
                 var oModel = new JSONModel();
+                var oObj = new Date();
                 var oItemData = [];
                 oModel.setData(oItemData);
                 this.getView().setModel(oModel, "oModel");
@@ -38,6 +39,7 @@ sap.ui.define([
                 this.getView().byId("idDatePickerOnDemand").setMinDate(new Date());
                 this.getView().byId("idDatePickerSuspend").setMinDate(new Date());
                 this.getView().byId("idDatePicker2Suspend").setMinDate(new Date());
+                this.getView().getModel("oModel").setProperty("/dateValue", oObj);
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.getRoute("RoutecontrolView").attachPatternMatched(this.onRouteControl, this);
                 this.getTerminalDetails();
@@ -110,7 +112,6 @@ sap.ui.define([
                 });
             },
             onRouteControl: function (oEvent) {
-                // var t = oEvent.getParameter("arguments").Data;
                 this.getCustomerDetails();
             },
             getCCEmails: function () {
@@ -425,7 +426,7 @@ sap.ui.define([
                         }
                     });
                 } else {
-                    if (oDaily !== " " || oDaily !== undefined) {
+                    if (oDaily !== " " && oDaily !== undefined) {
                         BusyIndicator.show();
                         var oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue()),
                             dateH = oDate.getHours(),
@@ -448,7 +449,7 @@ sap.ui.define([
                             dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
                         }
                         var oTime = dateValue.getHours() + ":" + dateValue.getMinutes();
-                        
+
                         this.getView().byId("idTimePickerInput").setEnabled(false);
                         this.getView().byId("idInfoLabel").setColorScheme(7);
                         this.getView().byId("idInfoLabel").setText("Active");
@@ -497,6 +498,7 @@ sap.ui.define([
                             }
                         });
                     } else {
+                        that.getView().byId("idSwitchInput").setState(false);
                         MessageBox.error(that.oBundle.getText("manTime"));
                     }
                 }
@@ -520,11 +522,11 @@ sap.ui.define([
                         },
                         {
                             "label": "Ship-To",
-                            "template": "Shipto"
+                            "template": "ShipTo"
                         },
                         {
                             "label": "Ship-To Name",
-                            "template": "ShiptoName"
+                            "template": "ShipToName"
                         }
                     ]
                 };
@@ -546,11 +548,11 @@ sap.ui.define([
                     oTable.setModel(this.oColModel, "columns");
 
                     if (oTable.bindRows) {
-                        oTable.bindAggregation("rows", "/CustValHelp");
+                        oTable.bindAggregation("rows", "/CustomerData");
                     }
 
                     if (oTable.bindItems) {
-                        oTable.bindAggregation("items", "/CustValHelp", function () {
+                        oTable.bindAggregation("items", "/CustomerData", function () {
                             return new ColumnListItem({
                                 cells: aCols.map(function (column) {
                                     return new Label({ text: "{" + column.template + "}" });
@@ -1355,22 +1357,20 @@ sap.ui.define([
             },
             onPressSaveOnDemand: function () {
                 debugger;
-                var oDate = this.getView().byId("idDatePickerOnDemand").getDateValue(),
-                    oDate1 = this.getView().byId("idDatePickerOnDemand").getValue(),
-                    dateValue = new Date();
-                // index = oDataArr2.DISPLAY.indexOf(":"),
-                //             hours = oDataArr2.DISPLAY.substring(0, index),
-                //             minutes = oDataArr2.DISPLAY.substring(index + 1);
-                oCust = this.getView().byId("idMultiInputCustomer").getTokens(),
-                    oTer = this.getView().byId("idMultiInputTerminal").getTokens(),
-                    x = oDate.toDateString().length,
-                    result = oDate.toDateString() + oDate.toString().substring(x, x + 9);
+                // var oDate = this.getView().byId("idDatePickerOnDemand").getDateValue(),
+                var oDate = this.getView().byId("idDatePickerOnDemand").getValue(),
+                    that = this,
+                    oCust = this.getView().byId("idMultiInputCustomer").getTokens(),
+                    oTer = this.getView().byId("idMultiInputTerminal").getSelectedItems(),
+                    oTer2 = this.getView().byId("idMultiInputTerminal").getSelectedKeys(),
+                    xLen = oDate.length - 4,
+                    result = oDate.slice(0,xLen),
+                    dateValue = new Date(result);
                 // Get dates for January and July
                 var dateJan = new Date(dateValue.getFullYear(), 0, 1);
                 var dateJul = new Date(dateValue.getFullYear(), 6, 1);
                 // Get timezone offset
                 var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                // var oTempDate = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
                 if (dateValue.getTimezoneOffset() < timezoneOffset) {
                     // Adjust date by 5 hours
                     dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 5));
@@ -1379,6 +1379,7 @@ sap.ui.define([
                     // Adjust date by 6 hours
                     dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
                 }
+
                 if (oDate && oCust.length !== constants.INTZERO && oTer.length !== constants.INTZERO) {
                     this.getView().byId("idMultiInputCustomer").setEnabled(false);
                     this.getView().byId("idDatePickerOnDemand").setEnabled(false);
@@ -1387,7 +1388,7 @@ sap.ui.define([
                     this.getView().byId("idButtonCancel").setVisible(false);
                     this.getView().byId("idButtonEdit").setVisible(true);
                     this.getView().byId("idTextOnDemandST").setText(result);
-                    this.oDataModelT.callFunction("/createSchedule", {
+                    this.oDataModelT.callFunction("/createOnDemandSchedule", {
                         method: "GET",
                         urlParameters: {
                             time: result,
@@ -1395,30 +1396,30 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            if (oData.createSchedule) {
-                                var jsonDT = {
-                                    "Key": "ONDEMANDT",
-                                    "Value": oDate1
-                                }
-                                var oPayloadDT = JSON.stringify(jsonDT);
-                                debugger;
-                                that.oDataModelT.callFunction("/createCCEmail", {
-                                    method: constants.httpPost,
-                                    urlParameters: {
-                                        createData: oPayloadDT
-                                    },
-                                    success: function (oData) {
-                                        debugger;
-                                    },
-                                    error: function (err) {
-                                        BusyIndicator.hide();
-                                        MessageBox.error("Technical error has occurred ", {
-                                            details: err
-                                        });
+                            // if (oData.createSchedule) {
+                            //     var jsonDT = {
+                            //         "Key": "ONDEMANDT",
+                            //         "Value": oDate1
+                            //     }
+                            //     var oPayloadDT = JSON.stringify(jsonDT);
+                            //     debugger;
+                            //     that.oDataModelT.callFunction("/createCCEmail", {
+                            //         method: constants.httpPost,
+                            //         urlParameters: {
+                            //             createData: oPayloadDT
+                            //         },
+                            //         success: function (oData) {
+                            //             debugger;
+                            //         },
+                            //         error: function (err) {
+                            //             BusyIndicator.hide();
+                            //             MessageBox.error("Technical error has occurred ", {
+                            //                 details: err
+                            //             });
 
-                                    }
-                                });
-                            }
+                            //         }
+                            //     });
+                            // }
                             MessageBox.success(that.oBundle.getText("succJS"));
                         },
                         error: function (err) {
@@ -1779,8 +1780,8 @@ sap.ui.define([
                     filters: [
                         new Filter({ path: "Customer", operator: FilterOperator.Contains, value1: sSearchQuery }),
                         new Filter({ path: "CustomerName", operator: FilterOperator.Contains, value1: sSearchQuery }),
-                        new Filter({ path: "Shipto", operator: FilterOperator.Contains, value1: sSearchQuery }),
-                        new Filter({ path: "ShiptoName", operator: FilterOperator.Contains, value1: sSearchQuery })
+                        new Filter({ path: "ShipTo", operator: FilterOperator.Contains, value1: sSearchQuery }),
+                        new Filter({ path: "ShipToName", operator: FilterOperator.Contains, value1: sSearchQuery })
                     ],
                     and: false
                 }));
@@ -1841,16 +1842,27 @@ sap.ui.define([
                 oBinding.filter([aFiltersCombo]);
             },
             handleChangeOnDemand: function (oEvent) {
-                var showondemanttime = this.getView().byId("idTextOnDemandST");
-                // showondemanttime.setText(this.getView().byId("idDatePickerOnDemand").getValue());
-                const date = new Date(this.getView().byId("idDatePickerOnDemand").getValue());
+                debugger;
+                var oDTP = oEvent.getSource(),
+				sValue = oEvent.getParameter("value"),
+				bValid = oEvent.getParameter("valid");
+                // oDTP.getId().setValue(sValue);
+                
                 //  convert date to CST (Central Standard Time)
-                // showondemanttime.setText(date);
-                // showondemanttime.setText(date.toLocaleString('en-US', {
+                // suspendstarttime.setText(date.toLocaleString('en-US', {
+
                 //     timeZone: 'CST',
+
                 //     dateStyle: 'medium',
+
                 //     timeStyle: 'medium',
+
                 // }));
+                // debugger;
+                // var date = new Date(this.getView().byId("idDatePickerOnDemand").getValue()),
+                // result = date.toDateString() + date.toString().substring(x, x + 9);
+                // this.getView().byId("idDatePickerOnDemand").setValue(result);
+
             },
             //Suspend From
             handleChangeSuspensStartTime: function (oEvent) {

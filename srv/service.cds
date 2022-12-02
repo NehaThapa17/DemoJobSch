@@ -5,7 +5,9 @@ service CatalogService @(requires : 'authenticated-user')
     };
     action MasterUpload() returns String;
     function createSchedule(time:String,desc:String) returns String;
-    function deleteSchedule(desc:String) returns String;
+    function createOnDemandSchedule(time:String,desc:String) returns String;
+    function deleteSchedule(desc:String) returns String; 
+    function suspendSchedule(timeS:String,timeE:String) returns String;
     function getJobDetails() returns String;
     function getEmailDetails() returns response;
     function getTerminalDetails() returns response;

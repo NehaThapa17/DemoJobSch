@@ -89,7 +89,7 @@
       "testSys": {
         "kind": "odata",
         "credentials": {
-          "destination": "s4rt"
+          "destination": "ds4rt_120"
         }
       }
     }
