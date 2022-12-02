@@ -426,7 +426,7 @@ sap.ui.define([
                         }
                     });
                 } else {
-                    if (oDaily !== " " && oDaily !== undefined) {
+                    if (oDaily !== "" && oDaily !== " " && oDaily !== undefined) {
                         BusyIndicator.show();
                         var oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue()),
                             dateH = oDate.getHours(),
