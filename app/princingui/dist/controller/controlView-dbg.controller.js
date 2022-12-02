@@ -430,7 +430,7 @@ sap.ui.define([
                         BusyIndicator.show();
                         var oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue()),
                             dateH = oDate.getHours(),
-                            dateM = oDate.getMinutes(),
+                            dateM = (oDate.getMinutes()<10?'0':'') + oDate.getMinutes(),
                             dateValue = new Date();
                         dateValue.setHours(dateH);
                         dateValue.setMinutes(dateM);
@@ -448,7 +448,8 @@ sap.ui.define([
                             // Adjust date by 6 hours
                             dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
                         }
-                        var oTime = dateValue.getHours() + ":" + dateValue.getMinutes();
+                        var oMin = (dateValue.getMinutes()<10?'0':'') + dateValue.getMinutes();
+                        var oTime = dateValue.getHours() + ":" + oMin;
 
                         this.getView().byId("idTimePickerInput").setEnabled(false);
                         this.getView().byId("idInfoLabel").setColorScheme(7);
