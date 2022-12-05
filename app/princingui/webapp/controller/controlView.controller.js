@@ -1459,6 +1459,7 @@ sap.ui.define([
             onPressSuspendSave: function () {
                 var oDateSuspendTo = this.getView().byId("idDatePickerSuspend").getDateValue(),
                     oDateSuspendFrom = this.getView().byId("idDatePicker2Suspend").getDateValue(),
+                    oArr=[],
                     xSuspendTo = oDateSuspendTo.toDateString().length,
                     resultTo = oDateSuspendTo.toDateString() + oDateSuspendTo.toString().substring(xSuspendTo, xSuspendTo + 9),
                     xSuspendFrom = oDateSuspendFrom.toDateString().length,
@@ -1473,6 +1474,51 @@ sap.ui.define([
                     this.getView().byId("idButtonSuspendCancel").setVisible(false);
                     this.getView().byId("idObjStatusS1").setText(resultFrom);
                     this.getView().byId("idObjStatusS2").setText(resultTo);
+                    oArr.push(oDateSuspendTo);
+                    oArr.push(oDateSuspendFrom);
+                    var oPayloadSus = JSON.stringify(oArr)
+                    this.oDataModelT.callFunction("/createSuspendSchedule", {
+                        method: "GET",
+                        urlParameters: {
+                            time: oPayloadSus,
+                            desc: "SUSPEND"
+                        },
+                        success: function (oData) {
+                            BusyIndicator.hide();
+                            // if (oData.createSchedule) {
+                            //     var jsonDT = {
+                            //         "Key": "DAILYT",
+                            //         "Value": oDaily
+                            //     }
+                            //     var oPayloadDT = JSON.stringify(jsonDT);
+                            //     debugger;
+                            //     that.oDataModelT.callFunction("/createCCEmail", {
+                            //         method: constants.httpPost,
+                            //         urlParameters: {
+                            //             createData: oPayloadDT
+                            //         },
+                            //         success: function (oData) {
+                            //             debugger;
+                            //         },
+                            //         error: function (err) {
+                            //             BusyIndicator.hide();
+                            //             MessageBox.error("Technical error has occurred ", {
+                            //                 details: err
+                            //             });
+
+                            //         }
+                            //     });
+                            // }
+                            MessageBox.success(that.oBundle.getText("succJS"));
+                        },
+                        error: function (err) {
+                            BusyIndicator.hide();
+                            MessageBox.error("Technical error has occurred ", {
+                                details: err
+                            });
+
+                        }
+                    });
                 } else {
                     MessageBox.error("Kindly fill the mandatory fields");
                 }

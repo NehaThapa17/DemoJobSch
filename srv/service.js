@@ -212,7 +212,7 @@ module.exports = cds.service.impl(async function () {
     })
 
   });
-  this.on('suspendSchedule', async (req) => {
+  this.on('createSuspendSchedule', async (req) => {
     const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);
     const options = {
       baseURL: 'https://jobscheduler-rest.cfapps.us10.hana.ondemand.com',
@@ -221,53 +221,52 @@ module.exports = cds.service.impl(async function () {
     const scheduler = new JobSchedulerClient.Scheduler(options);
     let jobID = await getJobId('pricingNotificationJobs', scheduler);
     let jobDetails = await getJobDetals(jobID,scheduler);
-    let sTime= req.data.timeS;
-    let eTime = req.data.timeE;
+    let timeArray= req.data.time;
+    let sDesc = req.data.desc;
     
     let sSId;
     let resultJob = jobDetails.results;
     if(resultJob){
       for(var i=0; i<resultJob.length; i++ ){
+        if(resultJob[i].description === sDesc){
           sSId = resultJob[i].scheduleId;
           var req = {
             jobId: jobID._id,
-            scheduleId: sSId,
-            schedule: {
-              "active": false
-            }
+            scheduleId: sSId
           };
-          scheduler.updateJobSchedule(req, function(err, result) {
+          scheduler.deleteJobSchedule(req, function(err, result) {
             if(err){
               return logger.log('Error deleting schedule: %s', err);
             }
             //Schedule deleted successfully
             log.info("Schedule Deleted");
           });
-          break;
-        
+        }
       };
     }
+for(var j=0; j<timeArray.length; j++){
+  var scJob = {
+    jobId: jobID._id,
+    schedule: {
+      "time": timeArray[j],
+      "description": sDesc,
+      "data": {
+        "headers":{"Content-Type":"application/json"}
+      },
+      "active": true
+    }
+  };
 
-    var scJob = {
-      jobId: jobID._id,
-      schedule: {
-        "time": sTime,
-        "description": sDesc,
-        "data": {
-          "headers":{"Content-Type":"application/json"}
-        },
-        "active": true
+  return new Promise((resolve, reject) => {
+    scheduler.createJobSchedule(scJob, function (error, body) {
+      if (error) {
+        reject(error.message);
       }
-    };
-    return new Promise((resolve, reject) => {
-      scheduler.createJobSchedule(scJob, function (error, body) {
-        if (error) {
-          reject(error.message);
-        }
-        // Job successfully created.
-        resolve('Job successfully created')
-      });
-    })
+      // Job successfully created.
+      resolve('Job successfully created')
+    });
+  })
+}
 
   });
   async function getJobDetals(jobID, scheduler) {
