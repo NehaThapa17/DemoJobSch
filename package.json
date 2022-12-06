@@ -77,7 +77,7 @@
       "CPIDest": {
         "kind": "destination",
         "credentials": {
-          "destination": "CPI"
+          "destination": "CPIDEV"
         }
       },
       "data": {

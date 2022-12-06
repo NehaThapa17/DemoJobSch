@@ -1380,7 +1380,6 @@ sap.ui.define([
                     // Adjust date by 6 hours
                     dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
                 }
-
                 if (oDate && oCust.length !== constants.INTZERO && oTer.length !== constants.INTZERO) {
                     this.getView().byId("idMultiInputCustomer").setEnabled(false);
                     this.getView().byId("idDatePickerOnDemand").setEnabled(false);
@@ -1389,6 +1388,8 @@ sap.ui.define([
                     this.getView().byId("idButtonCancel").setVisible(false);
                     this.getView().byId("idButtonEdit").setVisible(true);
                     this.getView().byId("idTextOnDemandST").setText(result);
+                    var oJsonData = this.getPayloadJson(oCust,oTer2);
+
                     this.oDataModelT.callFunction("/createOnDemandSchedule", {
                         method: "GET",
                         urlParameters: {
@@ -1397,31 +1398,11 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            // if (oData.createSchedule) {
-                            //     var jsonDT = {
-                            //         "Key": "ONDEMANDT",
-                            //         "Value": oDate1
-                            //     }
-                            //     var oPayloadDT = JSON.stringify(jsonDT);
-                            //     debugger;
-                            //     that.oDataModelT.callFunction("/createCCEmail", {
-                            //         method: constants.httpPost,
-                            //         urlParameters: {
-                            //             createData: oPayloadDT
-                            //         },
-                            //         success: function (oData) {
-                            //             debugger;
-                            //         },
-                            //         error: function (err) {
-                            //             BusyIndicator.hide();
-                            //             MessageBox.error("Technical error has occurred ", {
-                            //                 details: err
-                            //             });
-
-                            //         }
-                            //     });
-                            // }
-                            MessageBox.success(that.oBundle.getText("succJS"));
+                            if (oData.createOnDemandSchedule) {   
+                                that.updateOndemandData(oJsonData);
+                                MessageBox.success(that.oBundle.getText("succJS"));
+                            }
+                                
                         },
                         error: function (err) {
                             BusyIndicator.hide();
@@ -1435,6 +1416,50 @@ sap.ui.define([
                 } else {
                     MessageBox.error("Kindly fill the mandatory fields");
                 }
+            },
+            getPayloadJson:function(oCust,oTer2){
+                var oCustArray=[],oTerArray=[],
+                oTData = this.getView().getModel("oModel").getProperty("/CustomerData");
+                for (var i = constants.INTZERO; i < oCust.length; i++) {
+                    var oLen = oCust[i].getId().slice(-2),
+                    oIdx = oLen.replace(/\D+/g, '');
+                    var obj = {
+                        "Customer": oCust[i].getKey(),
+                        "ShipTo": oTData[oIdx].ShipTo
+                    };
+                    oCustArray.push(obj);
+                }
+                for (var i = constants.INTZERO; i < oTer2.length; i++) {
+                    var objTer = {
+                        "Terminal": oTer2[i]
+                    };
+                    oTerArray.push(objTer);
+                }
+                var oJsonData = {
+                    "Customer" : oCustArray,
+                    "Terminal" : oTerArray
+                        }; 
+                        return oJsonData
+            },
+            updateOndemandData: function(oJsonData){
+                var that = this; 
+                var oPayloadOnD = JSON.stringify(oJsonData)
+                this.oDataModelT.callFunction("/updateOnDemand", {
+                    method: "POST",
+                    urlParameters: {
+                        createData: oPayloadOnD
+                    },
+                    success: function (oData) {
+                        BusyIndicator.hide();         
+                    },
+                    error: function (err) {
+                        BusyIndicator.hide();
+                        MessageBox.error("Technical error has occurred ", {
+                            details: err
+                        });
+
+                    }
+                });
             },
             onPressSuspendEdit: function () {
                 this.getView().byId("idDatePickerSuspend").setEnabled(true);
@@ -1459,7 +1484,7 @@ sap.ui.define([
             onPressSuspendSave: function () {
                 var oDateSuspendTo = this.getView().byId("idDatePickerSuspend").getDateValue(),
                     oDateSuspendFrom = this.getView().byId("idDatePicker2Suspend").getDateValue(),
-                    oArr=[],
+                    oArr=[],that = this,
                     xSuspendTo = oDateSuspendTo.toDateString().length,
                     resultTo = oDateSuspendTo.toDateString() + oDateSuspendTo.toString().substring(xSuspendTo, xSuspendTo + 9),
                     xSuspendFrom = oDateSuspendFrom.toDateString().length,
@@ -1476,7 +1501,7 @@ sap.ui.define([
                     this.getView().byId("idObjStatusS2").setText(resultTo);
                     oArr.push(oDateSuspendTo);
                     oArr.push(oDateSuspendFrom);
-                    var oPayloadSus = JSON.stringify(oArr)
+                    var oPayloadSus = JSON.stringify(oArr);
                     this.oDataModelT.callFunction("/createSuspendSchedule", {
                         method: "GET",
                         urlParameters: {
@@ -1485,30 +1510,6 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            // if (oData.createSchedule) {
-                            //     var jsonDT = {
-                            //         "Key": "DAILYT",
-                            //         "Value": oDaily
-                            //     }
-                            //     var oPayloadDT = JSON.stringify(jsonDT);
-                            //     debugger;
-                            //     that.oDataModelT.callFunction("/createCCEmail", {
-                            //         method: constants.httpPost,
-                            //         urlParameters: {
-                            //             createData: oPayloadDT
-                            //         },
-                            //         success: function (oData) {
-                            //             debugger;
-                            //         },
-                            //         error: function (err) {
-                            //             BusyIndicator.hide();
-                            //             MessageBox.error("Technical error has occurred ", {
-                            //                 details: err
-                            //             });
-
-                            //         }
-                            //     });
-                            // }
                             MessageBox.success(that.oBundle.getText("succJS"));
                         },
                         error: function (err) {

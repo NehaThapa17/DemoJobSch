@@ -10,7 +10,7 @@ applications:
 - name: pricingNotification-srv
   random-route: true  # for development only
   path: gen/srv
-  memory: 256M
+  memory: 1024M
   buildpack: nodejs_buildpack
   services:
     - pricingNotification-xsuaa-service

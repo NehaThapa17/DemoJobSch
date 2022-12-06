@@ -73,8 +73,13 @@
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>suspendFrom}" required="true" />
+                                		<DateTimePicker
+			id="idDatePickerSuspend"
+			dateValue=""
+			timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time"  afterValueHelpClose="onhandleChangeDP1Suspend" 
+			class="sapUiSmallMarginBottom"/>
                                 <!-- <DateTimePicker id="idDatePickerSuspend" timezone="CST" showTimezone="false" enabled="false" placeholder="Enter Date and Time"  afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" /> -->
-                                <DateTimePicker id="idDatePickerSuspend" timezone="CST" placeholder="Enter Date and Time" change="handleChangeSuspensStartTime" class="sapUiSmallMarginBottom"/>
+                                <!-- <DateTimePicker id="idDatePickerSuspend" timezone="CST" placeholder="Enter Date and Time" change="handleChangeSuspensStartTime" class="sapUiSmallMarginBottom"/> -->
                                 <Label text="{i18n>suspendTo}" required="true" />
                                 <DateTimePicker id="idDatePicker2Suspend" timezone="CST" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend"  class="sapUiSmallMarginBottom" valueStateText="From Date cannot be greater than To Date" />
                             </forms:SimpleForm>

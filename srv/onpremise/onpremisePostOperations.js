@@ -28,6 +28,34 @@ async function getToken(url) {
     }
 }
 
+let EditOnDemand = async (req) => {
+    try {
+        let sUrl = constants.CREATEPRODUCTURL;
+        let { xcsrfToken, cookie } = await getToken(sUrl);
+        let payload = JSON.parse(req.data.createData);
+        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAME }, {
+            method: 'POST',
+            url: sUrl + "/OnDemandDetailSet",
+            headers: {
+                "content-type": "application/json",
+                'x-csrf-token': xcsrfToken,
+                'Cookie': cookie,
+            },
+            data: payload
+        });
+        let result = [{
+            "status": response.status,
+            "statusText": response.statusText,
+            "data": response.data.d
+        }];
+        return result;
+    }
+    catch (error) {
+        return error;
+    }
+}
+module.exports.EditOnDemand = EditOnDemand;
+
 let createProductDetail = async (req) => {
     try {
         let sUrl = constants.CREATEPRODUCTURL;

@@ -1389,6 +1389,44 @@ sap.ui.define([
                     this.getView().byId("idButtonCancel").setVisible(false);
                     this.getView().byId("idButtonEdit").setVisible(true);
                     this.getView().byId("idTextOnDemandST").setText(result);
+                    var oJsonData = {
+                        "Customer" : [
+                        {
+                        "Customer" : "1000000",
+                        "ShipTo" : "801001"
+                        },
+                        {
+                        "Customer" : "1000005",
+                        "ShipTo" : "721177"
+                        }
+                        ],
+                        "Terminal" : [
+                        {
+                        "Terminal" : "TM01"
+                        },
+                        {
+                        "Terminal" : "TM29"
+                        }
+                        ]
+                        };                        
+                    var oPayloadOnD = JSON.stringify(oJsonData)
+                    this.oDataModelT.callFunction("/updateOnDemand", {
+                        method: "POST",
+                        urlParameters: {
+                            createData: oPayloadOnD
+                        },
+                        success: function (oData) {
+                            BusyIndicator.hide();
+                            MessageBox.success(that.oBundle.getText("succJS"));
+                        },
+                        error: function (err) {
+                            BusyIndicator.hide();
+                            MessageBox.error("Technical error has occurred ", {
+                                details: err
+                            });
+
+                        }
+                    });
                     this.oDataModelT.callFunction("/createOnDemandSchedule", {
                         method: "GET",
                         urlParameters: {
@@ -1459,6 +1497,7 @@ sap.ui.define([
             onPressSuspendSave: function () {
                 var oDateSuspendTo = this.getView().byId("idDatePickerSuspend").getDateValue(),
                     oDateSuspendFrom = this.getView().byId("idDatePicker2Suspend").getDateValue(),
+                    oArr=[],that = this,
                     xSuspendTo = oDateSuspendTo.toDateString().length,
                     resultTo = oDateSuspendTo.toDateString() + oDateSuspendTo.toString().substring(xSuspendTo, xSuspendTo + 9),
                     xSuspendFrom = oDateSuspendFrom.toDateString().length,
@@ -1473,6 +1512,27 @@ sap.ui.define([
                     this.getView().byId("idButtonSuspendCancel").setVisible(false);
                     this.getView().byId("idObjStatusS1").setText(resultFrom);
                     this.getView().byId("idObjStatusS2").setText(resultTo);
+                    oArr.push(oDateSuspendTo);
+                    oArr.push(oDateSuspendFrom);
+                    var oPayloadSus = JSON.stringify(oArr);
+                    this.oDataModelT.callFunction("/createSuspendSchedule", {
+                        method: "GET",
+                        urlParameters: {
+                            time: oPayloadSus,
+                            desc: "SUSPEND"
+                        },
+                        success: function (oData) {
+                            BusyIndicator.hide();
+                            MessageBox.success(that.oBundle.getText("succJS"));
+                        },
+                        error: function (err) {
+                            BusyIndicator.hide();
+                            MessageBox.error("Technical error has occurred ", {
+                                details: err
+                            });
+
+                        }
+                    });
                 } else {
                     MessageBox.error("Kindly fill the mandatory fields");
                 }

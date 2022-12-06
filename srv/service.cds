@@ -3,7 +3,7 @@ service CatalogService @(requires : 'authenticated-user')
     type response{
         data : String
     };
-
+    
     action MasterUpload() returns String;
     function createSchedule(time:String,desc:String) returns String;
     function createOnDemandSchedule(time:String,desc:String) returns String;
@@ -18,6 +18,7 @@ service CatalogService @(requires : 'authenticated-user')
     function getOnPremTerminalF4() returns response; 
     function getOnPremProductF4() returns response;
     function getOnCCEmail() returns response; 
+    action updateOnDemand(createData: String) returns response;
     action createCCEmail(createData: String) returns response;
     action createProduct(createData: String) returns response;
     action createTerminal(createData: String) returns response; 
