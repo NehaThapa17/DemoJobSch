@@ -1,8 +1,15 @@
+/*&--------------------------------------------------------------------------------------*
+ * File name                    	   : editCust.controller.js	                     *
+ * Created By                          : NThapa@marathonpetroleum.com                   *            	
+ * Created On                          : 17-Oct-2022                                	 *                           							                                         *
+ * Purpose                             : Controller for editCust.view.xml to edit Customer/ShipTo  
+ *                                                                                                    
+ *---------------------------------------------------------------------------------------*
+ */
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageBox",
     "sap/ui/model/json/JSONModel",
-    'sap/ui/core/Fragment',
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/ui/core/BusyIndicator",
@@ -13,23 +20,29 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, MessageBox, JSONModel, Fragment, Filter, FilterOperator, BusyIndicator, Token, constants,SearchField) {
+    function (Controller, MessageBox, JSONModel, Filter, FilterOperator, BusyIndicator, Token, constants, SearchField) {
         "use strict";
-
         return Controller.extend("marathon.pp.princingui.controller.editCust", {
+            /**
+              * Method to initialize all models and global variables
+              * @public
+              */    
             onInit: function () {
+                //fetch i18n model for text translation
                 this.oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+                //fetch the service model
                 this.oDataModelE = this.getOwnerComponent().getModel();
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.getRoute("RouteEditView").attachPatternMatched(this.onRouteEditCustomer, this);
-                
-
             },
-            onRouteEditCustomer: function (oEvent) {
-               
+            /**
+      * Method for  Routing
+      * @public
+      */             
+            onRouteEditCustomer: function () {
                 var oModel = new JSONModel();
                 var fgModel = this.getOwnerComponent().getModel("oModel");
-                var aArray = fgModel.oData.selectedRow; //JSON.parse(oEvent.getParameter("arguments").Data);
+                var aArray = fgModel.oData.selectedRow; 
                 this.getView().byId("idInputCustomerID").setValue(aArray[constants.INTZERO].Customer);
                 this.getView().byId("idInputCustomerName").setValue(aArray[constants.INTZERO].CustomerName);
                 this.getView().byId("idInputShipToID").setValue(aArray[constants.INTZERO].ShipTo);
@@ -44,52 +57,18 @@ sap.ui.define([
                     this.getView().byId("idMultiComboBoxProducts").setTokens(tokenArray);
                 }
                 oModel.setData({ "items": aArray[constants.INTZERO].EmailArray });
+                //set model 
                 this.getView().setModel(oModel, "detailModel");
                 this.getView().byId("idInputEmail").setModel(oModel, "detailModel");
                 this.getView().byId("idCheckBoxDaily").setSelected(aArray[constants.INTZERO].DailyJob);
                 this.getView().byId("idCheckBoxOnDemand").setSelected(aArray[constants.INTZERO].OnDemandJob);
                 this.getView().getModel("detailModel").setProperty("/ProductData", fgModel.oData.ProductData);
-                // this.getF4Product2();
+                
             },
-            // getF4Product2: function () {
-            //     var that = this;
-            //     this.oDataModelE.callFunction("/getOnPremProductDetails", {
-            //         method: 'GET',
-            //         success: function (oData) {
-                        
-            //             that.getView().getModel("detailModel").setProperty("/ProductData", oData.getOnPremProductDetails.data);
-            //             BusyIndicator.hide();
-            //         },
-            //         error: function (err) {
-            //             BusyIndicator.hide();
-            //             MessageBox.error("Technical error has occurred ", {
-            //                 details: err
-            //             });
-
-            //         }
-            //     })
-            // },
-            handleSearch: function (oEvent) {
-                var sQuery = oEvent.getParameter("value");
-                var aFilters = [], aFiltersCombo = [];
-                if (sQuery && sQuery.length > constants.INTZERO) {
-                aFilters.push(new Filter({
-                    filters: [
-                        new Filter({ path: "Customer", operator: FilterOperator.Contains, value1: sQuery }),
-                        new Filter({ path: "CustomerName", operator: FilterOperator.Contains, value1: sQuery }),
-                        new Filter({ path: "Shipto", operator: FilterOperator.Contains, value1: sQuery }),
-                        new Filter({ path: "ShiptoName", operator: FilterOperator.Contains, value1: sQuery })
-                    ],
-                    and: false
-                }));
-                aFiltersCombo.push(new Filter({
-                    filters: aFilters,
-                    and: true
-                }));
-            }
-                var oBinding = oEvent.getSource().getBinding("items");
-                oBinding.filter([aFiltersCombo]);
-            },
+            /**
+      * Method to handle Save of create Customer 
+      * @public 
+      */                
             onPressSaveEditCust: function () {
                 var oCustID = this.getView().byId("idInputCustomerID").getValue(),
                     oCustName = this.getView().byId("idInputCustomerName").getValue(),
@@ -106,7 +85,7 @@ sap.ui.define([
                             "Customer": oCustID,
                             "ShipTo": oSh,
                             "Product": oProd[i].getKey()
-                            
+
                         };
                         oProdArray.push(objProd);
                     }
@@ -115,7 +94,7 @@ sap.ui.define([
                         if (j === constants.INTZERO) {
                             oEmailString = objEmail;
                         } else {
-                            oEmailString = oEmailString + ";" + objEmail;
+                            oEmailString = oEmailString + constants.spliter + objEmail;
                         }
 
                     }
@@ -138,36 +117,45 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            if(oData.updateCustomer !== undefined){
-                            MessageBox.success(that.oBundle.getText("savedSucc"), {
-                                onClose: function (sAction) {
-                                    if (sAction === MessageBox.Action.OK) {
-                                        that.onBack();
-                                        BusyIndicator.hide();
+                            if (oData.updateCustomer !== undefined) {
+                                MessageBox.success(that.oBundle.getText("savedSucc"), {
+                                    onClose: function (sAction) {
+                                        if (sAction === MessageBox.Action.OK) {
+                                            that.onBack();
+                                            BusyIndicator.hide();
 
+                                        }
                                     }
-                                }
-                            });
-                        } else {
-                            MessageBox.error(oData.updateCustomer.data.message); 
-                        }
+                                });
+                            } else {
+                                MessageBox.error(oData.updateCustomer.data.message);
+                            }
                         },
                         error: function (err) {
                             BusyIndicator.hide();
-                            MessageBox.error("Technical error has occurred ", {
+                            MessageBox.error(that.oBundle.getText("techError"), {
                                 details: err
                             });
-    
+
                         }
                     });
                 } else {
-                    MessageBox.error("Kindly fill the mandatory fields");
+                    MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
             },
+            /**
+      * Method to navigate Back through navigation
+      * @public
+      */               
             onBack: function () {
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RoutecontrolView");
             },
+            /**
+      * Method to validation on Email MutiInput
+      * @public
+      * @param {sap.ui.base.Event} oEvt An Event object consisting of an ID, a source and a map of parameter
+      */              
             onEmailChangeEditCust: function (oEvt) {
                 var oMultiInput1 = this.getView().byId("idInputEmail");
                 var sVal = oEvt.getParameters().value;
@@ -182,11 +170,15 @@ sap.ui.define([
                         return new Token({ key: email, text: email });
                     }
                 };
-                if (sVal === ""){
+                if (sVal === "") {
                     oMultiInput1.setValueState(sap.ui.core.ValueState.None);
-                } 
+                }
                 oMultiInput1.addValidator(fnValidator);
             },
+            /**
+      * Method to handle the fragment ProductVH
+      * @public
+      */             
             onProductsValueHelpRequested: function () {
                 this._oBasicSearchField = new SearchField();
                 this.oColModel = new JSONModel();
@@ -202,21 +194,21 @@ sap.ui.define([
                         }
                     ]
                 };
-                
-                this.oProductsModel  = this.getView().getModel("detailModel");
+
+                this.oProductsModel = this.getView().getModel("detailModel");
 
                 this.oColModel.setData(aCols);
-                this._oValueHelpDialog = sap.ui.xmlfragment("marathon.pp.princingui.fragments.productListVH", this);
+                this._oValueHelpDialog = sap.ui.xmlfragment(constants.fragmentProdVH, this);
                 this.getView().addDependent(this._oValueHelpDialog);
-	// Set Basic Search for FilterBar
-    var oFilterBar = this._oValueHelpDialog.getFilterBar();
-    oFilterBar.setFilterBarExpanded(false);
-    oFilterBar.setBasicSearch(this._oBasicSearchField);
+                // Set Basic Search for FilterBar
+                var oFilterBar = this._oValueHelpDialog.getFilterBar();
+                oFilterBar.setFilterBarExpanded(false);
+                oFilterBar.setBasicSearch(this._oBasicSearchField);
 
-    // Trigger filter bar search when the basic search is fired
-    this._oBasicSearchField.attachSearch(function() {
-        oFilterBar.search();
-    });
+                // Trigger filter bar search when the basic search is fired
+                this._oBasicSearchField.attachSearch(function () {
+                    oFilterBar.search();
+                });
                 this._oValueHelpDialog.getTableAsync().then(function (oTable) {
                     oTable.setModel(this.oProductsModel);
                     oTable.setModel(this.oColModel, "columns");
@@ -240,31 +232,36 @@ sap.ui.define([
                 this._oValueHelpDialog.setTokens(this.getView().byId("idMultiComboBoxProducts").getTokens());
                 this._oValueHelpDialog.open();
             },
+            /**
+      * Method to handle search on Product F4 
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */              
             onFilterBarSearchProd: function (oEvent) {
                 var sSearchQuery = this._oBasicSearchField.getValue(),
                     aSelectionSet = oEvent.getParameter("selectionSet");
                 var aFilters = aSelectionSet.reduce(function (aResult, oControl) {
                     if (oControl.getValue()) {
-                        if(oControl.getName() === "Product ID"){
-                        aResult.push(new Filter({
-                            path: "Product",
-                            operator: FilterOperator.Contains,
-                            value1: oControl.getValue()
-                        }));
-                        } else if(oControl.getName() === "Product Name"){
+                        if (oControl.getName() === "Product ID") {
                             aResult.push(new Filter({
-                                path: "ProductName",
+                                path: constants.pathProd,
                                 operator: FilterOperator.Contains,
                                 value1: oControl.getValue()
                             }));
-                            }
+                        } else if (oControl.getName() === constants.prodName) {
+                            aResult.push(new Filter({
+                                path: constants.pathProdName,
+                                operator: FilterOperator.Contains,
+                                value1: oControl.getValue()
+                            }));
+                        }
                     }
                     return aResult;
                 }, []);
                 aFilters.push(new Filter({
                     filters: [
-                        new Filter({ path: "Product", operator: FilterOperator.Contains, value1: sSearchQuery }),
-                        new Filter({ path: "ProductName", operator: FilterOperator.Contains, value1: sSearchQuery })
+                        new Filter({ path: constants.pathProd, operator: FilterOperator.Contains, value1: sSearchQuery }),
+                        new Filter({ path: constants.pathProdName, operator: FilterOperator.Contains, value1: sSearchQuery })
                     ],
                     and: false
                 }));
@@ -286,17 +283,30 @@ sap.ui.define([
                     oVHD.update();
                 });
             },
+           /**
+      * Method to handle confirm on ProductVH
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */             
             onValueHelpOkPressProd: function (oEvent) {
                 var aTokens = oEvent.getParameter("tokens");
                 this.getView().byId("idMultiComboBoxProducts").setTokens(aTokens);
                 this._oValueHelpDialog.close();
             },
-
+           /**
+      * Method to handle cancel on ProductVH
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */ 
             onValueHelpCancelPressProd: function () {
                 this._oValueHelpDialog.close();
                 this._oValueHelpDialog.destroy();
             },
-
+           /**
+      * Method to handle afterclose on ProductVH
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */ 
             onValueHelpAfterClose: function () {
                 this._oValueHelpDialog.destroy();
             },

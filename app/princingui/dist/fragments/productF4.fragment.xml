@@ -2,8 +2,7 @@
 	xmlns="sap.m"
 	xmlns:core="sap.ui.core">
 	<SelectDialog
-	
-		title="Product"
+		title="{i18n>products}"
 		items="{oModel>/ProductValHelp}"
 		search="_handleValueHelpSearchProduct"
 		confirm="_handleValueHelpOKProduct"

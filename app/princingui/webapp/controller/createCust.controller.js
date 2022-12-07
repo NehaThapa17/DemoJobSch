@@ -1,3 +1,11 @@
+/*&--------------------------------------------------------------------------------------*
+ * File name                    	   : createCust.controller.js	                     *
+ * Created By                          : NThapa@marathonpetroleum.com                   *            	
+ * Created On                          : 17-Oct-2022                                	 *                           							                                         *
+ * Purpose                             : Controller for createCust.view.xml to save Customer/ShipTo  
+ *                                                                                                    
+ *---------------------------------------------------------------------------------------*
+ */
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageBox",
@@ -6,7 +14,6 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/ui/core/BusyIndicator",
-    "sap/ui/core/routing/Route",
     "sap/m/Token",
     "marathon/pp/princingui/utils/constants",
     "sap/m/SearchField"
@@ -14,24 +21,26 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, MessageBox, JSONModel, Fragment, Filter, FilterOperator, BusyIndicator, Route, Token, constants, SearchField) {
+    function (Controller, MessageBox, JSONModel, Fragment, Filter, FilterOperator, BusyIndicator, Token, constants, SearchField) {
         "use strict";
-        var aTokens;
-
         return Controller.extend("marathon.pp.princingui.controller.createCust", {
+            /**
+              * Method to initialize all models and global variables
+              * @public
+              */            
             onInit: function () {
+                //fetch i18n model for text translation
                 this.oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+                //fetch the service model
                 this.oDataModel = this.getOwnerComponent().getModel();
-                // var fgModel = this.getOwnerComponent().getModel("oModel");
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.getRoute("RoutecreateView").attachPatternMatched(this.onRouteCustomer, this);
                 var oModel = new JSONModel();
-
                 var oItemData = [];
                 oModel.setData(oItemData);
+                //set model 
                 this.getView().setModel(oModel, "oCustModel");
-                // this.getView().getModel("oCustModel").setProperty("/CustValHelp", fgModel.oData.CustValHelp);
-                // this.getView().getModel("oCustModel").setProperty("/ProductData", fgModel.oData.ProductData);
+
                 this.getCustomerDetails2();
                 this.getF4Product2();
             },
@@ -39,14 +48,14 @@ sap.ui.define([
                 var that = this;
                 debugger;
                 this.oDataModel.callFunction("/getOnPremCustomerF4", {
-                    method: 'GET',
+                    method: constants.httpGet,
                     success: function (oData) {
                         that.getView().getModel("oCustModel").setProperty("/CustValHelp", oData.getOnPremCustomerF4.data);
                         BusyIndicator.hide();
                     },
                     error: function (err) {
                         BusyIndicator.hide();
-                        MessageBox.error("errorTechnical", {
+                        MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
                         });
 
@@ -56,7 +65,7 @@ sap.ui.define([
             getF4Product2: function () {
                 var that = this;
                 this.oDataModel.callFunction("/getOnPremProductDetails", {
-                    method: 'GET',
+                    method: constants.httpGet,
                     success: function (oData) {
                         debugger;
                         that.getView().getModel("oCustModel").setProperty("/ProductData", oData.getOnPremProductDetails.data);
@@ -64,14 +73,22 @@ sap.ui.define([
                     },
                     error: function (err) {
                         BusyIndicator.hide();
-                        MessageBox.error("Technical error has occurred ", {
+                        MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
                         });
 
                     }
                 })
             },
+            /**
+      * Method for  Routing
+      * @public
+      */            
             onRouteCustomer: function () {
+                var pvModel = this.getOwnerComponent().getModel("oModel");
+                console.log(pvModel);
+                // this.getView().getModel("oCustModel").setProperty("/CustValHelp", pvModel.oData.CustValHelp);
+                // this.getView().getModel("oCustModel").setProperty("/ProductData", pvModel.oData.ProductData);
                 this.getView().byId("idInputCustomerIDAdd").setValue(""),
                     this.getView().byId("idInputCustomerNameAdd").setValue(""),
                     this.getView().byId("idInputSHAdd").setValue(""),
@@ -81,16 +98,21 @@ sap.ui.define([
                     this.getView().byId("daily_distribution").setSelected(false),
                     this.getView().byId("on_demand_distribution").setSelected(false);
             },
+            /**
+      * Method to handle search on Customer F4 
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */            
             handleSearch: function (oEvent) {
                 var sQuery = oEvent.getParameter("value");
                 var aFilters = [], aFiltersCombo = [];
                 if (sQuery && sQuery.length > constants.INTZERO) {
                     aFilters.push(new Filter({
                         filters: [
-                            new Filter({ path: "Customer", operator: FilterOperator.Contains, value1: sQuery }),
-                            new Filter({ path: "CustomerName", operator: FilterOperator.Contains, value1: sQuery }),
-                            new Filter({ path: "Shipto", operator: FilterOperator.Contains, value1: sQuery }),
-                            new Filter({ path: "ShiptoName", operator: FilterOperator.Contains, value1: sQuery })
+                            new Filter({ path: constants.pathCus, operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: constants.pathCName, operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: constants.pathSH2, operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: constants.pathSHName2, operator: FilterOperator.Contains, value1: sQuery })
                         ],
                         and: false
                     }));
@@ -102,6 +124,11 @@ sap.ui.define([
                 var oBinding = oEvent.getSource().getBinding("items");
                 oBinding.filter([aFiltersCombo]);
             },
+            /**
+      * Method to handle confirm on Customer F4 
+      * @public
+      * @param {sap.ui.base.Event} oEvt An Event object consisting of an ID, a source and a map of parameter
+      */               
             handleConfirm: function (oEvt) {
                 // reset the filter
                 var oBinding = oEvt.getSource().getBinding("items");
@@ -115,17 +142,18 @@ sap.ui.define([
                     // var v = aContexts.map(function (oContext) { return oContext.getObject().Customer; });
                 }
             },
-            handleClose: function () {
-
-            },
-            onValueHelpRequestedcust: function (oEvent) {
+            /**
+      * Method to open fragment Customer F4 
+      * @public
+      */               
+            onValueHelpRequestedcust: function () {
                 var oView = this.getView();
                 // create dialog lazily
                 if (!this.byId("openDialog")) {
                     // load asynchronous XML fragment
                     Fragment.load({
                         id: oView.getId(),
-                        name: "marathon.pp.princingui.fragments.customerF4",
+                        name: constants.fargmentCusF4,
                         controller: this
                     }).then(function (oDialog) {
                         // connect dialog to the root view
@@ -140,10 +168,18 @@ sap.ui.define([
             onValueHelpCancelPress: function () {
                 this.byId("openDialog").close();
             },
+            /**
+      * Method to navigate Back through navigation
+      * @public
+      */               
             onBack: function () {
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RoutecontrolView");
             },
+            /**
+      * Method to handle Save of create Customer 
+      * @public 
+      */               
             onSaveCustomer: function () {
                 BusyIndicator.show();
                 var oCustID = this.getView().byId("idInputCustomerIDAdd").getValue(),
@@ -168,7 +204,7 @@ sap.ui.define([
                         if (j === constants.INTZERO) {
                             oEmailString = objEmail;
                         } else {
-                            oEmailString = oEmailString + ";" + objEmail;
+                            oEmailString = oEmailString + constants.spliter + objEmail;
                         }
 
                     }
@@ -207,16 +243,20 @@ sap.ui.define([
                         },
                         error: function (err) {
                             BusyIndicator.hide();
-                            MessageBox.error("Technical error has occurred ", {
+                            MessageBox.error(that.oBundle.getText("techError"), {
                                 details: err
                             });
 
                         }
                     });
                 } else {
-                    MessageBox.error("Kindly fill the mandatory fields");
+                    MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
             },
+            /**
+      * Method to handle the fragment ProductVH
+      * @public
+      */               
             onProductsValueHelpRequestedAdd: function () {
                 this._oBasicSearchField = new SearchField();
                 this.oColModel = new JSONModel();
@@ -233,30 +273,8 @@ sap.ui.define([
                     ]
                 };
                 this.oProductsModel = this.getView().getModel("oCustModel");
-                //***Delete Start */
-                // var oF4Data = {
-                //     "productF4": [{
-                //         "Customer": "4725",
-                //         "ShipTo": "4726",
-                //         "Product": "1286",
-                //         "ProductName": "ARCO PREMIUM GAS EXP MX",
-                //         "Selected": "X"
-                //     },
-                //     {
-                //         "Customer": "4725",
-                //         "ShipTo": "4726",
-                //         "Product": "1287",
-                //         "ProductName": "CLEAR PREMIUM GAS EXP MX",
-                //         "Selected": "X"
-                //     }
-                //     ]
-                // }
-
-                // this.oProductsModel = new JSONModel();
-                // this.oProductsModel.setData(oF4Data);
-                //***Delete ENd */
                 this.oColModel.setData(aCols);
-                this._oValueHelpDialog = sap.ui.xmlfragment("marathon.pp.princingui.fragments.productListVH", this);
+                this._oValueHelpDialog = sap.ui.xmlfragment(constants.fragmentProdVH, this);
                 this.getView().addDependent(this._oValueHelpDialog);
                 // Set Basic Search for FilterBar
                 var oFilterBar = this._oValueHelpDialog.getFilterBar();
@@ -290,20 +308,25 @@ sap.ui.define([
 
                 this._oValueHelpDialog.open();
             },
+            /**
+      * Method to handle search on Product F4 
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */               
             onFilterBarSearchProd: function (oEvent) {
                 var sSearchQuery = this._oBasicSearchField.getValue(),
                     aSelectionSet = oEvent.getParameter("selectionSet");
                 var aFilters = aSelectionSet.reduce(function (aResult, oControl) {
                     if (oControl.getValue()) {
-                        if (oControl.getName() === "Product ID") {
+                        if (oControl.getName() === constants.prodID) {
                             aResult.push(new Filter({
-                                path: "Product",
+                                path: constants.pathProd,
                                 operator: FilterOperator.Contains,
                                 value1: oControl.getValue()
                             }));
-                        } else if (oControl.getName() === "Product Name") {
+                        } else if (oControl.getName() === constants.prodName) {
                             aResult.push(new Filter({
-                                path: "ProductName",
+                                path: constants.pathProdName,
                                 operator: FilterOperator.Contains,
                                 value1: oControl.getValue()
                             }));
@@ -313,8 +336,8 @@ sap.ui.define([
                 }, []);
                 aFilters.push(new Filter({
                     filters: [
-                        new Filter({ path: "Product", operator: FilterOperator.Contains, value1: sSearchQuery }),
-                        new Filter({ path: "ProductName", operator: FilterOperator.Contains, value1: sSearchQuery })
+                        new Filter({ path: constants.pathProd, operator: FilterOperator.Contains, value1: sSearchQuery }),
+                        new Filter({ path: constants.pathProdName, operator: FilterOperator.Contains, value1: sSearchQuery })
                     ],
                     and: false
                 }));
@@ -336,6 +359,11 @@ sap.ui.define([
                     oVHD.update();
                 });
             },
+            /**
+      * Method to handle confirm on ProductVH
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */               
             onValueHelpOkPressProd: function (oEvent) {
                 var aTokens = oEvent.getParameter("tokens");
                 this.getView().byId("idMultiComboBoxProductsAdd").setTokens(aTokens);
@@ -345,6 +373,11 @@ sap.ui.define([
                 this._oValueHelpDialog.close();
                 this._oValueHelpDialog.destroy();
             },
+            /**
+      * Method to validation on Email MutiInput
+      * @public
+      * @param {sap.ui.base.Event} oEvt An Event object consisting of an ID, a source and a map of parameter
+      */               
             onEmailChangeAddCust: function (oEvt) {
                 var oMultiInput1 = this.getView().byId("idInputEmailAdd");
                 var sVal = oEvt.getParameters().value;
@@ -364,18 +397,9 @@ sap.ui.define([
                 oMultiInput1.addValidator(fnValidator);
             },
             onEmailEnter: function (oEvent) {
-                debugger;
                 if (oEvent.getSource().getValue().includes('\n')) {
                     this.onEmailChangeAddCust(oEvent);
                 }
             }
-            // onBackCancel: function(){
-            //     debugger;
-            //     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-            //     oRouter.navTo("RoutecontrolView", {
-            //         Data: "Cancel"
-            //     });
-            // }
-
         });
     });

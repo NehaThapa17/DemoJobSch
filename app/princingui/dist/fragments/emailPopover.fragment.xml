@@ -11,7 +11,7 @@
 		<NavContainer>
 			<Page
 				class="sapUiResponsivePadding--header"
-				title="Emails">
+				title="{i18n>emails}">
 				<List items="{/}" >
 					<StandardListItem
 						title="{email}"/>

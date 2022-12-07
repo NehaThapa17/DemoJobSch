@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:tnt="sap.tnt" xmlns:core="sap.ui.core">
-    <Dialog id="terTable" title="Terminal">
+    <Dialog id="terTable" title="{i18n>terminal}">
         <Table class="sapUiSizeCompact" id="idTerTablePopout" selectionChange="singlemode" 
         mode="SingleSelectMaster" width="auto" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingScrollToLoad="true" growingThreshold="8" items="{oModel>/TerminalData}">
             <headerToolbar>
@@ -13,22 +13,22 @@
             <columns>
                 <Column >
                     <header>
-                        <Text text="Terminal ID " />
+                        <Text text="{i18n>terminalID}" />
                     </header>
                 </Column>
                 <Column demandPopin="true" hAlign="Begin" >
                     <header>
-                        <Text text="Terminal Name" />
+                        <Text text="{i18n>terminalName}" />
                     </header>
                 </Column>
                 <Column hAlign="Center">
                     <header>
-                        <Text text="Daily" />
+                        <Text text="{i18n>daily}" />
                     </header>
                 </Column>
                 <Column hAlign="Begin" >
                     <header>
-                        <Text text="On-Demand" />
+                        <Text text="{i18n>onDemandlbl}" />
                     </header>
                 </Column>
             </columns>
@@ -40,10 +40,10 @@
             </ColumnListItem>
         </Table>
         <beginButton>
-            <Button text="Add New" type="Emphasized" press="onCreateCustomer" />
+            <Button text="{i18n>btnAddNew}" type="Emphasized" press="onCreateCustomer" />
         </beginButton>
         <endButton>
-            <Button text="Cancel" press="onCloseTer" />
+            <Button text="{i18n>cancel}" press="onCloseTer" />
         </endButton>
     </Dialog>
 </core:FragmentDefinition>

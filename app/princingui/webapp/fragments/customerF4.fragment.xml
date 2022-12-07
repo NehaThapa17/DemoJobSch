@@ -1,8 +1,7 @@
 <core:FragmentDefinition 
     xmlns="sap.m"
-    xmlns:fb="sap.ui.comp.filterbar"
     xmlns:core="sap.ui.core">
-      <TableSelectDialog noDataText="No Customer Found" contentWidth="50%" title="Customer" search=".handleSearch" confirm=".handleConfirm" cancel=".handleClose" items="{oCustModel>/CustValHelp}">
+      <TableSelectDialog noDataText="{i18n>cusPlcHolder}" contentWidth="50%" title="{i18n>customer}" search=".handleSearch" confirm=".handleConfirm" cancel=".handleClose" items="{oCustModel>/CustValHelp}">
             <ColumnListItem>
                 <cells>
                     <ObjectIdentifier title="{oCustModel>Customer}" text="{oCustModel>CustomerName}" />
@@ -12,12 +11,12 @@
             <columns>
                 <Column mergeDuplicates="true">
                     <header>
-                        <Text text="Customer" />
+                        <Text text="{i18n>customer}" />
                     </header>
                 </Column>
                 <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin">
                     <header>
-                        <Text text="Ship-to" />
+                        <Text text="{i18n>shipTo}" />
                     </header>
                 </Column>
             </columns>

@@ -1,10 +1,10 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:tnt="sap.tnt" xmlns:core="sap.ui.core">
-    <Dialog id="custTable" title="Customer">
+    <Dialog id="custTable" title="{i18n>customer}">
         <Table class="sapUiSizeCompact" id="idTablePopout" width="auto" sticky="ColumnHeaders,HeaderToolbar" 
         growing="true" growingScrollToLoad="true" selectionChange="singlemode" growingThreshold="8" items="{oModel>/CustomerData}" mode="SingleSelectMaster">
             <headerToolbar>
                 <Toolbar>
-                    <SearchField width="50%" change="onSearchCustomerPop" placeholder="Search by Customer or Ship-To"/>
+                    <SearchField width="50%" change="onSearchCustomerPop" placeholder="{i18n>searchPlcHolder}"/>
                     <ToolbarSpacer />
                     <Button icon="sap-icon://edit" press="onEditCustomerPopout" />
                     <Button icon="sap-icon://delete" press="onDeleteCustomerPopout" />
@@ -13,32 +13,32 @@
             <columns>
                 <Column mergeDuplicates="true" width="15rem">
                     <header>
-                        <Text text="Customer " />
+                        <Text text="{i18n>customer}" />
                     </header>
                 </Column>
                 <Column demandPopin="true" hAlign="Begin" width="15rem">
                     <header>
-                        <Text text="Ship To" />
+                        <Text text="{i18n>shipTo}" />
                     </header>
                 </Column>
                 <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="15rem">
                     <header>
-                        <Text text="Product" />
+                        <Text text="{i18n>product}" />
                     </header>
                 </Column>
                 <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="15rem">
                     <header>
-                        <Text text="Email" />
+                        <Text text="{i18n>email}" />
                     </header>
                 </Column>
                 <Column hAlign="Center">
                     <header>
-                        <Text text="Daily" />
+                        <Text text="{i18n>daily}" />
                     </header>
                 </Column>
                 <Column hAlign="Center" width="6rem">
                     <header>
-                        <Text text="On-Demand" />
+                        <Text text="{i18n>onDemandlbl}" />
                     </header>
                 </Column>
             </columns>
@@ -56,401 +56,12 @@
                 <ObjectStatus icon="{path:'oModel>DailyJob', formatter: '.formatter.getIconOrder'}" />
                 <ObjectStatus icon="{path:'oModel>OnDemandJob', formatter: '.formatter.getIconOrder'}" />
             </ColumnListItem>
-            <!-- <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000022" text="ALMACENES DISTRIBUIDORES DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="5" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="sap-icon://accept" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000022" text="ALMACENES DISTRIBUIDORES DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="sap-icon://accept" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000022" text="ALMACENES DISTRIBUIDORES DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="5" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000031" text="ALMACENES  DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="poukemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="7" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000030" text="SHELF DISTRIBUIDORES DE LA FRONTERA" />
-                    <ObjectIdentifier title="70228" text="70228-PARAJE DE ORIENTE" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="sap-icon://accept" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <ObjectIdentifier title="1000029" text="PETROTAL/RAFAEL PEREZ SERNA" />
-                <ObjectIdentifier title="705170" text="Pulatarco[TotalGas - 5170]" />
-                <HBox>
-                    <Link text="ARCO Regular Gas" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <HBox>
-                    <Link text="hjuemail2@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <core:Icon src="sap-icon://accept" />
-                <core:Icon src="sap-icon://accept" />
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000080" text="ALMACENES SHELF DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="4" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <ObjectIdentifier title="1000029" text="PETROTAL/RAFAEL PEREZ SERNA" />
-                <ObjectIdentifier title="705170" text="Pulatarco[TotalGas - 5170]" />
-                <HBox>
-                    <Link text="ARCO Regular Gas" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <HBox>
-                    <Link text="hjuemail2@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <core:Icon src="sap-icon://accept" />
-                <core:Icon src="sap-icon://accept" />
-            </ColumnListItem>
-            <ColumnListItem>
-                <ObjectIdentifier title="1000024" text="ALMACENES DISTRIBUIDORES DE LA" />
-                <ObjectIdentifier title="72269" text="Customer2" />
-                <HBox>
-                    <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="5" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <HBox>
-                    <Link text="email2@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="5" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <core:Icon src="sap-icon://accept" />
-                <core:Icon src="sap-icon://accept" />
-            </ColumnListItem>
-            <ColumnListItem>
-                <ObjectIdentifier title="1000025" text="ALMACENES DE LA FRONTERA" />
-                <ObjectIdentifier title="72265" text="Customer2" />
-                <HBox>
-                    <Link text="ARCO Regular Gas" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="1" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <HBox>
-                    <Link text="kiteemail2@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <core:Icon src="sap-icon://accept" />
-                <core:Icon src="sap-icon://accept" />
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000034" text="SOFASOGOOD DISTRIBUIDORES DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem> -->
-            <!-- <cells>
-                    <ObjectIdentifier title="1000034" text="ORBITAL KEYS FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem> -->
         </Table>
         <beginButton>
-            <Button text="Add New" type="Emphasized" press="onCreateCustomer" />
+            <Button text="{i18n>btnAddNew}" type="Emphasized" press="onCreateCustomer" />
         </beginButton>
         <endButton>
-            <Button text="Cancel" press="onClose" />
+            <Button text="{i18n>cancel}" press="onClose" />
         </endButton>
     </Dialog>
-    <!-- <TableSelectDialog id="myDialog" noDataText="No Products Found" title="Customer" search=".handleSearch" confirm=".handleClose" cancel=".handleClose">
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000022" text="ALMACENES DISTRIBUIDORES DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="5" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="sap-icon://accept" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000022" text="ALMACENES DISTRIBUIDORES DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="sap-icon://accept" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000022" text="ALMACENES DISTRIBUIDORES DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="5" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000031" text="ALMACENES  DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="poukemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="7" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000030" text="SHELF DISTRIBUIDORES DE LA FRONTERA" />
-                    <ObjectIdentifier title="70228" text="70228-PARAJE DE ORIENTE" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="sap-icon://accept" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <ObjectIdentifier title="1000029" text="PETROTAL/RAFAEL PEREZ SERNA" />
-                <ObjectIdentifier title="705170" text="Pulatarco[TotalGas - 5170]" />
-                <HBox>
-                    <Link text="ARCO Regular Gas" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <HBox>
-                    <Link text="hjuemail2@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <core:Icon src="sap-icon://accept" />
-                <core:Icon src="sap-icon://accept" />
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000080" text="ALMACENES SHELF DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="4" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000034" text="SOFASOGOOD DISTRIBUIDORES DE LA FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <cells>
-                    <ObjectIdentifier title="1000034" text="ORBITAL KEYS FRONTERA" />
-                    <ObjectIdentifier title="702268" text="702268-PARAJE DE ORIENTE-8070" />
-                    <HBox>
-                        <Link text="ARCO PREMIUM GAS EXP MX" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <HBox>
-                        <Link text="almacenesemail@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                        <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                    </HBox>
-                    <core:Icon src="" />
-                    <core:Icon src="sap-icon://accept" />
-                </cells>
-            </ColumnListItem>
-            <ColumnListItem>
-                <ObjectIdentifier title="1000029" text="PETROTAL/RAFAEL PEREZ SERNA" />
-                <ObjectIdentifier title="705170" text="Pulatarco[TotalGas - 5170]" />
-                <HBox>
-                    <Link text="ARCO Regular Gas" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="3" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <HBox>
-                    <Link text="hjuemail2@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <core:Icon src="sap-icon://accept" />
-                <core:Icon src="sap-icon://accept" />
-            </ColumnListItem>
-            <ColumnListItem>
-                <ObjectIdentifier title="1000026" text="ALMACENES DISTRIBUIDORES" />
-                <ObjectIdentifier title="72269" text="Pulatarco - Customer2 " />
-                <HBox>
-                    <Link text="ARCO Regular Gas" press="handlePopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="6" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <HBox>
-                    <Link text="emailkyile@address.com" press="handleEmailPopoverPress" ariaHasPopup="Dialog"/>
-                    <tnt:InfoLabel text="2" colorScheme="1" renderMode="Narrow"/>
-                </HBox>
-                <core:Icon src="sap-icon://accept" />
-                <core:Icon  />
-            </ColumnListItem>
-            <columns>
-                <Column mergeDuplicates="true" width="15rem">
-                    <header>
-                        <Text text="Customer " />
-                    </header>
-                </Column>
-                <Column demandPopin="true" hAlign="Begin" width="15rem">
-                    <header>
-                        <Text text="Ship To" />
-                    </header>
-                </Column>
-                <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="15rem">
-                    <header>
-                        <Text text="Product" />
-                    </header>
-                </Column>
-                <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="15rem">
-                    <header>
-                        <Text text="Email" />
-                    </header>
-                </Column>
-                <Column hAlign="Center">
-                    <header>
-                        <Text text="Daily" />
-                    </header>
-                </Column>
-                <Column hAlign="Center" width="6rem">
-                    <header>
-                        <Text text="On-Demand" />
-                    </header>
-                </Column>
-            </columns>
-
-        </TableSelectDialog> -->
 </core:FragmentDefinition>

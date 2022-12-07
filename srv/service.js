@@ -2,7 +2,6 @@ const constants = require("./util/constants-util.js");
 const log = require('cf-nodejs-logging-support');
 const cds = require('@sap/cds');
 const axios = require('axios');
-//***START Comment Before running in Local */
 const express = require('express');
 const passport = require('passport');
 const xsenv = require('@sap/xsenv');
@@ -17,6 +16,7 @@ const app = express();
 app.use(passport.initialize());
 app.use(passport.authenticate('JWT', { session: false }));
 const https = require('https');
+const LG_SERVICE = 'Service: ';
 // access credentials from environment variable (alternatively use xsenv)
 const VCAP_SERVICES = JSON.parse(process.env.VCAP_SERVICES)
 const CREDENTIALS = VCAP_SERVICES.jobscheduler[0].credentials
@@ -26,35 +26,56 @@ const baseURL = CREDENTIALS.url;
 const OA_CLIENTID = UAA.clientid;
 const OA_SECRET = UAA.clientsecret;
 const OA_ENDPOINT = UAA.url;
-// let oDesc="";
-//***END Comment Before running in Local */
 const core = require('@sap-cloud-sdk/core');
-const onPremData = require('./onpremise/onpremiseoperations.js');
+const onPremData = require('./onpremise/onpremiseGetOperations.js');
 const SapCfAxios = require('sap-cf-axios').default;
-const SapCfAxiosObj = SapCfAxios('CPIDEV');
+const SapCfAxiosObj = SapCfAxios('CPI');
 const onPostData = require('./onpremise/onpremisePostOperations.js');
 const JobSchedulerClient = require('@sap/jobs-client');
+//Function referance to onpremiseGetOperations.js
+const {getOnPremDetails} = require('./onpremise/onpremiseGetOperations.js');
+const {getOnPremTerminalDetails} = require('./onpremise/onpremiseGetOperations.js');
+const {getOnPremCustomerDetails} = require('./onpremise/onpremiseGetOperations.js');
+const {getOnPremProductDetails} = require('./onpremise/onpremiseGetOperations.js');
+const {getOnPremCustomerValueHelp} = require('./onpremise/onpremiseGetOperations.js');
+const {getOnPremTerminalValueHelp} = require('./onpremise/onpremiseGetOperations.js');
+const {getOnPremProductValueHelp} = require('./onpremise/onpremiseGetOperations.js');
+const {getOnPremCCEmail} = require('./onpremise/onpremiseGetOperations.js');
+//Function referance to onpremisePostOperations.js
+const {createProductDetail} = require('./onpremise/onpremisePostOperations.js');
+const {editOnDemand} = require('./onpremise/onpremisePostOperations.js');
+const {createCCEmailDetail} = require('./onpremise/onpremisePostOperations.js');
+const {createTerminalDetail} = require('./onpremise/onpremisePostOperations.js');
+const {createCustomerDetail} = require('./onpremise/onpremisePostOperations.js');
+const {updateTerminalDetail} = require('./onpremise/onpremisePostOperations.js');
+const {updateCustomerDetail} = require('./onpremise/onpremisePostOperations.js');
+const {updateProductDetail} = require('./onpremise/onpremisePostOperations.js');
+const {deleteCustomerDetail} = require('./onpremise/onpremisePostOperations.js');
+const {deleteTerminalDetail} = require('./onpremise/onpremisePostOperations.js');
+const {deleteProductDetail} = require('./onpremise/onpremisePostOperations.js');
+
 
 module.exports = cds.service.impl(async function () {
-  
+   /**
+* Function to get Job Details that will be called from UI
+*/  
   this.on('getJobDetails', async (req) => {
-    const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET); //getAccessToken; 
-    console.log("NEHA0 "+baseURL);
+    const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET); 
     const options = {
       baseURL: baseURL,
       token: token
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
-    let jobID = await getJobId('pricingNotificationJobs', scheduler);
+    let jobID = await getJobId(constants.jobNAME, scheduler);
     let jobDetails = await getJobDetals(jobID,scheduler);
     let sdisplayT,sdemandT;
     let resultJob = jobDetails.results;
     if(resultJob){
       for(var i=0; i<resultJob.length; i++ ){
-        if(resultJob[i].description === 'DAILY'){
+        if(resultJob[i].description === constants.daily){
           sdisplayT = resultJob[i].repeatAt;
         }
-        if(resultJob[i].description === 'ONDEMAND'){
+        if(resultJob[i].description === constants.onDemand){
           sdemandT = resultJob[i].time;
         }
       };
@@ -67,14 +88,17 @@ module.exports = cds.service.impl(async function () {
     return JSON.stringify(msg);
 
   });
+  /**
+* Function to delete Schedule
+*/   
   this.on('deleteSchedule', async (req) => {
-    const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);//getAccessToken;
+    const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET); 
     const options = {
       baseURL: baseURL,
       token: token
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
-    let jobID = await getJobId('pricingNotificationJobs', scheduler);
+    let jobID = await getJobId(constants.jobNAME, scheduler);
     let jobDetails = await getJobDetals(jobID,scheduler);
     let sDesc= req.data.desc;
     let sSId;
@@ -93,53 +117,32 @@ module.exports = cds.service.impl(async function () {
               return logger.log('Error deleting schedule: %s', err);
             }
             //Schedule deleted successfully
-            log.info("Schedule Deleted");
+            log.info(constants.LOG_JS_DEL);
           });
           break;
         }
       };
     }
-  });  
+  });
+  /**
+* Function to create Daily Schedule
+*/     
   this.on('createSchedule', async (req) => {
-    const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);//getAccessToken;
+    const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET); 
     const options = {
       baseURL: baseURL,
       token: token
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
-    let jobID = await getJobId('pricingNotificationJobs', scheduler);
+    let jobID = await getJobId(constants.jobNAME, scheduler);
     let sTime= req.data.time;
     let sDesc= req.data.desc;
-    // oDesc = sDesc;
-    // oDesc = sDesc;
-    // let sSId;
-    // let resultJob = jobDetails.results;
-    // if(resultJob){
-    //   for(var i=0; i<resultJob.length; i++ ){
-    //     if(resultJob[i].description.localeCompare(sDesc) == 0){
-    //       sSId = resultJob[i].scheduleId;
-    //       var req = {
-    //         jobId: jobID._id,
-    //         scheduleId: sSId
-    //       };
-    //       scheduler.deleteJobSchedule(req, function(err, result) {
-    //         if(err){
-    //           return logger.log('Error deleting schedule: %s', err);
-    //         }
-    //         //Schedule deleted successfully
-    //         log.info("Schedule Deleted");
-    //       });
-    //       break;
-    //     }
-    //   };
-    // }
-
+  
     var scJob = {
       jobId: jobID._id,
       schedule: {
          "repeatAt": sTime,
          "type": "recurring",
-        // "time": sTime,
         "description": sDesc,
         "data": {
           "headers":{"Content-Type":"application/json"},
@@ -159,14 +162,17 @@ module.exports = cds.service.impl(async function () {
     })
 
   });
+  /**
+* Function to create On-Demand Schedule
+*/   
   this.on('createOnDemandSchedule', async (req) => {
-    const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);//getAccessToken;
+    const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET); 
     const options = {
       baseURL: baseURL,
       token: token
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
-    let jobID = await getJobId('pricingNotificationJobs', scheduler);
+    let jobID = await getJobId(constants.jobNAME, scheduler);
     let jobDetails = await getJobDetals(jobID,scheduler);
     let sTime= req.data.time;
     let sDesc= req.data.desc;
@@ -185,7 +191,7 @@ module.exports = cds.service.impl(async function () {
               return logger.log('Error deleting schedule: %s', err);
             }
             //Schedule deleted successfully
-            log.info("Schedule Deleted");
+            log.info(constants.LOG_JS_DEL);
           });
           break;
         }
@@ -214,6 +220,9 @@ module.exports = cds.service.impl(async function () {
     })
 
   });
+  /**
+* Function to create Suspend Schedule
+*/   
   this.on('createSuspendSchedule', async (req) => {
     let timeArray= JSON.parse(req.data.time);
     const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);
@@ -222,7 +231,7 @@ module.exports = cds.service.impl(async function () {
       token: token
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
-    let jobID = await getJobId('pricingNotificationJobs', scheduler);
+    let jobID = await getJobId(constants.jobNAME, scheduler);
     let jobDetails = await getJobDetals(jobID,scheduler);
     // let oTemp = [timeArray];
     let sDesc = req.data.desc;
@@ -242,7 +251,7 @@ module.exports = cds.service.impl(async function () {
               return logger.log('Error deleting schedule: %s', err);
             }
             //Schedule deleted successfully
-            log.info("Schedule Deleted");
+            log.info(constants.LOG_JS_DEL);
           });
         }
       };
@@ -269,6 +278,9 @@ for(var j=0; j<timeArray.length; j++){
 }
 
   });
+    /**
+* Function to get Job Details
+*/ 
   async function getJobDetals(jobID, scheduler) {
     var req = {
       jobId: jobID._id
@@ -276,12 +288,12 @@ for(var j=0; j<timeArray.length; j++){
       return new Promise((resolve, reject) => {
         scheduler.fetchJobSchedules(req, function(err, result) {
           if(err){
-            // return logger.log('Error retrieving job: %s', err);
+            
             reject(err.message);
           }
           //job details retrieved successfully
           resolve(result)
-          // return logger.log('Fetched Job Details', req);
+          
         });
     })
 
@@ -303,6 +315,9 @@ for(var j=0; j<timeArray.length; j++){
     })
 
   }
+  /**
+* Function to get Schedule Details
+*/   
   async function getScheduleDetals(job_Id,schedule_Id,scheduler) {
     var req = {
       jobId: job_Id,
@@ -312,16 +327,17 @@ for(var j=0; j<timeArray.length; j++){
       return new Promise((resolve, reject) => {
         scheduler.fetchJobSchedule(req, function(err, result) {
           if(err){
-            // return logger.log('Error retrieving job: %s', err);
             reject(err.message);
           }
           //job details retrieved successfully
           resolve(result)
-          // return logger.log('Fetched Job Details', req);
         });
     })
 
   }
+    /**
+* Function to get Job ID
+*/ 
   async function getJobId(name, scheduler) {
     var req = {
       name: name
@@ -338,6 +354,9 @@ for(var j=0; j<timeArray.length; j++){
       });
     });
   }
+    /**
+* Function for Job schedule ENDPOINT
+*/ 
   this.on('MasterUpload', async (req) => {
     try {
       const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);
@@ -350,7 +369,7 @@ for(var j=0; j<timeArray.length; j++){
         let schedule_Id = req.headers['x-sap-job-schedule-id'];
         let schDetails = await getScheduleDetals(job_Id,schedule_Id,scheduler);
         let oDesc = schDetails.description;
-        let jobID = await getJobId('pricingNotificationJobs', scheduler);
+        let jobID = await getJobId(constants.jobNAME, scheduler);
         let jobDetails = await getJobDetals(jobID,scheduler);
         let resultJob = jobDetails.result;
         console.log("NEHA JOB: "+JSON.stringify(jobID));
@@ -363,51 +382,49 @@ for(var j=0; j<timeArray.length; j++){
         console.log(error);
     }
 });
-
-
 const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
     try {
-        let result = await operationMasterUpload(req,oDesc,resultJob,job_Id)
+        let result = await operationTriggerEndpoint(req,oDesc,resultJob,job_Id)
         if ((typeof result !== 'undefined') && (result !== null)) {
             await doUpdateStatus(headers, true, result)
             return result;
         } else {
-            await operationMasterUpload(req,oDesc,resultJob,job_Id)
+            await operationTriggerEndpoint(req,oDesc,resultJob,job_Id)
         }
     } catch (error) {
         doUpdateStatus(headers, false, error.message)
             .then(() => {
-                console.log('Successfully called REST api of Jobscheduler')
+                console.log(constants.LOG_JS_API);
+                log.info(constants.LOG_JS_API);
             }).catch((error) => {
-                console.log('Error occurred while calling REST api of Jobscheduler' + error)
-                
+                console.log(constants.LOG_JS_ERR + error);
+                log.info(constants.LOG_JS_ERR + error);   
             })
     }
 }
-  const operationMasterUpload = async function (req,oDesc,resultJob,job_Id) {
+/**
+* Function is the endpoint of the Job Schedules which sends Emails by calling the CPI endpoint
+*/  
+  const operationTriggerEndpoint = async function (req,oDesc,resultJob,job_Id) {
     try {
-      console.log("NEHA5 "+oDesc);
-      if(oDesc === 'DAILY' || oDesc === 'ONDEMAND' ){
-      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq '"+oDesc+"'";
-      console.log("NEHA1 "+sUrl);
-      let responseData = await onPremData.getOnPremDetails(sUrl);
+      log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
+      if(oDesc === constants.daily || oDesc === constants.onDemand ){
+      let sUrl = constants.CPI_DATA_URL+oDesc+"'";
+      let responseData = await getOnPremDetails(sUrl);
       let response = await SapCfAxiosObj({
-        method: 'POST',
-        url: "/http/httpendpoint",
+        method: constants.httpPost,
+        url: constants.CPI_ENDPOINT,
         headers: {
           'Content-Type': 'application/json'
         },
         data: responseData.data 
-        // {
-        //   result: resultData
-        // }
       }).then(res => {
-        return 'success';
+        return constants.SUCCESS;
       }).catch(async (error) => {
         return error;
       })
-      return 'tested from Job, success!!';
-    } else if(oDesc === 'SUSPEND'){
+      return response ;
+    } else if(oDesc === constants.suspend){
       if(resultJob){
         console.log("NEHA2 " +resultJob);
         console.log("NEHA3 "+resultJob.length);
@@ -437,7 +454,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
                 return logger.log('Error deleting schedule: %s', err);
               }
               //Schedule deleted successfully
-              log.info("Schedule Deactivated");
+              log.info(constants.LOG_SCH_DEL);
             });
           }
         }
@@ -447,10 +464,10 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
 
     }
     catch (error) {
-      req.error({ code: 401, message: error.message });
+      req.error({ code: constants.ERR, message: error.message });
     }
   }
-
+/********************Get Dynamic token for Jobscheduler***********************/
   const fetchJwtToken = function (clientId, clientSecret) {
     return new Promise((resolve, reject) => {
       const options = {
@@ -480,12 +497,10 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
         })
       })
         .on("error", (error) => {
-          console.log("Error: " + error.message);
           return reject({ error: error })
         });
     })
   }
-
   /********************Set the status in Jobscheduler***********************/
   const doUpdateStatus = function (headers, success, message) {
     return new Promise((resolve, reject) => {
@@ -509,16 +524,15 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
           const req = https.request(options, (res) => {
             res.setEncoding('utf8')
             const status = res.statusCode
-            if (status !== 200 && status !== 201) {
+            if (status !== constants.INTTWO && status !== constants.INTTW) {
               return reject(new Error('Failed to update status of job'))
             }
             res.on('data', () => {
-              console.log('Successfully hitting to jobschedular')
+              console.log(constants.LOG_JS_SUCC)
               resolve(message)
             })
           });
           req.on('error', (error) => {
-            console.log('error on hitting to jobschedular')
             return reject({ error: error })
           });
           req.write(data)
@@ -530,24 +544,13 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
         })
     })
   }
-  this.on('getEmailDetails', async (req) => {
-    try {
-      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq 'D'";
-      let response = await onPremData.getOnPremDetails(sUrl);
-      let resultData = {
-        data: response.data.d.results
-      }
-      return resultData;
-    }
-    catch (error) {
-      return error
-    }
-  });
-  //JOB SCHEDULING END//
+  /**
+* Function to get Terminal Details
+*/ 
   this.on('getTerminalDetails', async (req) => {
     try {
-      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/TerminalDetailSet?$orderby=UpdDate Desc,UpdTime Desc";
-      let response = await onPremData.getOnPremTerminalDetails(sUrl);
+      let sUrl = constants.URL_TerDetails;
+      let response = await  getOnPremTerminalDetails(sUrl);
       let resultData = {
         data: response.data.d.results
       }
@@ -557,11 +560,13 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
-
+  /**
+* Function to get Customer Details
+*/ 
   this.on('getCustomerDetails', async (req) => {
     try {
-      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/CustomerShipToDetailSet?$expand=ProductList";
-      let response = await onPremData.getOnPremCustomerDetails(sUrl);
+      let sUrl = constants.URL_CustDetails;
+      let response = await  getOnPremCustomerDetails(sUrl);
       let resultData = {
         data: response.data.d.results
       }
@@ -571,10 +576,14 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
+  /**
+* Function to get Product Details
+*/    
   this.on('getOnPremProductDetails', async (req) => {
     try {
-      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/ProductDetailSet?$orderby=UpdDate Desc,UpdTime Desc";
-      let response = await onPremData.getOnPremProductDetails(sUrl);
+      let sUrl = constants.URL_ProdDetails;
+      // let response = await  getOnPremProductDetails(sUrl);
+      let response = await  getOnPremProductDetails(req,sUrl);
       let resultData = {
         data: response.data.d.results
       }
@@ -584,24 +593,28 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
-  //Value Help Functions
+  /**
+* Function to get Customer F4 help data
+*/  
   this.on('getOnPremCustomerF4', async (req) => {
     try {
-      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/CustomerShipTo_VHSet";
-      let response = await onPremData.getOnPremCustomerValueHelp(sUrl);
+      let sUrl = constants.URL_F4cust;
+      let response = await  getOnPremCustomerValueHelp(sUrl);
       let resultData = {
         data: response.data.d.results
       }
       return resultData;
     }
     catch (error) {
-
     }
   });
+  /**
+* Function to get Terminal F4 help data
+*/     
   this.on('getOnPremTerminalF4', async (req) => {
     try {
-      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/Terminal_VHSet";
-      let response = await onPremData.getOnPremTerminalValueHelp(sUrl);
+      let sUrl = constants.URL_F4Ter;
+      let response = await  getOnPremTerminalValueHelp(sUrl);
       let resultData = {
         data: response.data.d.results
       }
@@ -611,26 +624,28 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
 
     }
   });
-
+/**
+* Function to get Product F4 Details
+*/   
   this.on('getOnPremProductF4', async (req) => {
     try {
-      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/Product_VHSet";
-      let response = await onPremData.getOnPremProductValueHelp(sUrl);
+      let sUrl = constants.URL_F4Prod;
+      let response = await  getOnPremProductValueHelp(sUrl);
       let resultData = {
         data: response.data.d.results
       }
       return resultData;
     }
     catch (error) {
-
     }
   });
-
-  //Function for get CC Email
+/**
+* Function to get CCEmails
+*/   
   this.on('getOnCCEmail', async (req) => {
     try {
-      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/KeyValueSet";
-      let response = await onPremData.getOnPremCCEmail(sUrl);
+      let sUrl = constants.URL_CC;
+      let response = await  getOnPremCCEmail(sUrl);
       let resultData = {
         data: response.data.d.results
       }
@@ -639,9 +654,12 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
     catch (error) {
     }
   });
+/**
+* Function to create/update CCEmails
+*/     
   this.on("createCCEmail", async (req) => {
     try {
-      let response = await onPostData.createCCEmailDetail(req);
+      let response = await  createCCEmailDetail(req);
       let resultData = { data: response };
       return resultData;
     }
@@ -649,12 +667,14 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
-  //Function to delete 
+  /**
+* Function to delete Customer Details
+*/   
   this.on("deleteCustomer", async (req) => {
     try {
       let m = req.data.customer;
       let n = req.data.shipTo;
-      let response = await onPostData.deleteCustomerDetail(req, m, n);
+      let response = await  deleteCustomerDetail(req, m, n);
       let resultData = { data: response };
       return resultData;
     }
@@ -662,11 +682,13 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
+/**
+* Function to delete Terminal Details
+*/     
   this.on("deleteTerminal", async (req) => {
     try {
       let m = req.data.terminal;
-
-      let response = await onPostData.deleteTerminalDetail(req, m);
+      let response = await  deleteTerminalDetail(req, m);
       let resultData = { data: response };
       return resultData;
     }
@@ -674,11 +696,13 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
-
+/**
+* Function to delete Product Details
+*/   
   this.on("deleteProduct", async (req) => {
     try {
       let m = req.data.product;
-      let response = await onPostData.deleteProductDetail(req, m);
+      let response = await  deleteProductDetail(req, m);
       let resultData = { data: response };
       return resultData;
     }
@@ -686,12 +710,12 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
-  //Function to call create product operation
+/**
+* Function to create Product Details
+*/     
   this.on("createProduct", async (req) => {
     try {
-      // log.info(`${LG_SERVICE}${__filename}`, "createSalesOrder", constants.LOG_INITIAL_COMMENT);
-      let response = await onPostData.createProductDetail(req);
-      // log.info(`${LG_SERVICE}${__filename}`, "createSalesOrder", constants.LOG_CREATING_SALES_ORDER);
+      let response = await  createProductDetail(req);
       let resultData = { data: response };
       return resultData;
     }
@@ -699,11 +723,12 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
+/**
+* Function to create Terminal Details
+*/   
   this.on("createTerminal", async (req) => {
     try {
-      // log.info(`${LG_SERVICE}${__filename}`, "createSalesOrder", constants.LOG_INITIAL_COMMENT);
-      let response = await onPostData.createTerminalDetail(req);
-      // log.info(`${LG_SERVICE}${__filename}`, "createSalesOrder", constants.LOG_CREATING_SALES_ORDER);
+      let response = await  createTerminalDetail(req);
       let resultData = { data: response };
       return resultData;
     }
@@ -711,11 +736,12 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
+/**
+* Function to create Customer Details
+*/   
   this.on("createCustomer", async (req) => {
     try {
-      // log.info(`${LG_SERVICE}${__filename}`, "createSalesOrder", constants.LOG_INITIAL_COMMENT);
-      let response = await onPostData.createCustomerDetail(req);
-      // log.info(`${LG_SERVICE}${__filename}`, "createSalesOrder", constants.LOG_CREATING_SALES_ORDER);
+      let response = await  createCustomerDetail(req);
       let resultData = { data: response };
       return resultData;
     }
@@ -723,10 +749,12 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
-  //Update Functions
+/**
+* Function to update customer/shipto selected at On-Demand Prosessing 
+*/
   this.on("updateOnDemand", async (req) => {
     try {
-      let response = await onPostData.EditOnDemand(req);
+      let response = await  editOnDemand(req);
       let resultData = { data: response };
       return resultData;
     }
@@ -734,11 +762,13 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
+/**
+* Function to update Terminal Details
+*/  
   this.on("updateTerminal", async (req) => {
     try {
       let m = req.data.terminal;
-      // log.info(`${LG_SERVICE}${__filename}`, "createSalesOrder", constants.LOG_INITIAL_COMMENT);
-      let response = await onPostData.updateTerminalDetail(req, m);
+      let response = await  updateTerminalDetail(req, m);
       let resultData = { data: response };
       return resultData;
     }
@@ -746,11 +776,12 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
+/**
+* Function to update Customer Details
+*/    
   this.on("updateCustomer", async (req) => {
     try {
-      let m = req.data.customer;
-      let n = req.data.shipTo;
-      let response = await onPostData.updateCustomerDetail(req);
+      let response = await  updateCustomerDetail(req);
       let resultData = { data: response };
       return resultData;
     }
@@ -758,10 +789,13 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
+/**
+* Function to update Product Details
+*/   
   this.on("updateProduct", async (req) => {
     try {
       let m = req.data.product;
-      let response = await onPostData.updateProductDetail(req, m);
+      let response = await  updateProductDetail(req, m);
       let resultData = { data: response };
       return resultData;
     }
@@ -769,749 +803,4 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return error
     }
   });
-  //Function to Trigger CPI for sending emails
-  this.on('triggerCPI', async (req) => {
-    let response = await SapCfAxiosObj({
-      method: 'POST',
-      url: "/http/httpendpoint",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: {
-        "Customer": [{
-          "To": "neha.thapa@accenture.com",
-          "CC": "neha.thapa@accenture.com",
-          "Subject": "MX-MARATHON PRICE NOTIFICATION (ALMACENES DISTRIBUIDORES DE LA FRONTERA)",
-          "Terminal": [{
-            "SoldtopartyName": "ALMACENES DISTRIBUIDORES DE LA FRONTERA",
-            "ShiptopartyName": "702268-PARAJE DE ORIENTE-8070",
-            "Plant": "MX-MAZATLAN-PEMEX",
-            "PricingDate": "5-Oct-22",
-            "ProductNames": [{
-              "Product1": "ARCO REGULAR"
-            }],
-            "PricingData": [
-
-              {
-                "ElementName": "Base Price:",
-                "P1": 16.6065
-              },
-              {
-                "ElementName": "Volume Adjustment:",
-                "P1": "-1.3600"
-              },
-              {
-                "ElementName": "Temp Competitive:",
-                "P1": "-0.1000"
-
-              },
-              {
-                "ElementName": "Frieght Adjustment:",
-                "P1": "0.0101"
-              },
-              {
-                "ElementName": "Rack Price Diff:",
-                "P1": "0.2087"
-              },
-              {
-                "ElementName": "Temp Adjustment:",
-                "P1": "0.4098"
-              },
-              {
-                "ElementName": "Premium:",
-                "P1": "0.2315"
-              },
-              {
-                "ElementName": "Rin Value Obligation:",
-                "P1": "0.1234"
-
-              },
-              {
-                "ElementName": "Reid Vapour Pressure",
-                "P1": "0.1234"
-
-              },
-              {
-                "ElementName": "Gross Up Adjustment:",
-                "P1": "0.3421"
-
-              },
-              {
-                "ElementName": "Tax Incentive:",
-                "P1": "0.5634"
-
-              },
-              {
-                "ElementName": "Price:",
-                "P1": 15.1465
-
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2D:",
-                "P1": 1.4929
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2H:",
-                "P1": 0.1456
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2A:",
-                "P1": 0.4847
-              },
-              {
-                "ElementName": "Unit Price:",
-                "P1": 17.2696
-              }
-            ]
-          },
-          {
-
-            "SoldtopartyName": "ALMACENES DISTRIBUIDORES DE LA FRONTERA",
-            "ShiptopartyName": "702268-PARAJE DE ORIENTE-8070",
-            "Plant": "MX-LA PAZ-PEMEX",
-            "PricingDate": "5-Oct-22",
-
-            "ProductNames": [{
-
-              "Product1": "ARCO REGULAR"
-            },
-            {
-              "Product2": "ARCO PREMIUM"
-            }
-
-            ],
-
-
-            "PricingData": [
-
-
-              {
-                "ElementName": "Base Price:",
-                "P1": 16.6065,
-                "P2": 17.5780
-
-              },
-              {
-                "ElementName": "Volume Adjustment:",
-                "P1": "-1.3600",
-                "P2": "-1.1700"
-              },
-              {
-                "ElementName": "Temp Competitive:",
-                "P1": "-0.1000",
-                "P2": "-0.1000"
-              },
-              {
-                "ElementName": "Frieght Adjustment:",
-                "P1": "",
-                "P2": ""
-              },
-              {
-                "ElementName": "Rack Price Diff:",
-                "P1": "",
-                "P2": ""
-
-              },
-              {
-                "ElementName": "Temp Adjustment:",
-                "P1": "",
-                "P2": ""
-              },
-              {
-                "ElementName": "Premium:",
-                "P1": "",
-                "P2": ""
-              },
-              {
-                "ElementName": "Rin Value Obligation:",
-                "P1": "",
-                "P2": ""
-              },
-              {
-                "ElementName": "Reid Vapour Pressure",
-                "P1": "",
-                "P2": ""
-              },
-              {
-                "ElementName": "Gross Up Adjustment:",
-                "P1": "",
-                "P2": ""
-              },
-              {
-                "ElementName": "Tax Incentive:",
-                "P1": "",
-                "P2": ""
-              },
-              {
-                "ElementName": "Price:",
-                "P1": 15.1465,
-                "P2": 16.3080
-
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2D:",
-                "P1": 1.4929,
-                "P2": 2.1461
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2H:",
-                "P1": 0.1456,
-                "P2": 0.1456
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2A:",
-                "P1": 0.4847,
-                "P2": 0.5914
-              },
-              {
-                "ElementName": "Unit Price:",
-                "P1": 17.2696,
-                "P2": 19.1911
-              }
-            ]
-          },
-
-          {
-
-            "SoldtopartyName": "ALMACENES DISTRIBUIDORES DE LA FRONTERA",
-            "ShiptopartyName": "702268-PARAJE DE ORIENTE-8070",
-            "Plant": "MX-VT-ELPASO",
-            "PricingDate": "5-Oct-22",
-
-            "ProductNames": [{
-
-              "Product1": "ARCO REGULAR"
-            },
-            {
-              "Product2": "ARCO PREMIUM"
-            },
-            {
-              "Product3": "ARCO DIESEL"
-            }
-            ],
-
-
-            "PricingData": [
-
-
-              {
-                "ElementName": "Base Price:",
-                "P1": 16.6065,
-                "P2": 17.5780,
-                "P3": 19.3730
-              },
-              {
-                "ElementName": "Volume Adjustment:",
-                "P1": "-1.3600",
-                "P2": "-1.1700",
-                "P3": "-1.1700"
-
-              },
-              {
-                "ElementName": "Temp Competitive:",
-                "P1": "-0.1000",
-                "P2": "-0.1000",
-                "P3": "-0.1000"
-
-              },
-              {
-                "ElementName": "Frieght Adjustment:",
-                "P1": "",
-                "P2": "",
-                "P3": ""
-
-              },
-              {
-                "ElementName": "Rack Price Diff:",
-                "P1": "",
-                "P2": "",
-                "P3": ""
-              },
-              {
-                "ElementName": "Temp Adjustment:",
-                "P1": "",
-                "P2": "",
-                "P3": ""
-              },
-              {
-                "ElementName": "Premium:",
-                "P1": "",
-                "P2": "",
-                "P3": ""
-              },
-              {
-                "ElementName": "Rin Value Obligation:",
-                "P1": "",
-                "P2": "",
-                "P3": ""
-              },
-              {
-                "ElementName": "Reid Vapour Pressure",
-                "P1": "",
-                "P2": "",
-                "P3": ""
-
-              },
-              {
-                "ElementName": "Gross Up Adjustment:",
-                "P1": "",
-                "P2": "",
-                "P3": "0.3156"
-              },
-              {
-                "ElementName": "Tax Incentive:",
-                "P1": "",
-                "P2": "",
-                "P3": "-0.3156"
-
-              },
-              {
-                "ElementName": "Price:",
-                "P1": 15.1465,
-                "P2": 16.3080,
-                "P3": 17.5730
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2D:",
-                "P1": 1.4929,
-                "P2": 2.1461,
-                "P3": "0.0000"
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2H:",
-                "P1": 0.1456,
-                "P2": 0.1456,
-                "P3": 0.1766
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2A:",
-                "P1": 0.4847,
-                "P2": 0.5914,
-                "P3": 0.4023
-              },
-              {
-                "ElementName": "Unit Price:",
-                "P1": 17.2696,
-                "P2": 19.1911,
-                "P3": 18.1519
-              }
-            ]
-          },
-
-
-          {
-
-            "SoldtopartyName": "ALMACENES DISTRIBUIDORES DE LA FRONTERA",
-            "ShiptopartyName": "702268-PARAJE DE ORIENTE-8070",
-            "Plant": "MX-CULIACAN-PEMEX",
-            "PricingDate": "5-Oct-22",
-
-            "ProductNames": [{
-
-              "Product1": "ARCO REGULAR"
-            },
-            {
-              "Product2": "ARCO PREMIUM"
-            },
-            {
-              "Product3": "ARCO DIESEL"
-            },
-            {
-              "Product4": "CLEAR REGULAR"
-            },
-            {
-              "Product5": "CLEAR PREMIUM"
-            }
-
-            ],
-
-
-            "PricingData": [
-
-
-              {
-                "ElementName": "Base Price:",
-                "P1": 16.6065,
-                "P2": 17.5780,
-                "P3": 19.3730,
-                "P4": 15.4812,
-                "P5": 16.2401
-
-              },
-              {
-                "ElementName": "Volume Adjustment:",
-                "P1": "-1.3600",
-                "P2": "-1.1700",
-                "P3": "-1.1700",
-                "P4": "",
-                "P5": ""
-
-              },
-              {
-                "ElementName": "Temp Competitive:",
-                "P1": "-0.1000",
-                "P2": "-0.1000",
-                "P3": "-0.1000",
-                "P4": "",
-                "P5": ""
-              },
-              {
-                "ElementName": "Frieght Adjustment:",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": ""
-
-              },
-              {
-                "ElementName": "Rack Price Diff:",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": ""
-              },
-              {
-                "ElementName": "Temp Adjustment:",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": ""
-
-              },
-              {
-                "ElementName": "Premium:",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": ""
-
-              },
-              {
-                "ElementName": "Rin Value Obligation:",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": ""
-              },
-              {
-                "ElementName": "Reid Vapour Pressure",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": ""
-              },
-              {
-                "ElementName": "Gross Up Adjustment:",
-                "P1": "",
-                "P2": "",
-                "P3": "0.3156",
-                "P4": "",
-                "P5": ""
-
-              },
-              {
-                "ElementName": "Tax Incentive:",
-                "P1": "",
-                "P2": "",
-                "P3": "-0.3156",
-                "P4": "",
-                "P5": ""
-
-              },
-              {
-                "ElementName": "Price:",
-                "P1": 15.1465,
-                "P2": 16.3080,
-                "P3": 17.5730,
-                "P4": "",
-                "P5": ""
-
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2D:",
-                "P1": 1.4929,
-                "P2": 2.1461,
-                "P3": "0.0000",
-                "P4": "",
-                "P5": ""
-
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2H:",
-                "P1": 0.1456,
-                "P2": 0.1456,
-                "P3": 0.1766,
-                "P4": "",
-                "P5": ""
-
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2A:",
-                "P1": 0.4847,
-                "P2": 0.5914,
-                "P3": 0.4023,
-                "P4": "",
-                "P5": ""
-              },
-              {
-                "ElementName": "Unit Price:",
-                "P1": 17.2696,
-                "P2": 19.1911,
-                "P3": 18.1519,
-                "P4": "",
-                "P5": ""
-              }
-            ]
-          },
-          {
-
-            "SoldtopartyName": "ALMACENES DISTRIBUIDORES DE LA FRONTERA",
-            "ShiptopartyName": "702268-PARAJE DE ORIENTE-8070",
-            "Plant": "MX-TOPOLOBAMPO-PEMEX",
-            "PricingDate": "5-Oct-22",
-
-            "ProductNames": [{
-
-              "Product1": "ARCO REGULAR"
-            },
-            {
-              "Product2": "ARCO PREMIUM"
-            },
-            {
-              "Product3": "ARCO DIESEL"
-            },
-            {
-              "Product4": "CLEAR REGULAR"
-            },
-            {
-              "Product5": "CLEAR PREMIUM"
-            },
-            {
-              "Product6": "CLEAR DIESEL"
-            },
-            {
-              "Product7": "PRODUCT7"
-            },
-            {
-              "Product8": "PRODUCT8"
-            }
-            ],
-
-
-
-            "PricingData": [
-
-
-              {
-                "ElementName": "Base Price:",
-                "P1": 16.6065,
-                "P2": 17.5780,
-                "P3": 19.3730,
-                "P4": 15.4812,
-                "P5": 16.2401,
-                "P6": 18.9900,
-                "P7": "12.0106",
-                "P8": ""
-              },
-              {
-                "ElementName": "Volume Adjustment:",
-                "P1": "-1.3600",
-                "P2": "-1.1700",
-                "P3": "-1.1700",
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-              },
-              {
-                "ElementName": "Temp Competitive:",
-                "P1": "-0.1000",
-                "P2": "-0.1000",
-                "P3": "-0.1000",
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              },
-              {
-                "ElementName": "Frieght Adjustment:",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              },
-              {
-                "ElementName": "Rack Price Diff:",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              },
-              {
-                "ElementName": "Temp Adjustment:",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              },
-              {
-                "ElementName": "Premium:",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              },
-              {
-                "ElementName": "Rin Value Obligation:",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              },
-              {
-                "ElementName": "Reid Vapour Pressure",
-                "P1": "",
-                "P2": "",
-                "P3": "",
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              },
-              {
-                "ElementName": "Gross Up Adjustment:",
-                "P1": "",
-                "P2": "",
-                "P3": "0.3156",
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              },
-              {
-                "ElementName": "Tax Incentive:",
-                "P1": "",
-                "P2": "",
-                "P3": "-0.3156",
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-              },
-              {
-                "ElementName": "Price:",
-                "P1": 15.1465,
-                "P2": 16.3080,
-                "P3": 17.5730,
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2D:",
-                "P1": 1.4929,
-                "P2": 2.1461,
-                "P3": "0.0000",
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2H:",
-                "P1": 0.1456,
-                "P2": 0.1456,
-                "P3": 0.1766,
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              },
-              {
-                "ElementName": "Tax MX - IEPS 2A:",
-                "P1": 0.4847,
-                "P2": 0.5914,
-                "P3": 0.4023,
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              },
-              {
-                "ElementName": "Unit Price:",
-                "P1": 17.2696,
-                "P2": 19.1911,
-                "P3": 18.1519,
-                "P4": "",
-                "P5": "",
-                "P6": "",
-                "P7": "",
-                "P8": ""
-
-              }
-            ]
-          }
-
-
-          ]
-
-        }]
-      }
-
-
-    }).then(res => {
-      return 'success';
-    }).catch(async (error) => {
-      return error;
-    })
-    return response;
-  });
-
 });

@@ -2,25 +2,25 @@
     xmlns:m="sap.m"
     xmlns:fb="sap.ui.comp.filterbar"
     xmlns:core="sap.ui.core">
-    <ValueHelpDialog  title="Select Customer" ok=".onValueHelpOkPress" cancel=".onValueHelpCancelPress" 
+    <ValueHelpDialog  title="{i18n>selectCustomer}" ok=".onValueHelpOkPress" cancel=".onValueHelpCancelPress" 
     afterClose=".onValueHelpAfterClose" supportRanges="false" key="Customer" descriptionKey="CustomerName">
         <filterBar>
             <fb:FilterBar advancedMode="true" search=".onFilterBarSearch" isRunningInValueHelpDialog="true">
                 <fb:filterGroupItems>
-                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="CustomerId" label="Customer ID" visibleInFilterBar="false">
+                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="CustomerId" label="{i18n>customerID}" visibleInFilterBar="false">
                         <fb:control>
-                            <m:Input name="Customer ID" />
+                            <m:Input name="{i18n>customerID}" />
                         </fb:control>
                     </fb:FilterGroupItem>
-                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="Name" label="Customer Name" visibleInFilterBar="false">
+                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="Name" label="{i18n>customerName}" visibleInFilterBar="false">
                         <fb:control>
-                            <m:Input name="Customer Name" />
+                            <m:Input name="{i18n>customerName}" />
                         </fb:control>
                     </fb:FilterGroupItem>
 
-                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="Ship-To" label="Ship-To" visibleInFilterBar="false">
+                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="Ship-To" label="{i18n>shipTo}" visibleInFilterBar="false">
                         <fb:control>
-                            <m:Input name="Ship-To" />
+                            <m:Input name="{i18n>shipTo}" />
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>

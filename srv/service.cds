@@ -10,7 +10,6 @@ service CatalogService @(requires : 'authenticated-user')
     function deleteSchedule(desc:String) returns String; 
     function createSuspendSchedule(time:String,desc:String) returns String;
     function getJobDetails() returns String;
-    function getEmailDetails() returns response;
     function getTerminalDetails() returns response;
     function getCustomerDetails() returns response;
     function getOnPremProductDetails() returns response;
@@ -29,7 +28,6 @@ service CatalogService @(requires : 'authenticated-user')
     action deleteCustomer(customer:String,shipTo:String) returns response; 
     action deleteTerminal(terminal:String) returns response;
     action deleteProduct(product:String) returns response;
-    function triggerCPI() returns String;
     
   
 }

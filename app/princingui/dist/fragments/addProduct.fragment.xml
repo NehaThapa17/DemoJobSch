@@ -1,25 +1,22 @@
 <core:FragmentDefinition 
      xmlns="sap.m"
     xmlns:f="sap.ui.layout.form"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns:l="sap.ui.layout"
-    xmlns:tnt="sap.tnt"
     xmlns:core="sap.ui.core">
-    <Dialog id="addProduct" title="Add Product" afterClose=".onValueProductAfterClose">
+    <Dialog id="addProduct" title="{i18n>addProduct}" afterClose=".onValueProductAfterClose">
      <f:SimpleForm editable="true" layout="ColumnLayout" title="" columnsXL="2" columnsL="1" columnsM="1">
         <f:content>
-            <Label text="Product ID" required="true"/>
+            <Label text="{i18n>productID}" required="true"/>
              <Input id="idInputProductID" maxLength="10" valueHelpRequest="onHandleValueHelpProduct" width="360px" showValueHelp="true" valueHelpOnly="true" />
-            <Label text="Product Name" />
+            <Label text="{i18n>productName}" />
             <Input id="idInputProductName"  maxLength="40" width="360px" />
             
         </f:content>  
     </f:SimpleForm>  
       <beginButton>
-            <Button text="Save" type="Emphasized" press="onPressProductSave" />
+            <Button text="{i18n>save}" type="Emphasized" press="onPressProductSave" />
         </beginButton>
         <endButton>
-            <Button text="Cancel" press="onProductClose" />
+            <Button text="{i18n>cancel}" press="onProductClose" />
         </endButton>
     </Dialog>
 </core:FragmentDefinition>    

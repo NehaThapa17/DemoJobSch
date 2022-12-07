@@ -1,20 +1,16 @@
-<core:FragmentDefinition xmlns="sap.ui.comp.valuehelpdialog"
-    xmlns:m="sap.m"
-    xmlns:fb="sap.ui.comp.filterbar"
-    xmlns:core="sap.ui.core">
-    <ValueHelpDialog  title="Products" ok=".onValueHelpOkPressProd" cancel=".onValueHelpCancelPressProd" 
-    supportRanges="false"  key="Product" descriptionKey="ProductName" >
+<core:FragmentDefinition xmlns="sap.ui.comp.valuehelpdialog" xmlns:m="sap.m" xmlns:fb="sap.ui.comp.filterbar" xmlns:core="sap.ui.core">
+    <ValueHelpDialog title="{i18n>products}" ok=".onValueHelpOkPressProd" cancel=".onValueHelpCancelPressProd" supportRanges="false" key="Product" descriptionKey="ProductName">
         <filterBar>
             <fb:FilterBar advancedMode="true" search=".onFilterBarSearchProd" isRunningInValueHelpDialog="true">
                 <fb:filterGroupItems>
-                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="Product" label="Product ID" visibleInFilterBar="true">
+                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="Product" label="{i18n>productID}" visibleInFilterBar="true">
                         <fb:control>
-                            <m:Input name="Product ID" />
+                            <m:Input name="{i18n>productID}" />
                         </fb:control>
                     </fb:FilterGroupItem>
-                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="ProductName" label="Product Name" visibleInFilterBar="true">
+                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="ProductName" label="{i18n>productName}" visibleInFilterBar="true">
                         <fb:control>
-                            <m:Input name="Product Name" />
+                            <m:Input name="{i18n>productName}" />
                         </fb:control>
                     </fb:FilterGroupItem>
                 </fb:filterGroupItems>

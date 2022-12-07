@@ -1,3 +1,12 @@
+/*&--------------------------------------------------------------------------------------*
+ * File name                    	   : controlView.controller.js	                     *
+ * Created By                          : NThapa@marathonpetroleum.com                   *            	
+ * Created On                          : 17-Oct-2022                                	 *                           							                                         *
+ * Purpose                             : Controller for controlView.view.xml to process data  
+ *                                       by the Pricing Analyst                                                               
+ *---------------------------------------------------------------------------------------*
+ */
+
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/m/MessageBox",
@@ -6,11 +15,7 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/ui/core/BusyIndicator",
-    "sap/base/Log",
-    "sap/ui/table/library",
     "sap/m/MessageToast",
-    "sap/ui/core/format/DateFormat",
-    "sap/ui/thirdparty/jquery",
     "sap/m/Token",
     "marathon/pp/princingui/utils/formatter",
     "marathon/pp/princingui/utils/constants",
@@ -19,29 +24,35 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, MessageBox, JSONModel, Fragment, Filter, FilterOperator, BusyIndicator, Log, library, MessageToast, DateFormat, jquery, Token, formatter, constants, SearchField) {
+    function (Controller, MessageBox, JSONModel, Fragment, Filter, FilterOperator, BusyIndicator, MessageToast, Token, formatter, constants, SearchField) {
         "use strict";
-        var aTokens;
         return Controller.extend("marathon.pp.princingui.controller.controlView", {
             formatter: formatter,
+            /**
+              * Method to initialize all models and global variables
+              * @public
+              */
             onInit: function () {
-
+                //fetch i18n model for text translation
                 this.oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+                //fetch the service model
                 this.oDataModelT = this.getOwnerComponent().getModel();
                 BusyIndicator.show();
                 var oModel = new JSONModel();
                 var oObj = new Date();
                 var oItemData = [];
                 oModel.setData(oItemData);
+                //set model 
                 this.getView().setModel(oModel, "oModel");
                 this.getOwnerComponent().setModel(oModel, "oModel");
                 this.getView().byId("idMultiInputTerminal").setModel(oModel, "oModel");
-                this.getView().byId("idDatePickerOnDemand").setMinDate(new Date());
-                this.getView().byId("idDatePickerSuspend").setMinDate(new Date());
-                this.getView().byId("idDatePicker2Suspend").setMinDate(new Date());
+                // this.getView().byId("idDatePickerOnDemand").setMinDate(new Date());
+                // this.getView().byId("idDatePickerSuspend").setMinDate(new Date());
+                // this.getView().byId("idDatePicker2Suspend").setMinDate(new Date());
                 this.getView().getModel("oModel").setProperty("/dateValue", oObj);
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.getRoute("RoutecontrolView").attachPatternMatched(this.onRouteControl, this);
+                //OData call to get display data
                 this.getTerminalDetails();
                 this.getProductDetails();
                 this.getF4Customer();
@@ -50,35 +61,39 @@ sap.ui.define([
                 this.getCCEmails();
                 this.getTime();
             },
+            /**
+              * Method called on init() to get Job Schedule Time.
+              * @public
+              */
             getTime: function () {
                 debugger;
                 var that = this;
                 this.oDataModelT.callFunction("/getJobDetails", {
-                    method: "GET",
+                    method: constants.httpGet,
                     success: function (oData) {
                         BusyIndicator.hide();
                         debugger;
                         var oDataArr2 = JSON.parse(oData.getJobDetails);
                         if (oDataArr2.DISPLAY !== undefined) {
                             var date = new Date(),
-                                index = oDataArr2.DISPLAY.indexOf(":"),
-                                hours = oDataArr2.DISPLAY.substring(0, index),
-                                minutes = oDataArr2.DISPLAY.substring(index + 1);
+                                index = oDataArr2.DISPLAY.indexOf(constants.DIV),
+                                hours = oDataArr2.DISPLAY.substring(constants.INTZERO, index),
+                                minutes = oDataArr2.DISPLAY.substring(index + constants.INTONE);
                             date.setHours(hours);
                             date.setMinutes(minutes);
                             // Get dates for January and July
-                            var dateJan = new Date(date.getFullYear(), 0, 1);
-                            var dateJul = new Date(date.getFullYear(), 6, 1);
+                            var dateJan = new Date(date.getFullYear(), constants.INTZERO, constants.INTONE);
+                            var dateJul = new Date(date.getFullYear(), constants.INTSIX, constants.INTONE);
                             // Get timezone offset
                             var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                            // var oTempDate = new Date(date.getTime() + ((1 * 60 * 60 * 1000) * 6));
+                            // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
                             if (date.getTimezoneOffset() < timezoneOffset) {
                                 // Adjust date by 5 hours
-                                date = new Date(date.getTime() - ((1 * 60 * 60 * 1000) * 5));
+                                date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
                             }
                             else {
                                 // Adjust date by 6 hours
-                                date = new Date(date.getTime() - ((1 * 60 * 60 * 1000) * 6));
+                                date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
                             }
                             // var timzone = new Date().toLocaleDateString(undefined, { day: '2-digit', timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
                             var sTime = date.toLocaleString('en-US', {
@@ -89,7 +104,7 @@ sap.ui.define([
                             that.getView().byId("idTextDailyST").setText(sTime);
                             that.getView().byId("idTimePickerInput").setValue(sTime);
                             that.getView().byId("idSwitchInput").setState(true);
-                            that.getView().byId("idInfoLabel").setColorScheme(7);
+                            that.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
                             that.getView().byId("idInfoLabel").setText("Active");
                             that.getView().byId("idTimePickerInput").setEnabled(false);
                         } else {
@@ -98,39 +113,44 @@ sap.ui.define([
                             that.getView().byId("idSwitchInput").setState(false);
                             that.getView().byId("idTimePickerInput").setEnabled(true);
                             that.getView().byId("idInfoLabel").setText("InActive");
-                            that.getView().byId("idInfoLabel").setColorScheme(1);
+                            that.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
                         }
                     },
                     error: function (err) {
                         debugger;
                         BusyIndicator.hide();
-                        MessageBox.error("Technical error has occurred ", {
+                        MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
                         });
 
                     }
                 });
             },
-            onRouteControl: function (oEvent) {
+            /**
+               * Method called for Routing.
+               * @public
+               */
+            onRouteControl: function () {
                 this.getCustomerDetails();
             },
+            /**
+              * Method called on init() to get CC Emails.
+              * @public
+              */
             getCCEmails: function () {
                 var that = this;
                 this.oDataModelT.callFunction("/getOnCCEmail", {
-                    method: 'GET',
+                    method: constants.httpGet,
                     success: function (oData) {
                         var dataTmp = oData.getOnCCEmail.data, oEmailArray;
-                        debugger;
                         if (dataTmp != undefined) {
                             if (dataTmp.length != constants.INTZERO) {
-                                for (var u = 0; u < dataTmp.length; u++) {
+                                for (var u = constants.INTZERO; u < dataTmp.length; u++) {
                                     switch (dataTmp[u].Key) {
-                                        case "EMAILCC":
-                                            oEmailArray = dataTmp[u].Value.split(";");
+                                        case constants.emailCC:
+                                            oEmailArray = dataTmp[u].Value.split(constants.spliter);
                                             break;
-                                        case "ONDEMANDT":
-                                            // that.getView().byId("idTextOnDemandST").setText(dataTmp[u].Value);
-                                            // that.getView().byId("idDatePickerOnDemand").setValue(dataTmp[u].Value);
+                                        case constants.checkD:
                                             break;
                                     }
                                 }
@@ -141,18 +161,21 @@ sap.ui.define([
                     },
                     error: function (err) {
                         BusyIndicator.hide();
-                        MessageBox.error("Technical error has occurred ", {
+                        MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
                         });
 
                     }
                 })
             },
+            /**
+              * Method called on init() to get Terminal Details.
+              * @public
+              */
             getTerminalDetails: function () {
-
                 var that = this;
                 this.oDataModelT.callFunction("/getTerminalDetails", {
-                    method: 'GET',
+                    method: constants.httpGet,
                     success: function (oData) {
                         if (oData.getTerminalDetails.data) {
                             that.getView().getModel("oModel").setProperty("/TerminalData", oData.getTerminalDetails.data);
@@ -162,17 +185,21 @@ sap.ui.define([
                     },
                     error: function (err) {
                         BusyIndicator.hide();
-                        MessageBox.error("Technical error has occurred ", {
+                        MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
                         });
 
                     }
                 })
             },
+            /**
+              * Method called on init() to get Product Details.
+              * @public
+              */
             getProductDetails: function () {
                 var that = this;
                 this.oDataModelT.callFunction("/getOnPremProductDetails", {
-                    method: 'GET',
+                    method: constants.httpGet,
                     success: function (oData) {
                         if (oData.getOnPremProductDetails.data) {
                             that.getView().getModel("oModel").setProperty("/ProductData", oData.getOnPremProductDetails.data);
@@ -182,25 +209,28 @@ sap.ui.define([
                     },
                     error: function (err) {
                         BusyIndicator.hide();
-                        MessageBox.error("Technical error has occurred ", {
+                        MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
                         });
 
                     }
                 })
             },
+            /**
+              * Method called on init() to get Customer Details.
+              * @public
+              */
             getCustomerDetails: function () {
                 var that = this;
                 this.oDataModelT.callFunction("/getCustomerDetails", {
-                    method: 'GET',
+                    method: constants.httpGet,
                     success: function (oData) {
-
                         var finalArray = [];
                         var oDataCust = oData.getCustomerDetails.data;
                         if (oDataCust) {
                             that.getView().byId("idTitleCustomer").setText(that.oBundle.getText("comCusText", [oData.getCustomerDetails.data.length]));
                             for (var a = constants.INTZERO; a < oDataCust.length; a++) {
-                                var oEmailArray = oDataCust[a].EmailTo.split(";"), oArray = [], oFirstProd;
+                                var oEmailArray = oDataCust[a].EmailTo.split(constants.spliter), oArray = [], oFirstProd;
                                 for (var b = constants.INTZERO; b < oEmailArray.length; b++) {
                                     var obj = {};
                                     obj.email = oEmailArray[b];
@@ -232,83 +262,88 @@ sap.ui.define([
                     },
                     error: function (err) {
                         BusyIndicator.hide();
-                        MessageBox.error("Technical error has occurred ", {
+                        MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
                         });
-
                     }
-
                 })
-
             },
+            /**
+              * Method called on init() to get Customer F4 Details.
+              * @public
+              */
             getF4Customer: function () {
                 var that = this;
                 this.oDataModelT.callFunction("/getOnPremCustomerF4", {
-                    method: 'GET',
+                    method: constants.httpGet,
                     success: function (oData) {
                         that.getView().getModel("oModel").setProperty("/CustValHelp", oData.getOnPremCustomerF4.data);
                         BusyIndicator.hide();
                     },
                     error: function (err) {
                         BusyIndicator.hide();
-                        MessageBox.error("Technical error has occurred ", {
+                        MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
                         });
-
                     }
                 })
             },
+            /**
+              * Method called on init() to get Terminal F4 Details.
+              * @public
+              */
             getF4Terminal: function () {
                 var that = this;
-
                 this.oDataModelT.callFunction("/getOnPremTerminalF4", {
-                    method: 'GET',
+                    method: constants.httpGet,
                     success: function (oData) {
                         that.getView().getModel("oModel").setProperty("/TerminalValHelp", oData.getOnPremTerminalF4.data);
-                        // ;
                         BusyIndicator.hide();
                     },
                     error: function (err) {
                         BusyIndicator.hide();
-                        MessageBox.error("Technical error has occurred ", {
+                        MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
                         });
-
                     }
                 })
             },
+            /**
+              * Method called on init() to get Product F4 Details.
+              * @public
+              */
             getF4Product: function () {
                 var that = this;
-
                 this.oDataModelT.callFunction("/getOnPremProductF4", {
-                    method: 'GET',
+                    method: constants.httpGet,
                     success: function (oData) {
-
                         that.getView().getModel("oModel").setProperty("/ProductValHelp", oData.getOnPremProductF4.data);
                         BusyIndicator.hide();
                     },
                     error: function (err) {
                         BusyIndicator.hide();
-                        MessageBox.error("Technical error has occurred ", {
+                        MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
                         });
-
                     }
                 })
             },
-            //Delete Customer
+            /**
+              * Method called on click of Delete button on Customer/Ship-To Table.
+              * @public
+              */
             onDeleteCustomer: function () {
                 var oTable = this.getView().byId("idProductsTable"), that = this;
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 var oTableData = this.getView().getModel("oModel").getProperty("/CustomerData");
-                if (itemIndex !== -1) {
+                if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
                     MessageBox.confirm(that.oBundle.getText("customerDeleted", [oItems.Customer]), {
                         onClose: function (oAction) {
-                            if (oAction === "OK") {
+                            if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
                                 that.oDataModelT.callFunction("/deleteCustomer", {
-                                    method: "POST",
+                                    method: constants.httpPost,
                                     urlParameters: {
                                         customer: oItems.Customer,
                                         shipTo: oItems.ShipTo,
@@ -320,10 +355,9 @@ sap.ui.define([
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error("Technical error has occurred ", {
+                                        MessageBox.error(that.oBundle.getText("techError"), {
                                             details: err
                                         });
-
                                     }
                                 });
                             }
@@ -336,19 +370,22 @@ sap.ui.define([
                 }
 
             },
+            /**
+              * Method called on click of Delete button on Customer Pop-out Table
+              * @public
+              */
             onDeleteCustomerPopout: function () {
                 var oTable = this.getView().byId("idTablePopout"), that = this;
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 var oTableData = this.getView().getModel("oModel").getProperty("/CustomerData");
-                if (itemIndex !== -1) {
-
+                if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
                     MessageBox.confirm(that.oBundle.getText("customerDeleted", [oItems.Customer]), {
                         onClose: function (oAction) {
-                            if (oAction === "OK") {
+                            if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
                                 that.oDataModelT.callFunction("/deleteCustomer", {
-                                    method: "POST",
+                                    method: constants.httpPost,
                                     urlParameters: {
                                         customer: oItems.Customer,
                                         shipTo: oItems.ShipTo,
@@ -360,7 +397,7 @@ sap.ui.define([
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error("Technical error has occurred ", {
+                                        MessageBox.error(that.oBundle.getText("techError"), {
                                             details: err
                                         });
 
@@ -376,50 +413,30 @@ sap.ui.define([
                 }
 
             },
+            /**
+              * Method called on change Event of idSwitchInput to handle creation of Daily Job Schedule. 
+              * @public
+              * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameters
+              */
             onSwtichChange: function (oEvent) {
                 var oState = oEvent.getSource().getState(), that = this,
                     oDaily = this.getView().byId("idTimePickerInput").getValue();
                 if (oState === false) {
                     this.getView().byId("idTimePickerInput").setEnabled(true);
                     this.getView().byId("idInfoLabel").setText("InActive");
-                    this.getView().byId("idInfoLabel").setColorScheme(1);
+                    this.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
                     //Delete Schedule
-                    var emptyString = " ";
                     this.oDataModelT.callFunction("/deleteSchedule", {
-                        method: "GET",
+                        method: constants.httpGet,
                         urlParameters: {
-                            desc: "DAILY"
+                            desc: constants.daily
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            // if (oData.createSchedule) {
-                            //     var jsonDT = {
-                            //         "Key": "DAILYT",
-                            //         "Value": emptyString
-                            //     }
-                            //     var oPayloadDT = JSON.stringify(jsonDT);
-                            //     debugger;
-                            //     that.oDataModelT.callFunction("/createCCEmail", {
-                            //         method: constants.httpPost,
-                            //         urlParameters: {
-                            //             createData: oPayloadDT
-                            //         },
-                            //         success: function (oData) {
-                            //             debugger;
-                            //         },
-                            //         error: function (err) {
-                            //             BusyIndicator.hide();
-                            //             MessageBox.error("Technical error has occurred ", {
-                            //                 details: err
-                            //             });
-
-                            //         }
-                            //     });
-                            // }
                         },
                         error: function (err) {
                             BusyIndicator.hide();
-                            MessageBox.error("Technical error has occurred ", {
+                            MessageBox.error(that.oBundle.getText("techError"), {
                                 details: err
                             });
 
@@ -430,37 +447,35 @@ sap.ui.define([
                         BusyIndicator.show();
                         var oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue()),
                             dateH = oDate.getHours(),
-                            dateM = (oDate.getMinutes()<10?'0':'') + oDate.getMinutes(),
+                            dateM = (oDate.getMinutes() < constants.INTTEN ? constants.ZERO : '') + oDate.getMinutes(),
                             dateValue = new Date();
                         dateValue.setHours(dateH);
                         dateValue.setMinutes(dateM);
                         // Get dates for January and July
-                        var dateJan = new Date(dateValue.getFullYear(), 0, 1);
-                        var dateJul = new Date(dateValue.getFullYear(), 6, 1);
+                        var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
+                        var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
                         // Get timezone offset
                         var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                        // var oTempDate = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
                         if (dateValue.getTimezoneOffset() < timezoneOffset) {
                             // Adjust date by 5 hours
-                            dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 5));
+                            dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
                         }
                         else {
                             // Adjust date by 6 hours
-                            dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
+                            dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
                         }
-                        var oMin = (dateValue.getMinutes()<10?'0':'') + dateValue.getMinutes();
-                        var oTime = dateValue.getHours() + ":" + oMin;
-
+                        var oMin = (dateValue.getMinutes() < constants.INTTEN ? constants.ZERO : '') + dateValue.getMinutes();
+                        var oTime = dateValue.getHours() + constants.DIV + oMin;
                         this.getView().byId("idTimePickerInput").setEnabled(false);
-                        this.getView().byId("idInfoLabel").setColorScheme(7);
+                        this.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
                         this.getView().byId("idInfoLabel").setText("Active");
                         this.getView().byId("idTextDailyST").setText(oDaily);
-
+                        //Create Daily Schedule
                         this.oDataModelT.callFunction("/createSchedule", {
-                            method: "GET",
+                            method: constants.httpGet,
                             urlParameters: {
                                 time: oTime,
-                                desc: "DAILY"
+                                desc: constants.daily
                             },
                             success: function (oData) {
                                 BusyIndicator.hide();
@@ -481,7 +496,7 @@ sap.ui.define([
                                 //         },
                                 //         error: function (err) {
                                 //             BusyIndicator.hide();
-                                //             MessageBox.error("Technical error has occurred ", {
+                                //             MessageBox.error(that.oBundle.getText("techError"), {
                                 //                 details: err
                                 //             });
 
@@ -492,7 +507,7 @@ sap.ui.define([
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
-                                MessageBox.error("Technical error has occurred ", {
+                                MessageBox.error(that.oBundle.getText("techError"), {
                                     details: err
                                 });
 
@@ -506,15 +521,17 @@ sap.ui.define([
 
 
             },
-
-            //Customer ID & Ship To Value Help
+            /**
+              * Method called for idMultiInputCustomer (Customer ID & Ship To Value Help) to fetch valuehelp dialog 
+              * @public
+              */
             onValueHelpRequested: function () {
                 this._oBasicSearchField = new SearchField();
                 this.oColModel = new JSONModel();
                 var aCols = {
                     "cols": [
                         {
-                            "label": "Customer ID",
+                            "label": this.oBundle.getText("customerID"), //"Customer ID"
                             "template": "Customer",
                         },
                         {
@@ -532,7 +549,7 @@ sap.ui.define([
                     ]
                 };
                 this.oColModel.setData(aCols);
-                this._oValueHelpDialogCust = sap.ui.xmlfragment("marathon.pp.princingui.fragments.CustomerListVH", this);
+                this._oValueHelpDialogCust = sap.ui.xmlfragment(constants.fragmentCusVH, this);
                 this.getView().addDependent(this._oValueHelpDialogCust);
                 // Set Basic Search for FilterBar
                 var oFilterBar = this._oValueHelpDialogCust.getFilterBar();
@@ -567,6 +584,11 @@ sap.ui.define([
                 this._oValueHelpDialogCust.setTokens(this.getView().byId("idMultiInputCustomer").getTokens());
                 this._oValueHelpDialogCust.open();
             },
+            /**
+              * Method called for idMultiInputCustomer (Customer ID & Ship To Value Help) 
+              * @public
+              * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameters
+              */
             onValueHelpOkPress: function (oEvent) {
                 var aTokens = oEvent.getParameter("tokens");
                 this.getView().byId("idMultiInputCustomer").setTokens(aTokens);
@@ -575,22 +597,22 @@ sap.ui.define([
             onValueHelpCancelPress: function () {
                 this._oValueHelpDialogCust.close();
             },
-
             onValueHelpAfterClose: function () {
                 this._oValueHelpDialogCust.destroy();
             },
-            handleTableSelectDialogPress: function (oEvent) {
-
-                var oButton = oEvent.getSource(),
-                    oView = this.getView();
+            /**
+              * Method called for Fullscreen Pop-out for Customer/Ship-To Table
+              * @public
+              */
+            handleTableSelectDialogPress: function () {
+                var oView = this.getView();
                 if (!this.byId("custTable")) {
                     Fragment.load({
                         id: oView.getId(),
-                        name: "marathon.pp.princingui.fragments.tablePopout",
+                        name: constants.fragmentCusTablePopout,
                         controller: this
                     }).then(function (oDialog) {
                         oView.addDependent(oDialog);
-                        // return oDialog;
                         oDialog.open();
                     });
                 } else {
@@ -598,57 +620,63 @@ sap.ui.define([
                 }
 
             },
-            //Expand Product Table
-            handleProductTableSelectDialogPress: function (oEvent) {
-                var oButton = oEvent.getSource(),
-                    oView = this.getView();
+            /**
+              * Method called for Fullscreen Pop-out for Product Table
+              * @public
+              */
+            handleProductTableSelectDialogPress: function () {
+                var oView = this.getView();
                 if (!this.byId("prodTable")) {
                     Fragment.load({
                         id: oView.getId(),
-                        name: "marathon.pp.princingui.fragments.tableProdPopout",
+                        name: constants.fragmentProdTablePopout,
                         controller: this
                     }).then(function (oDialog) {
                         oView.addDependent(oDialog);
-                        // return oDialog;
                         oDialog.open();
                     });
                 } else {
                     this.byId("prodTable").open();
                 }
             },
-            //Expand Terminal Table
-            handleTerminalTableSelectDialogPress: function (oEvent) {
+            /**
+              * Method called for Fullscreen Pop-out for Terminal Table
+              * @public
+              */
+            handleTerminalTableSelectDialogPress: function () {
                 var oView = this.getView();
                 if (!this.byId("terTable")) {
                     Fragment.load({
                         id: oView.getId(),
-                        name: "marathon.pp.princingui.fragments.tableTerPopout",
+                        name: constants.fragmentTerTablePopout,
                         controller: this
                     }).then(function (oDialog) {
                         oView.addDependent(oDialog);
-                        // return oDialog;
                         oDialog.open();
                     });
                 } else {
                     this.byId("terTable").open();
                 }
             },
+            /**
+              * Method called for email pop-over link on Customer/Ship-To Customer
+              * @public
+              * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameters
+              */
             handleEmailPopoverPress: function (oEvent) {
                 var oButton2 = oEvent.getSource(),
                     oView = this.getView(),
-                    // oB_ID = oButton2.getId(),
                     oB_ID = oEvent.getSource().getParent().getParent().getBindingContextPath(),
                     oB_len = oB_ID.length,
-                    olen = oB_len - 1,
+                    olen = oB_len - constants.INTONE,
                     oB_Indx = oB_ID.slice(olen),
                     oCustData = this.getView().getModel("oModel").getProperty("/CustomerData")[oB_Indx],
                     oTempModel = new JSONModel();
                 oTempModel.setData(oCustData.EmailArray);
-
                 if (!this._pPopoverEmail) {
                     this._pPopoverEmail = Fragment.load({
                         id: oView.getId(),
-                        name: "marathon.pp.princingui.fragments.emailPopover",
+                        name: constants.fragmentEmailPopover,
                         controller: this
                     }).then(function (oPopover) {
                         oView.addDependent(oPopover);
@@ -660,22 +688,25 @@ sap.ui.define([
                     oPopover.setModel(oTempModel);
                 });
             },
+            /**
+              * Method called for product pop-over link on Customer/Ship-To Customer
+              * @public
+              * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameters
+              */
             handlePopoverPress: function (oEvent) {
                 var oButton = oEvent.getSource(),
                     oView = this.getView(),
                     oB_ID = oEvent.getSource().getParent().getParent().getBindingContextPath(),
-                    // oButton.getId(),
                     oB_len = oB_ID.length,
-                    olen = oB_len - 1,
+                    olen = oB_len - constants.INTONE,
                     oB_Indx = oB_ID.slice(olen),
                     oCustData = this.getView().getModel("oModel").getProperty("/CustomerData")[oB_Indx],
                     oTempModel = new JSONModel();
                 oTempModel.setData(oCustData.ProductList);
-
                 if (!this._pPopover) {
                     this._pPopover = Fragment.load({
                         id: oView.getId(),
-                        name: "marathon.pp.princingui.fragments.productPopover",
+                        name: constants.fragmentProdPopover,
                         controller: this
                     }).then(function (oPopover) {
                         oView.addDependent(oPopover);
@@ -687,16 +718,18 @@ sap.ui.define([
                     oPopover.setModel(oTempModel);
                 });
             },
-            //Add Terminal
+            /**
+              * Method called on click of add button of add terminal
+              * @public
+              */
             handleTerminalSelectDialogPress: function () {
                 var oView = this.getView();
                 // create dialog lazily
-
                 if (!this.byId("addTerminal")) {
                     // load asynchronous XML fragment
                     Fragment.load({
                         id: oView.getId(),
-                        name: "marathon.pp.princingui.fragments.addTerminal",
+                        name: constants.fragmentAddTerminal,
                         controller: this
                     }).then(function (oDialog) {
                         // connect dialog to the root view
@@ -710,34 +743,33 @@ sap.ui.define([
                     oDialog.setTitle("Add Terminal");
                 }
             },
-            onTerminalClose: function (oEvent) {
+            onTerminalClose: function () {
                 this.byId("addTerminal").close();
                 this.byId("addTerminal").destroy();
                 // oEvent.getSource().getParent().close();
                 // oEvent.getSource().getParent().destroy();
-
             },
-            //Edit Terminal
+            /**
+              * Method called on click of edit button of terminal
+              * @public
+              */
             handleEditTerminalSelectDialogPress: function () {
-                var oTable = this.getView().byId("idTableTerminal");
+                var oTable = this.getView().byId("idTableTerminal"), that = this;
                 var oTableData = this.getView().getModel("oModel").getProperty("/TerminalData");
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
-                if (itemIndex !== -1) {
+                if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
                     var oView = this.getView();
                     // create dialog lazily
-
                     if (!this.byId("addTerminal")) {
-                        //     // load asynchronous XML fragment
-                        //     this._oTerminalDialog = 
                         Fragment.load({
                             id: oView.getId(),
-                            name: "marathon.pp.princingui.fragments.addTerminal",
+                            name: constants.fragmentAddTerminal,
                             controller: this
                         }).then(function (oDialog) {
                             oView.addDependent(oDialog);
                             oDialog.open();
-                            oDialog.setTitle("Edit Terminal");
+                            oDialog.setTitle(that.oBundle.getText("editTerminal"));
                             var oInputTer = sap.ui.core.Fragment.byId(oView.getId(), "idInputTerminalID");
                             oInputTer.setEnabled(false);
                             sap.ui.core.Fragment.byId(oView.getId(), "idInputTerminalID").setValue(oItems.Terminal);
@@ -745,32 +777,33 @@ sap.ui.define([
                             sap.ui.core.Fragment.byId(oView.getId(), "idCheckBoxDaily").setSelected(oItems.DailyJob);
                             sap.ui.core.Fragment.byId(oView.getId(), "idCheckBoxOnDemand").setSelected(oItems.OnDemandJob);
                         });
-
                     }
                 }
                 else {
-                    MessageBox.error("Select a Terminal to proceed");
+                    MessageBox.error(that.oBundle.getText("selectTerminal"));
                 }
             },
-            //Edit Terminal Popout
+            /**
+              * Method called on click of edit button of terminal pop-out table
+              * @public
+              */
             handleEditTerminalPopout: function () {
                 var oTable = this.getView().byId("idTerTablePopout"), that = this;
                 var oTableData = this.getView().getModel("oModel").getProperty("/TerminalData");
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
-                if (itemIndex !== -1) {
+                if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
                     var oView = this.getView();
                     // create dialog lazily
-
                     if (!this.byId("addTerminal")) {
                         Fragment.load({
                             id: oView.getId(),
-                            name: "marathon.pp.princingui.fragments.addTerminal",
+                            name: constants.fragmentAddTerminal,
                             controller: this
                         }).then(function (oDialog) {
                             oView.addDependent(oDialog);
                             oDialog.open();
-                            oDialog.setTitle("Edit Terminal");
+                            oDialog.setTitle(that.oBundle.getText("editTerminal"));
                             var oInputTer = sap.ui.core.Fragment.byId(oView.getId(), "idInputTerminalID");
                             oInputTer.setEnabled(false);
                             sap.ui.core.Fragment.byId(oView.getId(), "idInputTerminalID").setValue(oItems.Terminal);
@@ -782,39 +815,43 @@ sap.ui.define([
                     }
                 }
                 else {
-                    MessageBox.error("Select a Terminal to proceed");
+                    MessageBox.error(that.oBundle.getText("selectTerminal"));
                 }
             },
-            //Add Product
+            /**
+              * Method called on click of add button of product table
+              * @public
+              */
             handleProductSelectDialogPress: function () {
-                var oView = this.getView();
+                var oView = this.getView(), that = this;
                 // create dialog lazily
                 if (!this.byId("addProduct")) {
                     // load asynchronous XML fragment
                     Fragment.load({
                         id: oView.getId(),
-                        name: "marathon.pp.princingui.fragments.addProduct",
+                        name: constants.fragmentAddProd,
                         controller: this
                     }).then(function (oDialog) {
                         // connect dialog to the root view
                         //of this component (models, lifecycle)
                         oView.addDependent(oDialog);
                         oDialog.open();
-                        oDialog.setTitle("Add Product");
+                        oDialog.setTitle(that.oBundle.getText("addProduct"));
                     });
                 } else {
                     this.byId("addProduct").open();
-                    oDialog.setTitle("Add Product");
+                    oDialog.setTitle(that.oBundle.getText("addProduct"));
                 }
             },
-            //Edit Product
+            /**
+               * Method called on click of edit button of product table
+               * @public
+               */
             handleEditProductSelectDialogPress: function () {
-                var oTable = this.getView().byId("producttbl");
+                var oTable = this.getView().byId("producttbl"), that = this;
                 var oTableData = this.getView().getModel("oModel").getProperty("/ProductData");
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
-
-                if (itemIndex !== -1) {
-
+                if (itemIndex !== constants.INTNEGONE) {
                     var lineData = oTableData[itemIndex];
                     var oView = this.getView();
                     // create dialog lazily
@@ -822,14 +859,14 @@ sap.ui.define([
                         // load asynchronous XML fragment
                         Fragment.load({
                             id: oView.getId(),
-                            name: "marathon.pp.princingui.fragments.addProduct",
+                            name: constants.fragmentAddProd,
                             controller: this
                         }).then(function (oDialog) {
                             // connect dialog to the root view
                             //of this component (models, lifecycle)
                             oView.addDependent(oDialog);
                             oDialog.open();
-                            oDialog.setTitle("Edit Product");
+                            oDialog.setTitle(that.oBundle.getText("editProduct"));
                             var oProdID = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductID");
                             var oProdName = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductName");
                             oProdID.setValue(lineData.Product);
@@ -838,19 +875,22 @@ sap.ui.define([
                         });
                     } else {
                         this.byId("addProduct").open();
-                        oDialog.setTitle("Edit Product");
+                        oDialog.setTitle(that.oBundle.getText("editProduct"));
                     }
                 }
                 else {
                     MessageBox.error("Select a Product to proceed");
                 }
             },
+            /**
+               * Method called on click of edit button of product pop-out table
+               * @public
+               */
             handleEditProductPopout: function () {
                 var oTable = this.getView().byId("idProdTablePopout");
                 var oTableData = this.getView().getModel("oModel").getProperty("/ProductData");
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
-
-                if (itemIndex !== -1) {
+                if (itemIndex !== constants.INTNEGONE) {
                     var lineData = oTableData[itemIndex];
                     var oView = this.getView();
                     // create dialog lazily
@@ -858,14 +898,14 @@ sap.ui.define([
                         // load asynchronous XML fragment
                         Fragment.load({
                             id: oView.getId(),
-                            name: "marathon.pp.princingui.fragments.addProduct",
+                            name: constants.fragmentAddProd,
                             controller: this
                         }).then(function (oDialog) {
                             // connect dialog to the root view
                             //of this component (models, lifecycle)
                             oView.addDependent(oDialog);
                             oDialog.open();
-                            oDialog.setTitle("Edit Product");
+                            oDialog.setTitle(that.oBundle.getText("editProduct"));
                             var oProdID = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductID");
                             var oProdName = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductName");
                             oProdID.setValue(lineData.Product);
@@ -874,7 +914,7 @@ sap.ui.define([
                         });
                     } else {
                         this.byId("addProduct").open();
-                        oDialog.setTitle("Edit Product");
+                        oDialog.setTitle(that.oBundle.getText("editProduct"));
                     }
                 }
                 else {
@@ -886,13 +926,16 @@ sap.ui.define([
                 this.byId("addProduct").destroy();
             },
 
-            onValueHelpOkEmail: function (oEvent) {
-                var oMultiInput1 = oView.byId("multiInput1");
-                oMultiInput1.setTokens([
-                    new Token({ text: { email }, key: { key } }),
-                ]);
-            },
-
+            //     onValueHelpOkEmail: function () {
+            //         var oMultiInput1 = oView.byId("multiInput1");
+            //         oMultiInput1.setTokens([
+            //             new Token({ text: { email }, key: { key } }),
+            //         ]);
+            //     },
+            /**
+               * Method called on Close Event for pop-out Tables
+               * @public
+               */
             onClose: function () {
                 this.byId("custTable").close();
             },
@@ -902,21 +945,29 @@ sap.ui.define([
             onCloseTer: function () {
                 this.byId("terTable").close();
             },
+            /**
+               * Method called to Nav to createCust.View 
+               * @public
+               */
             onCreateCustomer: function () {
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RoutecreateView");
-
             },
+            /**
+               * Method called on search of Customer popout Table
+               * @public
+               * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameters
+               */
             onSearchCustomerPop: function (oEvent) {
                 var aFilters = [], aFiltersCombo = [];
                 var sQuery = oEvent.getSource().getValue();
                 if (sQuery && sQuery.length > constants.INTZERO) {
                     aFilters.push(new Filter({
                         filters: [
-                            new Filter({ path: "Customer", operator: FilterOperator.Contains, value1: sQuery }),
-                            new Filter({ path: "CustomerName", operator: FilterOperator.Contains, value1: sQuery }),
-                            new Filter({ path: "ShipTo", operator: FilterOperator.Contains, value1: sQuery }),
-                            new Filter({ path: "ShipToName", operator: FilterOperator.Contains, value1: sQuery })
+                            new Filter({ path: constants.pathCus, operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: constants.pathCName, operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: constants.pathSH, operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: constants.pathSHName, operator: FilterOperator.Contains, value1: sQuery })
                         ],
                         and: false
                     }));
@@ -931,27 +982,37 @@ sap.ui.define([
 
 
             },
-            _filterTableC: function (oFilter) {
-                var oVHD = this.byId("custTable");
-                oVHD.getTableAsync().then(function (oTable) {
-                    if (oTable.bindRows) {
-                        oTable.getBinding("rows").filter(oFilter);
-                    }
-                    if (oTable.bindItems) {
-                        oTable.getBinding("items").filter(oFilter);
-                    }
-                    // This method must be called after binding update of the table.
-                    oVHD.update();
-                });
-            },
+            //    /**
+            //       * Method called for filter customer table
+            //       * @public
+            //       * @param  oFilter An object consisting of filter values
+            //       */              
+            //     _filterTableC: function (oFilter) {
+            //         var oVHD = this.byId("custTable");
+            //         oVHD.getTableAsync().then(function (oTable) {
+            //             if (oTable.bindRows) {
+            //                 oTable.getBinding("rows").filter(oFilter);
+            //             }
+            //             if (oTable.bindItems) {
+            //                 oTable.getBinding("items").filter(oFilter);
+            //             }
+            //             // This method must be called after binding update of the table.
+            //             oVHD.update();
+            //         });
+            //     },
+            /**
+               * Method called on search of Terminal popout Table
+               * @public
+                * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameters
+               */
             onSearchTerminalPop: function (oEvent) {
                 var aFilters = [], aFiltersCombo = [];
                 var sQuery = oEvent.getSource().getValue();
                 if (sQuery && sQuery.length > constants.INTZERO) {
                     aFilters.push(new Filter({
                         filters: [
-                            new Filter({ path: "Terminal", operator: FilterOperator.Contains, value1: sQuery }),
-                            new Filter({ path: "TerminalName", operator: FilterOperator.Contains, value1: sQuery })
+                            new Filter({ path: constants.pathTer, operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: constants.pathTName, operator: FilterOperator.Contains, value1: sQuery })
                         ],
                         and: false
                     }));
@@ -964,14 +1025,19 @@ sap.ui.define([
                 var oBinding = oList.getBinding("items");
                 oBinding.filter(aFiltersCombo, "Application");
             },
+            /**
+               * Method called on search of Product popout Table
+               * @public
+                * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameters
+               */
             onSearchProductPop: function (oEvent) {
                 var aFilters = [], aFiltersCombo = [];
                 var sQuery = oEvent.getSource().getValue();
                 if (sQuery && sQuery.length > constants.INTZERO) {
                     aFilters.push(new Filter({
                         filters: [
-                            new Filter({ path: "Product", operator: FilterOperator.Contains, value1: sQuery }),
-                            new Filter({ path: "ProductName", operator: FilterOperator.Contains, value1: sQuery })
+                            new Filter({ path: constants.pathProd, operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: constants.pathProdName, operator: FilterOperator.Contains, value1: sQuery })
                         ],
                         and: false
                     }));
@@ -985,13 +1051,14 @@ sap.ui.define([
                 var oBinding = oList.getBinding("items");
                 oBinding.filter(aFiltersCombo, "Application");
             },
-            //Edit Customer
+            /**
+               * Method called on edit for customer Table
+               * @public
+               */
             onEditCustomer: function () {
-
                 var oTable = this.getView().byId("idProductsTable"), oArray = [];
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
-                if (itemIndex !== -1) {
-
+                if (itemIndex !== constants.INTNEGONE) {
                     var value = this.getView().getModel("oModel").getProperty("/CustomerData")[itemIndex];
                     var prodObj = [];
                     for (var g = constants.INTZERO; g < value.ProductList.results.length; g++) {
@@ -1023,11 +1090,14 @@ sap.ui.define([
                 }
 
             },
-            //Edit Customer Popout
-            onEditCustomerPopout: function (oEvent) {
+            /**
+               * Method called on edit for customer pop-out Table
+               * @public
+               */
+            onEditCustomerPopout: function () {
                 var oTable = this.getView().byId("idTablePopout"), oArray = [];
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
-                if (itemIndex !== -1) {
+                if (itemIndex !== constants.INTNEGONE) {
 
                     var value = this.getView().getModel("oModel").getProperty("/CustomerData")[itemIndex];
                     var prodObj = [];
@@ -1063,19 +1133,22 @@ sap.ui.define([
             onValueProductAfterClose: function () {
                 this.byId("addProduct").destroy();
             },
-            //Delete Terminal
+            /**
+              * Method called to delete Terminal
+              * @public
+              */
             onDeleteTerminal: function () {
                 var oTable = this.getView().byId("idTableTerminal"), that = this;
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 var oTableData = this.getView().getModel("oModel").getProperty("/TerminalData");
-                if (itemIndex !== -1) {
+                if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
                     MessageBox.confirm(that.oBundle.getText("terminalDeleted", [oItems.Terminal]), {
                         onClose: function (oAction) {
-                            if (oAction === "OK") {
+                            if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
                                 that.oDataModelT.callFunction("/deleteTerminal", {
-                                    method: "POST",
+                                    method: constants.httpPost,
                                     urlParameters: {
                                         terminal: oItems.Terminal
                                     },
@@ -1086,7 +1159,7 @@ sap.ui.define([
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error("Technical error has occurred ", {
+                                        MessageBox.error(that.oBundle.getText("techError"), {
                                             details: err
                                         });
 
@@ -1102,19 +1175,23 @@ sap.ui.define([
                 }
 
             },
-            //Delete Product
+            /**
+              * Method called to delete Product
+              * @public
+              * @param {sap.ui.base.Event} _evt An Event object consisting of an ID, a source and a map of parameters
+              */
             onDeleteProduct: function (_evt) {
                 var oTable = this.getView().byId("producttbl"), that = this;
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 var oTableData = this.getView().getModel("oModel").getProperty("/ProductData");
-                if (itemIndex !== -1) {
+                if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
                     MessageBox.confirm(that.oBundle.getText("productDeleted", [oItems.Product]), {
                         onClose: function (oAction) {
-                            if (oAction === "OK") {
+                            if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
                                 that.oDataModelT.callFunction("/deleteProduct", {
-                                    method: "POST",
+                                    method: constants.httpPost,
                                     urlParameters: {
                                         product: oItems.Product
                                     },
@@ -1126,7 +1203,7 @@ sap.ui.define([
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error("Technical error has occurred ", {
+                                        MessageBox.error(that.oBundle.getText("techError"), {
                                             details: err
                                         });
 
@@ -1141,18 +1218,23 @@ sap.ui.define([
 
                 }
             },
+            /**
+              * Method called to delete Terminal pop-out table
+              * @public
+              * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameters
+              */
             onDeleteTerminalPopout: function () {
                 var oTable = this.getView().byId("idTerTablePopout"), that = this;
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 var oTableData = this.getView().getModel("oModel").getProperty("/TerminalData");
-                if (itemIndex !== -1) {
+                if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
                     MessageBox.confirm(that.oBundle.getText("terminalDeleted", [oItems.Terminal]), {
                         onClose: function (oAction) {
-                            if (oAction === "OK") {
+                            if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
                                 that.oDataModelT.callFunction("/deleteTerminal", {
-                                    method: "POST",
+                                    method: constants.httpPost,
                                     urlParameters: {
                                         terminal: oItems.Terminal
                                     },
@@ -1163,7 +1245,7 @@ sap.ui.define([
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error("Technical error has occurred ", {
+                                        MessageBox.error(that.oBundle.getText("techError"), {
                                             details: err
                                         });
 
@@ -1176,20 +1258,24 @@ sap.ui.define([
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }
             },
-            //Delete Product Popout
+            /**
+              * Method called to delete Product pop-out table
+              * @public
+              * @param {sap.ui.base.Event} _evt An Event object consisting of an ID, a source and a map of parameters
+              */
             onDeleteProductPopout: function (_evt) {
                 var oTable = this.getView().byId("idProdTablePopout"), that = this;
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 var oTableData = this.getView().getModel("oModel").getProperty("/ProductData");
-                if (itemIndex !== -1) {
+                if (itemIndex !== constants.INTNEGONE) {
 
                     var oItems = oTableData[itemIndex];
                     MessageBox.confirm(that.oBundle.getText("productDeleted", [oItems.Product]), {
                         onClose: function (oAction) {
-                            if (oAction === "OK") {
+                            if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
                                 that.oDataModelT.callFunction("/deleteProduct", {
-                                    method: "POST",
+                                    method: constants.httpPost,
                                     urlParameters: {
                                         product: oItems.Product
                                     },
@@ -1200,7 +1286,7 @@ sap.ui.define([
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error("Technical error has occurred ", {
+                                        MessageBox.error(that.oBundle.getText("techError"), {
                                             details: err
                                         });
 
@@ -1213,8 +1299,11 @@ sap.ui.define([
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }
             },
-            //CC button
-            onEmailCCSelectDialogPress: function (oEvent) {
+            /**
+              * Method called to open CCEmail dialog
+              * @public
+              */
+            onEmailCCSelectDialogPress: function () {
                 var oView = this.getView(), aTokens = [],
                     oDataCC = oView.getModel("oModel").getProperty("/emailsCC");
                 if (oDataCC) {
@@ -1223,15 +1312,12 @@ sap.ui.define([
                         aTokens.push(otoken1);
                     }
                 }
-
-                // var otoken2 = new sap.m.Token({ key: "002", text: 'almacenesemail@address.com' });
-                // aTokens = [otoken1, otoken2];
                 // create dialog lazily
                 if (!this.byId("addEmail")) {
                     // load asynchronous XML fragment
                     Fragment.load({
                         id: oView.getId(),
-                        name: "marathon.pp.princingui.fragments.addEmailCc",
+                        name: constants.fragmentAddCCEmail,
                         controller: this
                     }).then(function (oDialog) {
                         // connect dialog to the root view
@@ -1244,7 +1330,7 @@ sap.ui.define([
                             var email = args.text;
                             var eArr = email.split('@');
                             var mailregex = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
-                            if (!mailregex.test(email) || eArr[1] !== "marathonpetroleum.com") {
+                            if (!mailregex.test(email) || eArr[constants.INTONE] !== "marathonpetroleum.com") {
                                 oMultiInput1.setValueState(sap.ui.core.ValueState.Error);
                             } else {
                                 oMultiInput1.setValueState(sap.ui.core.ValueState.None);
@@ -1260,6 +1346,11 @@ sap.ui.define([
                     this.byId("addEmail").open();
                 }
             },
+            /**
+              * Method called for validation of emailCC MultiInput
+              * @public
+              * @param {sap.ui.base.Event} oEvt An Event object consisting of an ID, a source and a map of parameters
+              */
             onEmailChangeCC: function (oEvt) {
                 var oMultiInput1 = this.getView().byId(oEvt.getSource().getId());
                 var sVal = oEvt.getParameters().value;
@@ -1286,7 +1377,11 @@ sap.ui.define([
                 this.byId("addEmail").close();
                 this.byId("addEmail").destroy();
             },
-            onCCEmailSave: function (oEvent) {
+            /**
+              * Method called to save CCEmails in S/4
+              * @public
+              */
+            onCCEmailSave: function () {
                 BusyIndicator.show();
                 var oCCEmail = this.getView().byId("multiInputemail").getTokens(), oCCEmailString, that = this;
                 if (oCCEmail.length !== constants.INTZERO) {
@@ -1295,12 +1390,11 @@ sap.ui.define([
                         if (j === constants.INTZERO) {
                             oCCEmailString = objEmail;
                         } else {
-                            oCCEmailString = oCCEmailString + ";" + objEmail;
+                            oCCEmailString = oCCEmailString + constants.spliter + objEmail;
                         }
-
                     }
                     var jsonCC = {
-                        "Key": "EMAILCC",
+                        "Key": constants.emailCC,
                         "Value": oCCEmailString
                     }
                     var oPayloadCC = JSON.stringify(jsonCC);
@@ -1323,7 +1417,7 @@ sap.ui.define([
                         },
                         error: function (err) {
                             BusyIndicator.hide();
-                            MessageBox.error("Technical error has occurred ", {
+                            MessageBox.error(that.oBundle.getText("techError"), {
                                 details: err
                             });
 
@@ -1331,7 +1425,11 @@ sap.ui.define([
                     });
                 }
             },
-            onPressEditOnDemand: function (oEvent) {
+            /**
+              * Method called to handle Edit button for OnDemand Processing
+              * @public
+              */
+            onPressEditOnDemand: function () {
                 this.getView().byId("idMultiInputCustomer").setEnabled(true);
                 this.getView().byId("idDatePickerOnDemand").setEnabled(true);
                 this.getView().byId("idMultiInputTerminal").setEnabled(true);
@@ -1339,6 +1437,10 @@ sap.ui.define([
                 this.getView().byId("idButtonCancel").setVisible(true);
                 this.getView().byId("idButtonEdit").setVisible(false);
             },
+            /**
+              * Method called to handle cancel button for OnDemand Processing
+              * @public
+              */
             onPressCancelOnDemand: function () {
                 this.getView().byId("idButtonSave").setVisible(false);
                 this.getView().byId("idButtonCancel").setVisible(false);
@@ -1356,6 +1458,10 @@ sap.ui.define([
 
 
             },
+            /**
+              * Method called to handle Save button for OnDemand Processing
+              * @public
+              */
             onPressSaveOnDemand: function () {
                 debugger;
                 // var oDate = this.getView().byId("idDatePickerOnDemand").getDateValue(),
@@ -1365,22 +1471,21 @@ sap.ui.define([
                     oTer = this.getView().byId("idMultiInputTerminal").getSelectedItems(),
                     oTer2 = this.getView().byId("idMultiInputTerminal").getSelectedKeys(),
                     xLen = oDate.length - 4,
-                    result = oDate.slice(0,xLen),
+                    result = oDate.slice(constants.INTZERO, xLen),
                     dateValue = new Date(result);
                 // Get dates for January and July
-                var dateJan = new Date(dateValue.getFullYear(), 0, 1);
-                var dateJul = new Date(dateValue.getFullYear(), 6, 1);
+                var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
+                var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
                 // Get timezone offset
                 var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
                 if (dateValue.getTimezoneOffset() < timezoneOffset) {
                     // Adjust date by 5 hours
-                    dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 5));
+                    dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
                 }
                 else {
                     // Adjust date by 6 hours
-                    dateValue = new Date(dateValue.getTime() + ((1 * 60 * 60 * 1000) * 6));
+                    dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
                 }
-
                 if (oDate && oCust.length !== constants.INTZERO && oTer.length !== constants.INTZERO) {
                     this.getView().byId("idMultiInputCustomer").setEnabled(false);
                     this.getView().byId("idDatePickerOnDemand").setEnabled(false);
@@ -1389,81 +1494,25 @@ sap.ui.define([
                     this.getView().byId("idButtonCancel").setVisible(false);
                     this.getView().byId("idButtonEdit").setVisible(true);
                     this.getView().byId("idTextOnDemandST").setText(result);
-                    var oJsonData = {
-                        "Customer" : [
-                        {
-                        "Customer" : "1000000",
-                        "ShipTo" : "801001"
-                        },
-                        {
-                        "Customer" : "1000005",
-                        "ShipTo" : "721177"
-                        }
-                        ],
-                        "Terminal" : [
-                        {
-                        "Terminal" : "TM01"
-                        },
-                        {
-                        "Terminal" : "TM29"
-                        }
-                        ]
-                        };                        
-                    var oPayloadOnD = JSON.stringify(oJsonData)
-                    this.oDataModelT.callFunction("/updateOnDemand", {
-                        method: "POST",
-                        urlParameters: {
-                            createData: oPayloadOnD
-                        },
-                        success: function (oData) {
-                            BusyIndicator.hide();
-                            MessageBox.success(that.oBundle.getText("succJS"));
-                        },
-                        error: function (err) {
-                            BusyIndicator.hide();
-                            MessageBox.error("Technical error has occurred ", {
-                                details: err
-                            });
+                    var oJsonData = this.getPayloadJson(oCust, oTer2);
 
-                        }
-                    });
                     this.oDataModelT.callFunction("/createOnDemandSchedule", {
-                        method: "GET",
+                        method: constants.httpGet,
                         urlParameters: {
                             time: result,
-                            desc: "ONDEMAND"
+                            desc: constants.onDemand
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            // if (oData.createSchedule) {
-                            //     var jsonDT = {
-                            //         "Key": "ONDEMANDT",
-                            //         "Value": oDate1
-                            //     }
-                            //     var oPayloadDT = JSON.stringify(jsonDT);
-                            //     debugger;
-                            //     that.oDataModelT.callFunction("/createCCEmail", {
-                            //         method: constants.httpPost,
-                            //         urlParameters: {
-                            //             createData: oPayloadDT
-                            //         },
-                            //         success: function (oData) {
-                            //             debugger;
-                            //         },
-                            //         error: function (err) {
-                            //             BusyIndicator.hide();
-                            //             MessageBox.error("Technical error has occurred ", {
-                            //                 details: err
-                            //             });
+                            if (oData.createOnDemandSchedule) {
+                                that.updateOndemandData(oJsonData);
+                                MessageBox.success(that.oBundle.getText("succJS"));
+                            }
 
-                            //         }
-                            //     });
-                            // }
-                            MessageBox.success(that.oBundle.getText("succJS"));
                         },
                         error: function (err) {
                             BusyIndicator.hide();
-                            MessageBox.error("Technical error has occurred ", {
+                            MessageBox.error(that.oBundle.getText("techError"), {
                                 details: err
                             });
 
@@ -1471,9 +1520,65 @@ sap.ui.define([
                     });
 
                 } else {
-                    MessageBox.error("Kindly fill the mandatory fields");
+                    MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
             },
+            /**
+              * Method called in onPressSaveOnDemand to create Payload
+              * @public
+              */
+            getPayloadJson: function (oCust, oTer2) {
+                var oCustArray = [], oTerArray = [],
+                    oTData = this.getView().getModel("oModel").getProperty("/CustomerData");
+                for (var i = constants.INTZERO; i < oCust.length; i++) {
+                    var oLen = oCust[i].getId().slice(-2),
+                        oIdx = oLen.replace(/\D+/g, '');
+                    var obj = {
+                        "Customer": oCust[i].getKey(),
+                        "ShipTo": oTData[oIdx].ShipTo
+                    };
+                    oCustArray.push(obj);
+                }
+                for (var i = constants.INTZERO; i < oTer2.length; i++) {
+                    var objTer = {
+                        "Terminal": oTer2[i]
+                    };
+                    oTerArray.push(objTer);
+                }
+                var oJsonData = {
+                    "Customer": oCustArray,
+                    "Terminal": oTerArray
+                };
+                return oJsonData
+            },
+            /**
+              * Method called in onPressSaveOnDemand to update S/4
+              * @public
+              */
+            updateOndemandData: function (oJsonData) {
+                var that = this;
+                var oPayloadOnD = JSON.stringify(oJsonData)
+                this.oDataModelT.callFunction("/updateOnDemand", {
+                    method: constants.httpPost,
+                    urlParameters: {
+                        createData: oPayloadOnD
+                    },
+                    success: function (oData) {
+                        BusyIndicator.hide();
+                    },
+                    error: function (err) {
+                        BusyIndicator.hide();
+                        MessageBox.error(that.oBundle.getText("techError"), {
+                            details: err
+                        });
+
+                    }
+                });
+            },
+            /**
+              * Method called to handle Edit button for Suspend
+              * @public
+              */
             onPressSuspendEdit: function () {
                 this.getView().byId("idDatePickerSuspend").setEnabled(true);
                 this.getView().byId("idDatePicker2Suspend").setEnabled(true);
@@ -1481,6 +1586,10 @@ sap.ui.define([
                 this.getView().byId("idButtonSuspendCancel").setVisible(true);
                 this.getView().byId("idButtonSuspendEdit").setVisible(false);
             },
+            /**
+              * Method called to handle Cancel button for Suspend
+              * @public
+              */
             onPressSuspendClear: function () {
                 this.getView().byId("idButtonSuspendCancel").setVisible(false);
                 this.getView().byId("idButtonSuspendSave").setVisible(false);
@@ -1494,14 +1603,18 @@ sap.ui.define([
                 this.getView().byId("idDatePicker2Suspend").setDateValue("");
 
             },
+            /**
+              * Method called to handle Save button for Suspend
+              * @public
+              */
             onPressSuspendSave: function () {
                 var oDateSuspendTo = this.getView().byId("idDatePickerSuspend").getDateValue(),
                     oDateSuspendFrom = this.getView().byId("idDatePicker2Suspend").getDateValue(),
-                    oArr=[],that = this,
+                    oArr = [], that = this,
                     xSuspendTo = oDateSuspendTo.toDateString().length,
-                    resultTo = oDateSuspendTo.toDateString() + oDateSuspendTo.toString().substring(xSuspendTo, xSuspendTo + 9),
+                    resultTo = oDateSuspendTo.toDateString() + oDateSuspendTo.toString().substring(xSuspendTo, xSuspendTo + constants.INTNINE),
                     xSuspendFrom = oDateSuspendFrom.toDateString().length,
-                    resultFrom = oDateSuspendFrom.toDateString() + oDateSuspendFrom.toString().substring(xSuspendFrom, xSuspendFrom + 9);
+                    resultFrom = oDateSuspendFrom.toDateString() + oDateSuspendFrom.toString().substring(xSuspendFrom, xSuspendFrom + constants.INTNINE);
                 if (oDateSuspendTo && oDateSuspendFrom) {
                     this.getView().byId("idInfoLabel").setText("Suspended");
                     this.getView().byId("idInfoLabel").setColorScheme(2);
@@ -1516,10 +1629,10 @@ sap.ui.define([
                     oArr.push(oDateSuspendFrom);
                     var oPayloadSus = JSON.stringify(oArr);
                     this.oDataModelT.callFunction("/createSuspendSchedule", {
-                        method: "GET",
+                        method: constants.httpGet,
                         urlParameters: {
                             time: oPayloadSus,
-                            desc: "SUSPEND"
+                            desc: constants.suspend
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
@@ -1527,18 +1640,22 @@ sap.ui.define([
                         },
                         error: function (err) {
                             BusyIndicator.hide();
-                            MessageBox.error("Technical error has occurred ", {
+                            MessageBox.error(that.oBundle.getText("techError"), {
                                 details: err
                             });
 
                         }
                     });
                 } else {
-                    MessageBox.error("Kindly fill the mandatory fields");
+                    MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
 
             },
-            onhandleChangeDP1Suspend: function (onEvent) {
+            /**
+              * Method called to change events for Suspend To
+              * @public
+              */
+            onhandleChangeDP1Suspend: function () {
                 var oDateSuspendTo = this.getView().byId("idDatePickerSuspend").getDateValue(),
                     oDateSuspendFrom = this.getView().byId("idDatePicker2Suspend").getDateValue();
                 if (oDateSuspendFrom <= oDateSuspendTo) {
@@ -1546,18 +1663,13 @@ sap.ui.define([
                 }
                 else {
                     this.getView().byId("idDatePicker2Suspend").setValueState("None");
-                    // var suspendstarttime = this.getView().byId("idObjStatusS1");
-                    // suspendstarttime.setText(this.getView().byId("idDatePickerSuspend").getValue());
-                    // const date = new Date(this.getView().byId("idDatePickerSuspend").getValue());
-                    // //  convert date to CST (Central Standard Time)
-                    // suspendstarttime.setText(date.toLocaleString('en-US', {
-                    //     timeZone: 'CST',
-                    //     dateStyle: 'medium',
-                    //     timeStyle: 'medium',
-                    //   }));
                 }
             },
-            onhandleChangeDP2Suspend: function (onEvent) {
+            /**
+              * Method called to change events for Suspend From
+              * @public
+              */
+            onhandleChangeDP2Suspend: function () {
                 var oDateSuspendTo = this.getView().byId("idDatePickerSuspend").getDateValue(),
                     oDateSuspendFrom = this.getView().byId("idDatePicker2Suspend").getDateValue();
                 if (oDateSuspendFrom <= oDateSuspendTo) {
@@ -1572,15 +1684,18 @@ sap.ui.define([
             onChangeDP2: function () {
                 this.getView().byId("idDatePicker2Suspend").setValueState("None");
             },
-            //*************Terminal Value Help */
-            onHandleValueHelpTerminal: function (oEvent) {
+            /**
+      * Method to open Terminal value help 
+      * @public
+      */
+            onHandleValueHelpTerminal: function () {
                 var oView = this.getView();
                 // create dialog lazily
                 if (!this.byId("idDialogTerminalF4")) {
                     // load asynchronous XML fragment
                     Fragment.load({
                         id: oView.getId(),
-                        name: "marathon.pp.princingui.fragments.terminalF4",
+                        name: constants.fragmentTerF4,
                         controller: this
                     }).then(function (oDialog) {
                         oView.addDependent(oDialog);
@@ -1603,7 +1718,11 @@ sap.ui.define([
                     this.getView().byId("idInputTerminalName").setValue(aContexts.map(function (oContext) { return oContext.getObject().Terminalname; }));
                 }
             },
-            onPressTerminalSave: function (oEvent) {
+    /**
+    * Method to Save Terminal data to S/4
+    * @public
+    */
+            onPressTerminalSave: function () {
                 var oTerID = this.getView().byId("idInputTerminalID").getValue(),
                     oTerName = this.getView().byId("idInputTerminalName").getValue(), oJsonData,
                     isEnabled = this.getView().byId("idInputTerminalID").getEnabled(),
@@ -1621,7 +1740,6 @@ sap.ui.define([
                     }
                     var oPayloadTer = JSON.stringify(oJsonData)
                     if (isEnabled === true) {
-                        // this.openBusyDialog(this.oBundle.getText("placingOrder"));
                         this.oDataModelT.callFunction("/createTerminal", {
                             method: constants.httpPost,
                             urlParameters: {
@@ -1644,7 +1762,7 @@ sap.ui.define([
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
-                                MessageBox.error("Technical error has occurred ", {
+                                MessageBox.error(that.oBundle.getText("techError"), {
                                     details: err
                                 });
 
@@ -1653,7 +1771,6 @@ sap.ui.define([
                     }
                     else {
                         var that = this;
-                        // this.openBusyDialog(this.oBundle.getText("placingOrder"));
                         this.oDataModelT.callFunction("/updateTerminal", {
                             method: constants.httpPost,
                             urlParameters: {
@@ -1674,7 +1791,7 @@ sap.ui.define([
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
-                                MessageBox.error("Technical error has occurred ", {
+                                MessageBox.error(that.oBundle.getText("techError"), {
                                     details: err
                                 });
 
@@ -1684,29 +1801,19 @@ sap.ui.define([
 
 
                 } else {
-                    MessageBox.error("Kindly fill the mandatory fields");
+                    MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
             },
-            //*************Product Value Help */
-            onHandleValueHelpProduct: function (oEvent) {
+    /**
+      * Method to open productVH fargment
+      * @public
+      */
+            onHandleValueHelpProduct: function () {
                 var oView = this.getView();
                 // create dialog lazily
-                this._oValueHelpDialogListProd = sap.ui.xmlfragment("marathon.pp.princingui.fragments.productF4", this);
+                this._oValueHelpDialogListProd = sap.ui.xmlfragment(constants.fragmentProdF4, this);
                 oView.addDependent(this._oValueHelpDialogListProd);
                 this._oValueHelpDialogListProd.open();
-                // if (!this.byId("idDialogProductF4")) {
-                //     // load asynchronous XML fragment
-                //     Fragment.load({
-                //         id: oView.getId(),
-                //         name: "marathon.pp.princingui.fragments.productF4",
-                //         controller: this
-                //     }).then(function (oDialog) {
-                //         oView.addDependent(oDialog);
-                //         oDialog.open();
-                //     });
-                // } else {
-                //     this.byId("idDialogProductF4").open();
-                // }
             },
             _handleValueHelpCloseProduct: function () {
                 this._oValueHelpDialogListProd.close();
@@ -1721,8 +1828,11 @@ sap.ui.define([
                     this.getView().byId("idInputProductName").setValue(aContexts.map(function (oContext) { return oContext.getObject().ProductName; }));
                 }
             },
+    /**
+      * Method to Save product details to S/4
+      * @public
+      */            
             onPressProductSave: function () {
-
                 BusyIndicator.show();
                 var oProdID = this.getView().byId("idInputProductID").getValue(),
                     oProdName = this.getView().byId("idInputProductName").getValue(), oPayloadPro, oJsonData,
@@ -1735,7 +1845,6 @@ sap.ui.define([
                     }
                     var oPayloadPro = JSON.stringify(oJsonData)
                     if (oInputStatus === true) {
-                        // this.openBusyDialog(this.oBundle.getText("placingOrder"));
                         this.oDataModelT.callFunction("/createProduct", {
                             method: constants.httpPost,
                             urlParameters: {
@@ -1758,7 +1867,7 @@ sap.ui.define([
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
-                                MessageBox.error("Technical error has occurred ", {
+                                MessageBox.error(that.oBundle.getText("techError"), {
                                     details: err
                                 });
 
@@ -1785,7 +1894,7 @@ sap.ui.define([
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
-                                MessageBox.error("Technical error has occurred ", {
+                                MessageBox.error(that.oBundle.getText("techError"), {
                                     details: err
                                 });
 
@@ -1794,41 +1903,46 @@ sap.ui.define([
                     }
 
                 } else {
-                    MessageBox.error("Kindly fill the mandatory fields");
+                    MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
             },
+            //         /**
+            //   * Method to close the Busy Dialog
+            //   * @public
+            //   */
+            //         closeBusyDialog: function () {
+            //             this._pBusyDialog.then(function (oBusyDialog) {
+            //                 oBusyDialog.close();
+            //             });
+            //         },
             /**
-      * Method to close the Busy Dialog
+      * Method for  customerVH fargment filter bar 
       * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
       */
-            closeBusyDialog: function () {
-                this._pBusyDialog.then(function (oBusyDialog) {
-                    oBusyDialog.close();
-                });
-            },
             onFilterBarSearch: function (oEvent) {
                 var sSearchQuery = this._oBasicSearchField.getValue(),
                     aSelectionSet = oEvent.getParameter("selectionSet");
                 var aFilters = aSelectionSet.reduce(function (aResult, oControl) {
                     if (oControl.getValue()) {
                         switch (oControl.getName()) {
-                            case "Customer ID":
+                            case constants.filterCUSID:
                                 aResult.push(new Filter({
-                                    path: "Customer",
+                                    path: constants.pathCus,
                                     operator: FilterOperator.Contains,
                                     value1: oControl.getValue()
                                 }));
                                 break;
-                            case "Ship-To":
+                            case constants.filterSH:
                                 aResult.push(new Filter({
-                                    path: "Shipto",
+                                    path: constants.pathSH2,
                                     operator: FilterOperator.Contains,
                                     value1: oControl.getValue()
                                 }));
                                 break;
-                            case "Customer Name":
+                            case constants.filterName:
                                 aResult.push(new Filter({
-                                    path: "CustomerName",
+                                    path: constants.pathCName,
                                     operator: FilterOperator.Contains,
                                     value1: oControl.getValue()
                                 }));
@@ -1839,10 +1953,10 @@ sap.ui.define([
                 }, []);
                 aFilters.push(new Filter({
                     filters: [
-                        new Filter({ path: "Customer", operator: FilterOperator.Contains, value1: sSearchQuery }),
-                        new Filter({ path: "CustomerName", operator: FilterOperator.Contains, value1: sSearchQuery }),
-                        new Filter({ path: "ShipTo", operator: FilterOperator.Contains, value1: sSearchQuery }),
-                        new Filter({ path: "ShipToName", operator: FilterOperator.Contains, value1: sSearchQuery })
+                        new Filter({ path: constants.pathCus, operator: FilterOperator.Contains, value1: sSearchQuery }),
+                        new Filter({ path: constants.pathCName, operator: FilterOperator.Contains, value1: sSearchQuery }),
+                        new Filter({ path: constants.pathSH, operator: FilterOperator.Contains, value1: sSearchQuery }),
+                        new Filter({ path: constants.pathSHName, operator: FilterOperator.Contains, value1: sSearchQuery })
                     ],
                     and: false
                 }));
@@ -1864,14 +1978,18 @@ sap.ui.define([
                     oVHD.update();
                 });
             },
+            /**
+      * Method for  customerVH fargment filter bar 
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */
             _handleValueHelpSearchTerminal: function (oEvent) {
-
                 var sQuery = oEvent.getParameter("value"), aFilters = [], aFiltersCombo = [];
                 if (sQuery && sQuery.length > constants.INTZERO) {
                     aFilters.push(new Filter({
                         filters: [
-                            new Filter({ path: "Terminal", operator: FilterOperator.Contains, value1: sQuery }),
-                            new Filter({ path: "Terminalname", operator: FilterOperator.Contains, value1: sQuery })
+                            new Filter({ path: constants.pathTer, operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: constants.pathTername, operator: FilterOperator.Contains, value1: sQuery })
                         ],
                         and: false
                     }));
@@ -1883,14 +2001,18 @@ sap.ui.define([
                 var oBinding = oEvent.getSource().getBinding("items");
                 oBinding.filter([aFiltersCombo]);
             },
+            /**
+      * Method for  customerVH fargment filter bar 
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */
             _handleValueHelpSearchProduct: function (oEvent) {
-
                 var sQuery = oEvent.getParameter("value"), aFilters = [], aFiltersCombo = [];
                 if (sQuery && sQuery.length > constants.INTZERO) {
                     aFilters.push(new Filter({
                         filters: [
-                            new Filter({ path: "Product", operator: FilterOperator.Contains, value1: sQuery }),
-                            new Filter({ path: "ProductName", operator: FilterOperator.Contains, value1: sQuery })
+                            new Filter({ path: constants.pathProd, operator: FilterOperator.Contains, value1: sQuery }),
+                            new Filter({ path: constants.pathProdName, operator: FilterOperator.Contains, value1: sQuery })
                         ],
                         and: false
                     }));
@@ -1902,13 +2024,18 @@ sap.ui.define([
                 var oBinding = oEvent.getSource().getBinding("items");
                 oBinding.filter([aFiltersCombo]);
             },
+            /**
+      * Method for  customerVH fargment filter bar 
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */
             handleChangeOnDemand: function (oEvent) {
                 debugger;
                 var oDTP = oEvent.getSource(),
-				sValue = oEvent.getParameter("value"),
-				bValid = oEvent.getParameter("valid");
+                    sValue = oEvent.getParameter("value"),
+                    bValid = oEvent.getParameter("valid");
                 // oDTP.getId().setValue(sValue);
-                
+
                 //  convert date to CST (Central Standard Time)
                 // suspendstarttime.setText(date.toLocaleString('en-US', {
 
@@ -1921,7 +2048,7 @@ sap.ui.define([
                 // }));
                 // debugger;
                 // var date = new Date(this.getView().byId("idDatePickerOnDemand").getValue()),
-                // result = date.toDateString() + date.toString().substring(x, x + 9);
+                // result = date.toDateString() + date.toString().substring(x, x + constants.INTNINE);
                 // this.getView().byId("idDatePickerOnDemand").setValue(result);
 
             },

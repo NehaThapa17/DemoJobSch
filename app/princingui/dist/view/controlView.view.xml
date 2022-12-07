@@ -3,7 +3,7 @@
         <uxap:headerTitle>
             <uxap:ObjectPageDynamicHeaderTitle>
                 <uxap:heading>
-                    <tnt:InfoLabel id="idInfoLabel"/>
+                    <tnt:InfoLabel id="idInfoLabel" />
                 </uxap:heading>
                 <uxap:actions>
                     <Label text="{i18n>allTimesInCentralZone}" design="Bold" />
@@ -49,13 +49,12 @@
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>onDemandStartTime}" required="true" />
-                                <DateTimePicker id="idDatePickerOnDemand" timezone="America/Mexico_City" dateValue="{path:'oModel>/dateValue', formatOptions: { style: 'medium' }}" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
+                                <DateTimePicker id="idDatePickerOnDemand" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
                                 <Label text="{i18n>customer}" required="true" />
-                                <MultiInput id="idMultiInputCustomer" enabled="false" valueHelpRequest=".onValueHelpRequested" change="handleChangeOnDemand">
-                                </MultiInput>
+                                <MultiInput id="idMultiInputCustomer" enabled="false" valueHelpRequest=".onValueHelpRequested" change="handleChangeOnDemand" />
                                 <Label text="{i18n>terminal}" required="true" />
-                                <MultiComboBox id="idMultiInputTerminal" enabled="false" showSecondaryValues= "true" selectionChange="handleSelectionChangeTerF4" selectionFinish="handleSelectionFinishTerF4" showSelectAll="true" width="350px" items="{oModel>/TerminalData}" >
-                            	<core:ListItem key="{oModel>Terminal}" text="{oModel>TerminalName}" additionalText="{oModel>Terminal}"/>
+                                <MultiComboBox id="idMultiInputTerminal" enabled="false" showSecondaryValues="true" selectionChange="handleSelectionChangeTerF4" selectionFinish="handleSelectionFinishTerF4" showSelectAll="true" width="350px" items="{oModel>/TerminalData}">
+                                    <core:ListItem key="{oModel>Terminal}" text="{oModel>TerminalName}" additionalText="{oModel>Terminal}" />
                                 </MultiComboBox>
                             </forms:SimpleForm>
                         </uxap:blocks>
@@ -73,15 +72,9 @@
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>suspendFrom}" required="true" />
-                                		<DateTimePicker
-			id="idDatePickerSuspend"
-			dateValue=""
-			timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time"  afterValueHelpClose="onhandleChangeDP1Suspend" 
-			class="sapUiSmallMarginBottom"/>
-                                <!-- <DateTimePicker id="idDatePickerSuspend" timezone="CST" showTimezone="false" enabled="false" placeholder="Enter Date and Time"  afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" /> -->
-                                <!-- <DateTimePicker id="idDatePickerSuspend" timezone="CST" placeholder="Enter Date and Time" change="handleChangeSuspensStartTime" class="sapUiSmallMarginBottom"/> -->
+                                <DateTimePicker id="idDatePickerSuspend" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" />
                                 <Label text="{i18n>suspendTo}" required="true" />
-                                <DateTimePicker id="idDatePicker2Suspend" timezone="CST" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend"  class="sapUiSmallMarginBottom" valueStateText="From Date cannot be greater than To Date" />
+                                <DateTimePicker id="idDatePicker2Suspend" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend" class="sapUiSmallMarginBottom" valueStateText="From Date cannot be greater than To Date" />
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
@@ -113,14 +106,13 @@
                                 >
                                     <headerToolbar>
                                         <OverflowToolbar id="otbSubheader">
-                                            <Title id="idTitleCustomer"  level="H2" />
+                                            <Title id="idTitleCustomer" level="H2" />
                                             <ToolbarSpacer />
                                             <Button id="btnadd" icon="sap-icon://add" press="onCreateCustomer" />
                                             <Button id="btnedit" icon="sap-icon://edit" press="onEditCustomer" />
                                             <Button icon="sap-icon://delete" press="onDeleteCustomer" />
                                             <Button text="{i18n>ccButton}" type="Emphasized" press="onEmailCCSelectDialogPress" />
-                                            <Button  press="handleTableSelectDialogPress" type="Emphasized" icon="sap-icon://full-screen" />
-                                        
+                                            <Button press="handleTableSelectDialogPress" type="Emphasized" icon="sap-icon://full-screen" />
                                         </OverflowToolbar>
                                     </headerToolbar>
                                     <columns>
@@ -159,7 +151,7 @@
                                         <ObjectIdentifier title="{oModel>Customer}" text="{oModel>CustomerName}" />
                                         <ObjectIdentifier title="{oModel>ShipTo}" text="{oModel>ShipToName}" />
                                         <HBox>
-                                            <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog"  />
+                                            <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog" />
                                             <tnt:InfoLabel text="{oModel>CountProduct}" colorScheme="1" renderMode="Narrow" />
                                         </HBox>
                                         <HBox>
@@ -176,11 +168,7 @@
                     <uxap:ObjectPageSubSection id="personalSS2" title="{i18n>terminal}" showTitle="false" titleUppercase="false">
                         <uxap:blocks>
                             <VBox>
-                                <Table id="idTableTerminal" class="sapUiSizeCompact" items="{oModel>/TerminalData}" 
-                                 includeItemInSelection="true" mode="SingleSelectMaster"
-                                 sticky="ColumnHeaders,HeaderToolbar" growing="true"
-                                    growingScrollToLoad="false"
-                                    growingThreshold="3">
+                                <Table id="idTableTerminal" class="sapUiSizeCompact" items="{oModel>/TerminalData}" includeItemInSelection="true" mode="SingleSelectMaster" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingScrollToLoad="false" growingThreshold="3">
                                     <headerToolbar>
                                         <OverflowToolbar id="otbSubheaderterminal">
                                             <Title id="idTitleTerminal" level="H2" />
@@ -188,7 +176,7 @@
                                             <Button id="btnaddterminal" press="handleTerminalSelectDialogPress" icon="sap-icon://add" />
                                             <Button id="btneditterminal" icon="sap-icon://edit" press="handleEditTerminalSelectDialogPress" />
                                             <Button id="btndeleteterminal" icon="sap-icon://delete" press="onDeleteTerminal" />
-                                            <Button  press="handleTerminalTableSelectDialogPress" type="Emphasized" icon="sap-icon://full-screen" />
+                                            <Button press="handleTerminalTableSelectDialogPress" type="Emphasized" icon="sap-icon://full-screen" />
                                         </OverflowToolbar>
                                     </headerToolbar>
                                     <columns>
@@ -226,11 +214,7 @@
                     <uxap:ObjectPageSubSection id="personalSS3" title="{i18n>product}" showTitle="false" titleUppercase="false">
                         <uxap:blocks>
                             <VBox>
-                                <Table id="producttbl" class="sapUiSizeCompact" items="{oModel>/ProductData}" 
-                                mode="SingleSelectMaster" modeAnimationOn="false" sticky="ColumnHeaders,HeaderToolbar"
-                                growing="true"
-                                    growingScrollToLoad="false"
-                                    growingThreshold="3">
+                                <Table id="producttbl" class="sapUiSizeCompact" items="{oModel>/ProductData}" mode="SingleSelectMaster" modeAnimationOn="false" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingScrollToLoad="false" growingThreshold="3">
                                     <headerToolbar>
                                         <OverflowToolbar id="otbSubheaderproduct">
                                             <Title id="idTitleProduct" level="H2" />
@@ -238,7 +222,7 @@
                                             <Button id="btnaddproduct" press="handleProductSelectDialogPress" icon="sap-icon://add" />
                                             <Button id="btneditproduct" icon="sap-icon://edit" press="handleEditProductSelectDialogPress" />
                                             <Button id="btndeleteproduct" icon="sap-icon://delete" press="onDeleteProduct" />
-                                            <Button  press="handleProductTableSelectDialogPress" type="Emphasized" icon="sap-icon://full-screen" />
+                                            <Button press="handleProductTableSelectDialogPress" type="Emphasized" icon="sap-icon://full-screen" />
                                         </OverflowToolbar>
                                     </headerToolbar>
                                     <columns>
