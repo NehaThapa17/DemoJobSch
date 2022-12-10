@@ -1,6 +1,7 @@
 const core = require('@sap-cloud-sdk/core');
 const constants = require("../util/constants-util.js");
 const {getClientFromDestination} = require("../sap_client.js");
+const log = require('cf-nodejs-logging-support');
 const xsuaaService = constants.xsuaaService;
 const destService = constants.destService;
 const destination = constants.dest;
