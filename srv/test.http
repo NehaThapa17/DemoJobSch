@@ -1,30 +1,30 @@
 GET http://localhost:4004/catalog/getTerminalDetails()
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 #############################
 GET http://localhost:4004/catalog/getEmailDetails()
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 #####################
 GET http://localhost:4004/catalog/getOnCCEmail()
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 ######################
 GET http://localhost:4004/catalog/getOnPremProductDetails()
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 ########################################
 GET http://localhost:4004/catalog/getCustomerDetails()
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 ##################
 POST http://localhost:4004/catalog/createProduct
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 {
@@ -33,7 +33,7 @@ Content-Type: application/json;odata.metadata=minimal
 
 ################
 POST http://localhost:4004/catalog/createTerminal
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 {
@@ -42,7 +42,7 @@ Content-Type: application/json;odata.metadata=minimal
 
 #############
 POST http://localhost:4004/catalog/createCustomer
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 {
@@ -51,7 +51,7 @@ Content-Type: application/json;odata.metadata=minimal
 
 #############
 POST http://localhost:4004/catalog/updateTerminal
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 {
@@ -61,7 +61,7 @@ Content-Type: application/json;odata.metadata=minimal
 
 ##############
 POST http://localhost:4004/catalog/updateCustomer
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 {
@@ -71,7 +71,7 @@ Content-Type: application/json;odata.metadata=minimal
 #######################
 
 POST http://localhost:4004/catalog/updateProduct
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 {
@@ -81,7 +81,7 @@ Content-Type: application/json;odata.metadata=minimal
 
 ######################
 POST http://localhost:4004/catalog/deleteCustomer
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 {
@@ -90,7 +90,7 @@ Content-Type: application/json;odata.metadata=minimal
 
 ###############################
 POST http://localhost:4004/catalog/deleteTerminal
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 {
@@ -101,7 +101,7 @@ Content-Type: application/json;odata.metadata=minimal
 ############################
 
 POST http://localhost:4004/catalog/createCCEmail
-# Authorization:Basic NThapa@marathonpetroleum.com:
+ 
 Content-Type: application/json;odata.metadata=minimal
 
 {

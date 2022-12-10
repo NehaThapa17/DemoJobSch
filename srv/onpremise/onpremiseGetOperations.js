@@ -1,17 +1,26 @@
 const core = require('@sap-cloud-sdk/core');
 const constants = require("../util/constants-util.js");
 const {getClientFromDestination} = require("../sap_client.js");
-const xsuaaService = "pricingNotification-xsuaa-service";
-const destService = "pricingNotification-destination-service";
-const destination = "s4rt";
+const xsuaaService = constants.xsuaaService;
+const destService = constants.destService;
+const destination = constants.dest;
+const SapCfAxios = require('sap-cf-axios').default;
+const sapcfaxios= SapCfAxios(destination);
+// const username = require('username');
+// let os = require('os');
 
- 
-async function getOnPremProductDetails(req,sUrl) {
+/**
+* Function to call the url 
+* Function invoked in all get function calls
+* @param {String} sUrl
+*/ 
+async function getOnPremCall(req,sUrl) {
     try {
         const authorization = req.headers.authorization;
+        log.info("getOnPremCall is called");
         let sap_client = await getClientFromDestination(xsuaaService, destService, destination);
         let respSchedule = await sapcfaxios({
-            method: 'GET',
+            method: constants.httpGet,
             url: sUrl,
             headers: {
                 "content-type": "application/json",
@@ -19,9 +28,10 @@ async function getOnPremProductDetails(req,sUrl) {
                 'Authorization': authorization
             }
         });
-        return respSchedule;
+        return respSchedule;    
     }
     catch (error) {
+        log.info("getOnPremCall error" +error);
         return error;
     }
 }
@@ -33,7 +43,9 @@ async function getOnPremProductDetails(req,sUrl) {
 */
 async function getOnPremDetails(sUrl){
     try{
-        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAME }, {
+        log.info("getOnPremDetails Call to get Email Odata");
+        console.log("getOnPremDetails Call to get Email Odata");
+        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAMEBASIC }, {
             method: constants.httpGet,
             url: sUrl,
             headers: {
@@ -41,177 +53,12 @@ async function getOnPremDetails(sUrl){
                 'x-csrf-token': 'fetch'
             }
         });
+        console.log("EMAIL Data" +response);
         return response;
     }
     catch (error) {
+        log.info("getOnPremDetails error" +error);
         return error;
     }
 }
-/**
-* Function to call the url 
-* Function invoked in getTerminalDetails function call
-* @param {String} sUrl
-*/
-async function getOnPremTerminalDetails(sUrl){
-    try{
-        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAME }, {
-            method: constants.httpGet,
-            url: sUrl,
-            headers: {
-                "content-type": "application/json",
-                'x-csrf-token': 'fetch'
-            }
-        });
-        return response;
-    }
-    catch (error) {
-        log.info(constants.LOG_ONPREM_SELECT_ERR);
-        return error;
-    }
-}
-
-/**
-* Function to call the url 
-* Function invoked in getCustomerDetails function call
-* @param {String} sUrl
-*/
-async function getOnPremCustomerDetails(sUrl){
-    try{
-
-        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAME }, {
-            method: constants.httpGet,
-            url: sUrl,
-            headers: {
-                "content-type": "application/json",
-                'x-csrf-token': 'fetch'
-            }
-        });
-        return response;
-    }
-    catch (error) {
-        // log.info(errConstants.LOG_ONPREM_SELECT_ERR);
-        // log.info(error.message);
-        return error;
-    }
-}
-/**
-* Function to call the url 
-* Function invoked in getOnPremProductDetails function call
-* @param {String} sUrl
-*/
-/*
-async function getOnPremProductDetails(sUrl){
-    try{
-        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAME }, {
-            method: constants.httpGet,
-            url: sUrl,
-            headers: {
-                "content-type": "application/json",
-                'x-csrf-token': 'fetch'
-            }
-        });
-        return response;
-    }
-    catch (error) {
-        // log.info(errConstants.LOG_ONPREM_SELECT_ERR);
-        // log.info(error.message);
-        return error;
-    }
-}
-*/
-/**
-* Function to call the url 
-* Function invoked in getOnPremCustomerF4 function call
-* @param {String} sUrl
-*/
-async function getOnPremCustomerValueHelp(sUrl){
-    try{
-
-        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAME }, {
-            method: constants.httpGet,
-            url: sUrl,
-            headers: {
-                "content-type": "application/json",
-                'x-csrf-token': 'fetch'
-            }
-        });
-        return response;
-    }
-    catch (error) {
-        // log.info(errConstants.LOG_ONPREM_SELECT_ERR);
-        // log.info(error.message);
-        return error;
-    }
-}
-/**
-* Function to call the url 
-* Function invoked in getOnPremTerminalF4 function call
-* @param {String} sUrl
-*/
-async function getOnPremTerminalValueHelp(sUrl){
-    try{
-
-        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAME }, {
-            method: constants.httpGet,
-            url: sUrl,
-            headers: {
-                "content-type": "application/json",
-                'x-csrf-token': 'fetch'
-            }
-        });
-        return response;
-    }
-    catch (error) {
-        // log.info(errConstants.LOG_ONPREM_SELECT_ERR);
-        // log.info(error.message);
-        return error;
-    }
-}
-/**
-* Function to call the url 
-* Function invoked in getOnPremProductF4 function call
-* @param {String} sUrl
-*/
-async function getOnPremProductValueHelp(sUrl){
-    try{
-
-        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAME }, {
-            method: constants.httpGet,
-            url: sUrl,
-            headers: {
-                "content-type": "application/json",
-                'x-csrf-token': 'fetch'
-            }
-        });
-        return response;
-    }
-    catch (error) {
-        log.info(errConstants.LOG_ONPREM_SELECT_ERR);
-        return error;
-    }
-}
-/**
-* Function to call the url to get CC emails 
-* Function invoked in getOnCCEmail function call
-* @param {String} sUrl
-*/
-async function getOnPremCCEmail(sUrl){
-    try{
-
-        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAME }, {
-            method: constants.httpGet,
-            url: sUrl,
-            headers: {
-                "content-type": "application/json",
-                'x-csrf-token': 'fetch'
-            }
-        });
-        return response;
-    }
-    catch (error) {
-        return error;
-    }
-}
-// module.exports.getOnPremCCEmail = getOnPremCCEmail;
-
-module.exports = {getOnPremDetails,getOnPremTerminalDetails,getOnPremCustomerDetails,getOnPremProductDetails,getOnPremCustomerValueHelp,getOnPremTerminalValueHelp,getOnPremProductValueHelp,getOnPremCCEmail};
+module.exports = {getOnPremDetails,getOnPremCall};

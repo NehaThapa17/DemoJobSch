@@ -23,6 +23,7 @@
     "passport": "^0.6.0",
     "sap-cf-axios": "^0.3.6",
     "sap-hdbext-promisfied": "^2.202208.1",
+    "username": "^6.0.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -87,10 +88,22 @@
           "destination": "s4rt"
         }
       },
+      "dest": {
+        "kind": "destination",
+        "credentials": {
+          "destination": "s4rt"
+        }
+      },
+      "connectivity": {
+        "kind": "connectivity",
+        "credentials": {
+          "destination": "pricingNotification-connectivity"
+        }
+      },
       "testSys": {
         "kind": "odata",
         "credentials": {
-          "destination": "ds4rt_120"
+          "destination": "s4rt_basic"
         }
       }
     }

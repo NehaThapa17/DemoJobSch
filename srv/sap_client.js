@@ -1,5 +1,6 @@
 const cfenv = require('cfenv');
 const axios = require('axios');
+const constants = require("./util/constants-util.js");
 
 const getClientFromDestination = async (xsuaaService, destinationService, destination) => {
     try {
@@ -10,9 +11,9 @@ const getClientFromDestination = async (xsuaaService, destinationService, destin
 
              const getAuthTokenRequest = {
             url: uaa_service.credentials.url + '/oauth/token?grant_type=client_credentials&client_id=' + dest_service.credentials.clientid,
-            method: 'POST',
+            method: constants.httpPost,
             headers: {
-                'Authorization': 'Basic ' + Buffer.from(sUaaCredentials).toString('base64'),
+                'Authorization': constants.preURL + Buffer.from(sUaaCredentials).toString('base64'),
                 'Content-type': 'application/x-www-form-urlencoded'
             }
         };
@@ -20,7 +21,7 @@ const getClientFromDestination = async (xsuaaService, destinationService, destin
         const jwtTokenFromMethod = authTokenResponse.data.access_token;
         const getDestdetailsRequest = {
             url: dest_service.credentials.uri + '/destination-configuration/v1/destinations/' + destination,
-            method: 'GET',
+            method: constants.httpGet,
             headers: {
                 'Authorization': 'Bearer ' + jwtTokenFromMethod
             }
@@ -29,8 +30,7 @@ const getClientFromDestination = async (xsuaaService, destinationService, destin
         const sap_client = destDetailsResponse.data.destinationConfiguration['sap-client']
         return sap_client;
     } catch (error) {
-      //  console.log(error);
-        return "Error";
+        return constants.ERROR;
     }
 }
 

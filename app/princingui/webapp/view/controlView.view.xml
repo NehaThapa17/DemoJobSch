@@ -49,11 +49,12 @@
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>onDemandStartTime}" required="true" />
-                                <DateTimePicker id="idDatePickerOnDemand" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
+                                <DateTimePicker id="idDatePickerOnDemand" value="{oModel>/dateValue}" change="onhandleDateCheck" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
                                 <Label text="{i18n>customer}" required="true" />
                                 <MultiInput id="idMultiInputCustomer" enabled="false" valueHelpRequest=".onValueHelpRequested" change="handleChangeOnDemand" />
                                 <Label text="{i18n>terminal}" required="true" />
-                                <MultiComboBox id="idMultiInputTerminal" enabled="false" showSecondaryValues="true" selectionChange="handleSelectionChangeTerF4" selectionFinish="handleSelectionFinishTerF4" showSelectAll="true" width="350px" items="{oModel>/TerminalData}">
+                                <MultiComboBox id="idMultiInputTerminal" enabled="false" showSecondaryValues="true" showSelectAll="true" width="350px" items="{oModel>/TerminalData}"> 
+                                <!-- selectionChange="handleSelectionChangeTerF4" selectionFinish="handleSelectionFinishTerF4"  -->
                                     <core:ListItem key="{oModel>Terminal}" text="{oModel>TerminalName}" additionalText="{oModel>Terminal}" />
                                 </MultiComboBox>
                             </forms:SimpleForm>
@@ -72,9 +73,9 @@
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>suspendFrom}" required="true" />
-                                <DateTimePicker id="idDatePickerSuspend" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" />
+                                <DateTimePicker id="idDatePickerSuspend" value="{oModel>/dateValueF}" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck"/>
                                 <Label text="{i18n>suspendTo}" required="true" />
-                                <DateTimePicker id="idDatePicker2Suspend" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend" class="sapUiSmallMarginBottom" valueStateText="From Date cannot be greater than To Date" />
+                                <DateTimePicker id="idDatePicker2Suspend" value="{oModel>/dateValueT}" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" valueStateText="From Date cannot be greater than To Date" />
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>

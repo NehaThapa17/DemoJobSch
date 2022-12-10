@@ -40,9 +40,8 @@ sap.ui.define([
                 oModel.setData(oItemData);
                 //set model 
                 this.getView().setModel(oModel, "oCustModel");
-
-                this.getCustomerDetails2();
-                this.getF4Product2();
+                // this.getCustomerDetails2();
+                // this.getF4Product2();
             },
             getCustomerDetails2: function () {
                 var that = this;
@@ -67,7 +66,7 @@ sap.ui.define([
                 this.oDataModel.callFunction("/getOnPremProductDetails", {
                     method: constants.httpGet,
                     success: function (oData) {
-                        debugger;
+                        
                         that.getView().getModel("oCustModel").setProperty("/ProductData", oData.getOnPremProductDetails.data);
                         BusyIndicator.hide();
                     },
@@ -87,8 +86,8 @@ sap.ui.define([
             onRouteCustomer: function () {
                 var pvModel = this.getOwnerComponent().getModel("oModel");
                 console.log(pvModel);
-                // this.getView().getModel("oCustModel").setProperty("/CustValHelp", pvModel.oData.CustValHelp);
-                // this.getView().getModel("oCustModel").setProperty("/ProductData", pvModel.oData.ProductData);
+                this.getView().getModel("oCustModel").setProperty("/CustValHelp", pvModel.oData.CustValHelp);
+                this.getView().getModel("oCustModel").setProperty("/ProductData", pvModel.oData.ProductData);
                 this.getView().byId("idInputCustomerIDAdd").setValue(""),
                     this.getView().byId("idInputCustomerNameAdd").setValue(""),
                     this.getView().byId("idInputSHAdd").setValue(""),
@@ -226,10 +225,9 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            // if(oData.createCustomer != undefined)
-                            // {
-                            if (oData.createCustomer.data[constants.INTZERO]) {
-                                MessageBox.success(that.oBundle.getText("customerCreated", [oData.createCustomer.data[constants.INTZERO].data.Customer]), {
+
+                            if (oData.createCustomer.data) {
+                                MessageBox.success(that.oBundle.getText("customerCreated", [oData.createCustomer.data.Customer]), {
                                     onClose: function (sAction) {
                                         if (sAction === MessageBox.Action.OK) {
                                             that.onBack();
@@ -238,7 +236,7 @@ sap.ui.define([
                                 });
                             }
                             else {
-                                MessageBox.error(oData.createCustomer.data.message);
+                                MessageBox.error(that.oBundle.getText("techError"));
                             }
                         },
                         error: function (err) {

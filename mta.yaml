@@ -1,7 +1,7 @@
 _schema-version: "3.1"
 ID: pricingNotification
 version: 1.0.0
-description: "A simple CAP project."
+description: "A CAP project for Pricing Notification "
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
@@ -94,17 +94,15 @@ resources:
         instance:
           destinations:
           - Authentication: NoAuthentication
-            Name: ui5
-            ProxyType: Internet
-            Type: HTTP
-            URL: https://ui5.sap.com
-          - Authentication: NoAuthentication
             HTML5.DynamicDestination: true
             HTML5.ForwardAuthToken: true
             Name: pricingNotification-srv-api
             ProxyType: Internet
             Type: HTTP
-            URL: ~{srv-api/srv-url}
+            URL: '~{srv-api/srv-url}'
+            WebIDEAdditionalData: full_url
+            WebIDEEnabled: true
+            WebIDEUsage: odata_gen  
           existing_destinations_policy: update
       version: 1.0.0
     service: destination

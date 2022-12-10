@@ -40,16 +40,19 @@ sap.ui.define([
                 BusyIndicator.show();
                 var oModel = new JSONModel();
                 var oObj = new Date();
+                debugger;
+                var mindate = oObj.toLocaleString('en-US', {
+                    timeZone: "America/Mexico_City"
+                });
                 var oItemData = [];
                 oModel.setData(oItemData);
                 //set model 
                 this.getView().setModel(oModel, "oModel");
                 this.getOwnerComponent().setModel(oModel, "oModel");
                 this.getView().byId("idMultiInputTerminal").setModel(oModel, "oModel");
-                // this.getView().byId("idDatePickerOnDemand").setMinDate(new Date());
-                // this.getView().byId("idDatePickerSuspend").setMinDate(new Date());
-                // this.getView().byId("idDatePicker2Suspend").setMinDate(new Date());
-                this.getView().getModel("oModel").setProperty("/dateValue", oObj);
+                this.getView().byId("idDatePickerOnDemand").setMinDate(new Date(mindate));
+                this.getView().byId("idDatePickerSuspend").setMinDate(new Date(mindate));
+                this.getView().byId("idDatePicker2Suspend").setMinDate(new Date(mindate));
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.getRoute("RoutecontrolView").attachPatternMatched(this.onRouteControl, this);
                 //OData call to get display data
@@ -66,7 +69,6 @@ sap.ui.define([
               * @public
               */
             getTime: function () {
-                debugger;
                 var that = this;
                 this.oDataModelT.callFunction("/getJobDetails", {
                     method: constants.httpGet,
@@ -108,16 +110,108 @@ sap.ui.define([
                             that.getView().byId("idInfoLabel").setText("Active");
                             that.getView().byId("idTimePickerInput").setEnabled(false);
                         } else {
-                            that.getView().byId("idTextDailyST").setText(" ");
-                            that.getView().byId("idTimePickerInput").setValue(" ");
+                            that.getView().byId("idTextDailyST").setText(constants.SPACE);
+                            that.getView().byId("idTimePickerInput").setValue(constants.SPACE);
                             that.getView().byId("idSwitchInput").setState(false);
                             that.getView().byId("idTimePickerInput").setEnabled(true);
                             that.getView().byId("idInfoLabel").setText("InActive");
                             that.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
                         }
+                        if (oDataArr2.ONDEMAND !== undefined) {
+                            var date = new Date(oDataArr2.ONDEMAND);
+                            // // Get dates for January and July
+                            var dateJan = new Date(date.getFullYear(), constants.INTZERO, constants.INTONE);
+                            var dateJul = new Date(date.getFullYear(), constants.INTSIX, constants.INTONE);
+                            // Get timezone offset
+                            var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                            // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
+                            if (date.getTimezoneOffset() < timezoneOffset) {
+                                // Adjust date by 5 hours
+                                date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                            }
+                            else {
+                                // Adjust date by 6 hours
+                                date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                            }
+                            var sTime = date.toLocaleString('en-US', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true
+                            });
+                            var dDate = date.toDateString(),
+                                finalDate = dDate.slice(4) + constants.SPACE + sTime;
+                            that.getView().byId("idTextOnDemandST").setText(finalDate);
+                            that.getView().getModel("oModel").setProperty("/dateValue", finalDate);
+                        } else {
+                            that.getView().byId("idTextOnDemandST").setText(constants.SPACE);
+                            that.getView().getModel("oModel").setProperty("/dateValue", constants.SPACE);
+                        }
+                        if (oDataArr2.sActive !== "Completed" && oDataArr2.SUSPENDTo !== undefined && oDataArr2.SUSPENDFrom !== undefined) {
+                            var dateTo = new Date(oDataArr2.SUSPENDTo);
+                            var dateFrom = new Date(oDataArr2.SUSPENDFrom);
+                            // Get dates for January and July
+                            var dateJanF = new Date(dateFrom.getFullYear(), constants.INTZERO, constants.INTONE);
+                            var dateJulF = new Date(dateFrom.getFullYear(), constants.INTSIX, constants.INTONE);
+                            // Get timezone offset
+                            var timezoneOffsetF = Math.max(dateJanF.getTimezoneOffset(), dateJulF.getTimezoneOffset());
+                            // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
+                            if (dateFrom.getTimezoneOffset() < timezoneOffsetF) {
+                                // Adjust date by 5 hours
+                                dateFrom = new Date(dateFrom.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                            }
+                            else {
+                                // Adjust date by 6 hours
+                                dateFrom = new Date(dateFrom.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                            }
+
+                            var sTime = dateFrom.toLocaleString('en-US', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true
+                            });
+                            var dDate = dateFrom.toDateString(),
+                                finalText = dDate.slice(4) + constants.SPACE + sTime;
+                            /*************************** Suspend To Date ***************************/
+                            // Get dates for January and July
+                            var dateJanT = new Date(dateTo.getFullYear(), constants.INTZERO, constants.INTONE);
+                            var dateJulT = new Date(dateTo.getFullYear(), constants.INTSIX, constants.INTONE);
+                            // Get timezone offset
+                            var timezoneOffsetT = Math.max(dateJanT.getTimezoneOffset(), dateJulT.getTimezoneOffset());
+                            // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
+                            if (dateTo.getTimezoneOffset() < timezoneOffsetT) {
+                                // Adjust date by 5 hours
+                                dateTo = new Date(dateTo.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                            }
+                            else {
+                                // Adjust date by 6 hours
+                                dateTo = new Date(dateTo.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                            }
+                            // var timzone = new Date().toLocaleDateString(undefined, { day: '2-digit', timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
+                            var sTimeT = dateTo.toLocaleString('en-US', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true
+                            });
+                            var dDateT = dateTo.toDateString(),
+                                finalTextTo = dDateT.slice(4) + constants.SPACE + sTimeT;
+                            if (oDataArr2.sActive === true) {
+                                that.getView().byId("idInfoLabel").setText("Suspended");
+                                that.getView().byId("idInfoLabel").setColorScheme(2);
+                            }
+                            that.getView().byId("idObjStatusS2").setText(finalTextTo);
+                            that.getView().byId("idObjStatusS1").setText(finalText);
+                            that.getView().getModel("oModel").setProperty("/dateValueF", finalText);
+                            that.getView().getModel("oModel").setProperty("/dateValueT", finalTextTo);
+
+                        } else {
+                            that.getView().byId("idObjStatusS2").setText(constants.SPACE);
+                            that.getView().byId("idObjStatusS1").setText(constants.SPACE);
+                            that.getView().getModel("oModel").setProperty("/dateValueF", constants.SPACE);
+                            that.getView().getModel("oModel").setProperty("/dateValueT", constants.SPACE);
+                        }
+
                     },
                     error: function (err) {
-                        debugger;
                         BusyIndicator.hide();
                         MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
@@ -126,6 +220,7 @@ sap.ui.define([
                     }
                 });
             },
+
             /**
                * Method called for Routing.
                * @public
@@ -178,6 +273,15 @@ sap.ui.define([
                     method: constants.httpGet,
                     success: function (oData) {
                         if (oData.getTerminalDetails.data) {
+                            var oDataTer = oData.getTerminalDetails.data, tokenArray = [];
+                            for (var g = 0; g < oDataTer.length; g++) {
+                                if (oDataTer[g].OnDemandJob === true) {
+                                    // var otokenD = new sap.core.Item({ key: oDataTer[g].Terminal, text: oDataTer[g].TerminalName });
+                                    var otokenD = oDataTer[g].Terminal;
+                                    tokenArray.push(otokenD);
+                                }
+                            }
+                            that.getView().byId("idMultiInputTerminal").setSelectedKeys(tokenArray);
                             that.getView().getModel("oModel").setProperty("/TerminalData", oData.getTerminalDetails.data);
                             that.getView().byId("idTitleTerminal").setText(that.oBundle.getText("comTerText", [oData.getTerminalDetails.data.length]));
                         }
@@ -225,7 +329,8 @@ sap.ui.define([
                 this.oDataModelT.callFunction("/getCustomerDetails", {
                     method: constants.httpGet,
                     success: function (oData) {
-                        var finalArray = [];
+                        debugger;
+                        var finalArray = [], tokenArray = [];
                         var oDataCust = oData.getCustomerDetails.data;
                         if (oDataCust) {
                             that.getView().byId("idTitleCustomer").setText(that.oBundle.getText("comCusText", [oData.getCustomerDetails.data.length]));
@@ -239,6 +344,11 @@ sap.ui.define([
                                 if (oDataCust[a].ProductList.results.length != constants.INTZERO) {
                                     oFirstProd = oDataCust[a].ProductList.results[constants.INTZERO].Product;
                                 }
+                                if (oDataCust[a].OnDemandJob === true) {
+                                    var otokenD = new sap.m.Token({ key: oDataCust[a].Customer, text: oDataCust[a].ShipTo + "(" + oDataCust[a].Customer + ")" });
+                                    tokenArray.push(otokenD);
+                                }
+
                                 var objData = {};
                                 objData = {
                                     "CountEmail": oDataCust[a].CountEmail,
@@ -256,6 +366,7 @@ sap.ui.define([
                                 }
                                 finalArray.push(objData);
                             }
+                            that.getView().byId("idMultiInputCustomer").setTokens(tokenArray);
                             that.getView().getModel("oModel").setProperty("/CustomerData", finalArray);
                             BusyIndicator.hide();
                         }
@@ -443,7 +554,7 @@ sap.ui.define([
                         }
                     });
                 } else {
-                    if (oDaily !== "" && oDaily !== " " && oDaily !== undefined) {
+                    if (oDaily !== "" && oDaily !== constants.SPACE && oDaily !== undefined) {
                         BusyIndicator.show();
                         var oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue()),
                             dateH = oDate.getHours(),
@@ -1197,9 +1308,11 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        MessageToast.show(that.oBundle.getText("delSucc"));
-                                        that.getProductDetails();
-                                        that.getCustomerDetails();
+                                        if (oData.deleteProduct.data) {
+                                            MessageToast.show(that.oBundle.getText("delSucc"));
+                                            that.getProductDetails();
+                                            that.getCustomerDetails();
+                                        }
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
@@ -1240,8 +1353,10 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        MessageToast.show(that.oBundle.getText("delSucc"));
-                                        that.getTerminalDetails();
+                                        if (oData.deleteTerminal.data) {
+                                            MessageToast.show(that.oBundle.getText("delSucc"));
+                                            that.getTerminalDetails();
+                                        }
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
@@ -1281,8 +1396,10 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        MessageToast.show(that.oBundle.getText("delSucc"));
-                                        that.getProductDetails();
+                                        if (oData.deleteProduct.data) {
+                                            MessageToast.show(that.oBundle.getText("delSucc"));
+                                            that.getProductDetails();
+                                        }
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
@@ -1451,9 +1568,10 @@ sap.ui.define([
                 this.getView().byId("idMultiInputCustomer").setValueState("None");
                 this.getView().byId("idDatePickerOnDemand").setValueState("None");
                 this.getView().byId("idMultiInputTerminal").setValueState("None");
-                //once data bindined remove
+                var r = this.getView().getModel("oModel").getProperty("/dateValue");
+                this.getView().byId("idDatePickerSuspend").setDateValue(rFrom);
                 this.getView().byId("idMultiInputCustomer").setValue("");
-                this.getView().byId("idDatePickerOnDemand").setDateValue("");
+                this.getView().byId("idDatePickerOnDemand").setDateValue(r);
                 this.getView().byId("idMultiInputTerminal").setValue("");
 
 
@@ -1470,7 +1588,7 @@ sap.ui.define([
                     oCust = this.getView().byId("idMultiInputCustomer").getTokens(),
                     oTer = this.getView().byId("idMultiInputTerminal").getSelectedItems(),
                     oTer2 = this.getView().byId("idMultiInputTerminal").getSelectedKeys(),
-                    xLen = oDate.length - 4,
+                    xLen = oDate.length - 21,
                     result = oDate.slice(constants.INTZERO, xLen),
                     dateValue = new Date(result);
                 // Get dates for January and July
@@ -1486,7 +1604,13 @@ sap.ui.define([
                     // Adjust date by 6 hours
                     dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
                 }
-                if (oDate && oCust.length !== constants.INTZERO && oTer.length !== constants.INTZERO) {
+                var xTime = dateValue.toLocaleString('en-US', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                }),
+                    SuspendTo = dateValue.toDateString().slice(4) + constants.SPACE + xTime;
+                if ((oDate !== "" && oDate !== constants.SPACE && oDate !== undefined) && oCust.length !== constants.INTZERO && oTer.length !== constants.INTZERO) {
                     this.getView().byId("idMultiInputCustomer").setEnabled(false);
                     this.getView().byId("idDatePickerOnDemand").setEnabled(false);
                     this.getView().byId("idMultiInputTerminal").setEnabled(false);
@@ -1494,12 +1618,13 @@ sap.ui.define([
                     this.getView().byId("idButtonCancel").setVisible(false);
                     this.getView().byId("idButtonEdit").setVisible(true);
                     this.getView().byId("idTextOnDemandST").setText(result);
+                    this.getView().getModel("oModel").setProperty("/dateValue", result);
                     var oJsonData = this.getPayloadJson(oCust, oTer2);
 
                     this.oDataModelT.callFunction("/createOnDemandSchedule", {
                         method: constants.httpGet,
                         urlParameters: {
-                            time: result,
+                            time: SuspendTo,
                             desc: constants.onDemand
                         },
                         success: function (oData) {
@@ -1528,14 +1653,13 @@ sap.ui.define([
               * @public
               */
             getPayloadJson: function (oCust, oTer2) {
-                var oCustArray = [], oTerArray = [],
-                    oTData = this.getView().getModel("oModel").getProperty("/CustomerData");
+                var oCustArray = [], oTerArray = [];
                 for (var i = constants.INTZERO; i < oCust.length; i++) {
-                    var oLen = oCust[i].getId().slice(-2),
-                        oIdx = oLen.replace(/\D+/g, '');
+                    var len = oCust[i].getText().split('('),
+                        shipV = len[0].replace(/\s/g, '');
                     var obj = {
                         "Customer": oCust[i].getKey(),
-                        "ShipTo": oTData[oIdx].ShipTo
+                        "ShipTo": shipV //oTData[oIdx].ShipTo
                     };
                     oCustArray.push(obj);
                 }
@@ -1598,9 +1722,10 @@ sap.ui.define([
                 this.getView().byId("idDatePicker2Suspend").setEnabled(false);
                 this.getView().byId("idDatePicker2Suspend").setValueState("None");
                 this.getView().byId("idDatePicker2Suspend").setValueState("None");
-                //once data bindined remove
-                this.getView().byId("idDatePickerSuspend").setDateValue("");
-                this.getView().byId("idDatePicker2Suspend").setDateValue("");
+                var rFrom = this.getView().getModel("oModel").getProperty("/dateValueF"),
+                    rTo = this.getView().getModel("oModel").getProperty("/dateValueT");
+                this.getView().byId("idDatePickerSuspend").setDateValue(rFrom);
+                this.getView().byId("idDatePicker2Suspend").setDateValue(rTo);
 
             },
             /**
@@ -1608,44 +1733,100 @@ sap.ui.define([
               * @public
               */
             onPressSuspendSave: function () {
-                var oDateSuspendTo = this.getView().byId("idDatePickerSuspend").getDateValue(),
-                    oDateSuspendFrom = this.getView().byId("idDatePicker2Suspend").getDateValue(),
+                var oDateSuspendFrom = this.getView().byId("idDatePickerSuspend").getValue(),
+                    oDateSuspendTo = this.getView().byId("idDatePicker2Suspend").getValue(),
+                    checkVSF = this.getView().byId("idDatePickerSuspend").getValueState(),
+                    checkVST = this.getView().byId("idDatePicker2Suspend").getValueState(),
                     oArr = [], that = this,
-                    xSuspendTo = oDateSuspendTo.toDateString().length,
-                    resultTo = oDateSuspendTo.toDateString() + oDateSuspendTo.toString().substring(xSuspendTo, xSuspendTo + constants.INTNINE),
-                    xSuspendFrom = oDateSuspendFrom.toDateString().length,
-                    resultFrom = oDateSuspendFrom.toDateString() + oDateSuspendFrom.toString().substring(xSuspendFrom, xSuspendFrom + constants.INTNINE);
-                if (oDateSuspendTo && oDateSuspendFrom) {
-                    this.getView().byId("idInfoLabel").setText("Suspended");
-                    this.getView().byId("idInfoLabel").setColorScheme(2);
-                    this.getView().byId("idDatePickerSuspend").setEnabled(false);
-                    this.getView().byId("idDatePicker2Suspend").setEnabled(false);
-                    this.getView().byId("idButtonSuspendSave").setVisible(false);
-                    this.getView().byId("idButtonSuspendEdit").setVisible(true);
-                    this.getView().byId("idButtonSuspendCancel").setVisible(false);
-                    this.getView().byId("idObjStatusS1").setText(resultFrom);
-                    this.getView().byId("idObjStatusS2").setText(resultTo);
-                    oArr.push(oDateSuspendTo);
-                    oArr.push(oDateSuspendFrom);
-                    var oPayloadSus = JSON.stringify(oArr);
-                    this.oDataModelT.callFunction("/createSuspendSchedule", {
-                        method: constants.httpGet,
-                        urlParameters: {
-                            time: oPayloadSus,
-                            desc: constants.suspend
-                        },
-                        success: function (oData) {
-                            BusyIndicator.hide();
-                            MessageBox.success(that.oBundle.getText("succJS"));
-                        },
-                        error: function (err) {
-                            BusyIndicator.hide();
-                            MessageBox.error(that.oBundle.getText("techError"), {
-                                details: err
-                            });
+                    len = oDateSuspendTo.length - 21,
+                    lenF = oDateSuspendFrom.length - 21,
+                    resultTo = oDateSuspendTo.substring(0, len),
+                    resultFrom = oDateSuspendFrom.substring(0, lenF),
+                    oSusFrom = new Date(resultFrom),
+                    oSusTo = new Date(resultTo),
+                    // Get dates for January and July
+                    dateJanF = new Date(oSusFrom.getFullYear(), constants.INTZERO, constants.INTONE),
+                    dateJulF = new Date(oSusFrom.getFullYear(), constants.INTSIX, constants.INTONE),
+                    dateJanT = new Date(oSusTo.getFullYear(), constants.INTZERO, constants.INTONE),
+                    dateJulT = new Date(oSusTo.getFullYear(), constants.INTSIX, constants.INTONE);
+                // Get timezone offset
+                var timezoneOffsetFrom = Math.max(dateJanF.getTimezoneOffset(), dateJulF.getTimezoneOffset());
+                var timezoneOffsetTo = Math.max(dateJanT.getTimezoneOffset(), dateJulT.getTimezoneOffset());
+                if (oSusFrom.getTimezoneOffset() < timezoneOffsetFrom) {
+                    // Adjust date by 5 hours
+                    oSusFrom = new Date(oSusFrom.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                }
+                else {
+                    // Adjust date by 6 hours
+                    oSusFrom = new Date(oSusFrom.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                }
+                if (oSusTo.getTimezoneOffset() < timezoneOffsetTo) {
+                    // Adjust date by 5 hours
+                    oSusTo = new Date(oSusTo.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                }
+                else {
+                    // Adjust date by 6 hours
+                    oSusTo = new Date(oSusTo.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                }
+                var xSuspendTo = oSusTo.toLocaleString('en-US', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                }),
+                    SuspendTo = oSusTo.toDateString().slice(4) + constants.SPACE + xSuspendTo,
+                    // SuspendTo = oSusTo.toDateString() + oSusTo.toString().substring(xSuspendTo, xSuspendTo + constants.INTNINE),
+                    xSuspendFrom = oSusFrom.toLocaleString('en-US', {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                    }),
+                    SuspendFrom = oSusFrom.toDateString().slice(4) + constants.SPACE + xSuspendFrom;
+                // SuspendFrom = oSusFrom.toDateString() + oSusFrom.toString().substring(xSuspendFrom, xSuspendFrom + constants.INTNINE);
 
-                        }
-                    });
+                if ((oDateSuspendTo !== "" && oDateSuspendTo !== constants.SPACE && oDateSuspendTo !== undefined) && (oDateSuspendFrom !== "" && oDateSuspendFrom !== constants.SPACE && oDateSuspendFrom !== undefined)) {
+                    // this.getView().byId("idInfoLabel").setText("Suspended");
+                    // this.getView().byId("idInfoLabel").setColorScheme(2);
+                    if (checkVSF !== constants.ERROR || checkVST !== constants.ERROR) {
+                        this.getView().byId("idDatePickerSuspend").setEnabled(false);
+                        this.getView().byId("idDatePicker2Suspend").setEnabled(false);
+                        this.getView().byId("idButtonSuspendSave").setVisible(false);
+                        this.getView().byId("idButtonSuspendEdit").setVisible(true);
+                        this.getView().byId("idButtonSuspendCancel").setVisible(false);
+                        this.getView().byId("idObjStatusS1").setText(SuspendFrom);
+                        this.getView().byId("idObjStatusS2").setText(SuspendTo);
+                        this.getView().getModel("oModel").setProperty("/dateValueF", SuspendFrom);
+                        this.getView().getModel("oModel").setProperty("/dateValueT", SuspendTo);
+                        oArr.push({
+                            "time": SuspendFrom,
+                            "Desc": "SUSPENDFROM"
+                        });
+                        oArr.push({
+                            "time": SuspendTo,
+                            "Desc": "SUSPENDTO"
+                        });
+                        var oPayloadSus = JSON.stringify(oArr);
+                        this.oDataModelT.callFunction("/createSuspendSchedule", {
+                            method: constants.httpGet,
+                            urlParameters: {
+                                time: oPayloadSus,
+                                desc: constants.suspend
+                            },
+                            success: function (oData) {
+                                BusyIndicator.hide();
+                                MessageBox.success(that.oBundle.getText("succJS"));
+                            },
+                            error: function (err) {
+                                BusyIndicator.hide();
+                                MessageBox.error(that.oBundle.getText("techError"), {
+                                    details: err
+                                });
+
+                            }
+                        });
+                    }
+                    else {
+                        MessageBox.error(that.oBundle.getText("errorInp"));
+                    }
                 } else {
                     MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
@@ -1681,13 +1862,27 @@ sap.ui.define([
                     this.getView().byId("idDatePicker2Suspend").setValueState("None");
                 }
             },
-            onChangeDP2: function () {
-                this.getView().byId("idDatePicker2Suspend").setValueState("None");
+            onhandleDateCheck: function (oEvent) {
+                var oDTP = oEvent.getSource(),
+                    sValue = oEvent.getParameter("value"),
+                    bValid = oEvent.getParameter("valid");
+                var selectedDate = new Date(sValue);
+                var now = new Date(),
+                    cDate = now.toLocaleString("en-US", {
+                        timeZone: "America/Mexico_City",
+                    });
+                cDate = new Date(cDate);
+                if (bValid) {
+                    oDTP.setValueState("None");
+                } else if (selectedDate < cDate) {
+                    oDTP.setValueState("Error");
+                    MessageBox.error(this.oBundle.getText("dateError"));
+                }
             },
             /**
-      * Method to open Terminal value help 
-      * @public
-      */
+        * Method to open Terminal value help 
+        * @public
+        */
             onHandleValueHelpTerminal: function () {
                 var oView = this.getView();
                 // create dialog lazily
@@ -1718,10 +1913,10 @@ sap.ui.define([
                     this.getView().byId("idInputTerminalName").setValue(aContexts.map(function (oContext) { return oContext.getObject().Terminalname; }));
                 }
             },
-    /**
-    * Method to Save Terminal data to S/4
-    * @public
-    */
+            /**
+            * Method to Save Terminal data to S/4
+            * @public
+            */
             onPressTerminalSave: function () {
                 var oTerID = this.getView().byId("idInputTerminalID").getValue(),
                     oTerName = this.getView().byId("idInputTerminalName").getValue(), oJsonData,
@@ -1747,8 +1942,8 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.createTerminal.data[constants.INTZERO]) {
-                                    MessageBox.success(that.oBundle.getText("terminalCreated", [oData.createTerminal.data[constants.INTZERO].data.Terminal]), { //, [oData.createTerminal.data[constants.INTZERO].data]
+                                if (oData.createTerminal.data) {
+                                    MessageBox.success(that.oBundle.getText("terminalCreated", [oData.createTerminal.data.Terminal]), {
                                         onClose: function (sAction) {
                                             if (sAction === MessageBox.Action.OK) {
                                                 that.onTerminalClose();
@@ -1757,7 +1952,7 @@ sap.ui.define([
                                         }
                                     });
                                 } else {
-                                    MessageBox.error(oData.createTerminal.data.message);
+                                    MessageBox.error(oData.createTerminal.data);
                                 }
                             },
                             error: function (err) {
@@ -1780,12 +1975,12 @@ sap.ui.define([
 
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.updateTerminal.data[constants.INTZERO]) {
+                                if (oData.updateTerminal.data) {
                                     MessageBox.success(that.oBundle.getText("savedSucc"));
                                     that.onTerminalClose();
                                     that.getTerminalDetails();
                                 } else {
-                                    MessageBox.error(oData.updateTerminal.data.message);
+                                    MessageBox.error(that.oBundle.getText("techError"));
                                 }
 
                             },
@@ -1804,10 +1999,10 @@ sap.ui.define([
                     MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
             },
-    /**
-      * Method to open productVH fargment
-      * @public
-      */
+            /**
+              * Method to open productVH fargment
+              * @public
+              */
             onHandleValueHelpProduct: function () {
                 var oView = this.getView();
                 // create dialog lazily
@@ -1828,10 +2023,10 @@ sap.ui.define([
                     this.getView().byId("idInputProductName").setValue(aContexts.map(function (oContext) { return oContext.getObject().ProductName; }));
                 }
             },
-    /**
-      * Method to Save product details to S/4
-      * @public
-      */            
+            /**
+              * Method to Save product details to S/4
+              * @public
+              */
             onPressProductSave: function () {
                 BusyIndicator.show();
                 var oProdID = this.getView().byId("idInputProductID").getValue(),
@@ -1852,8 +2047,8 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.createProduct.data[constants.INTZERO]) {
-                                    MessageBox.success(that.oBundle.getText("productCreated", [oData.createProduct.data[constants.INTZERO].data.Product]), { //
+                                if (oData.createProduct.data) {
+                                    MessageBox.success(that.oBundle.getText("productCreated", [oData.createProduct.data.Product]), { //
                                         onClose: function (sAction) {
                                             if (sAction === MessageBox.Action.OK) {
                                                 that.onProductClose();
@@ -1862,7 +2057,7 @@ sap.ui.define([
                                         }
                                     });
                                 } else {
-                                    MessageBox.error(oData.createProduct.data.message);
+                                    MessageBox.error(that.oBundle.getText("techError"));
                                 }
                             },
                             error: function (err) {
@@ -1884,12 +2079,12 @@ sap.ui.define([
 
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.updateProduct.data[constants.INTZERO]) {
+                                if (oData.updateProduct.data) {
                                     MessageBox.success(that.oBundle.getText("savedSucc"));
                                     that.onProductClose();
                                     that.getProductDetails();
                                 } else {
-                                    MessageBox.error(oData.updateProduct.data.message);
+                                    MessageBox.error(that.oBundle.getText("techError"));
                                 }
                             },
                             error: function (err) {
@@ -1916,10 +2111,10 @@ sap.ui.define([
             //             });
             //         },
             /**
-      * Method for  customerVH fargment filter bar 
-      * @public
-      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
-      */
+        * Method for  customerVH fargment filter bar 
+        * @public
+        * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+        */
             onFilterBarSearch: function (oEvent) {
                 var sSearchQuery = this._oBasicSearchField.getValue(),
                     aSelectionSet = oEvent.getParameter("selectionSet");
@@ -1979,10 +2174,10 @@ sap.ui.define([
                 });
             },
             /**
-      * Method for  customerVH fargment filter bar 
-      * @public
-      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
-      */
+        * Method for  customerVH fargment filter bar 
+        * @public
+        * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+        */
             _handleValueHelpSearchTerminal: function (oEvent) {
                 var sQuery = oEvent.getParameter("value"), aFilters = [], aFiltersCombo = [];
                 if (sQuery && sQuery.length > constants.INTZERO) {
@@ -2002,10 +2197,10 @@ sap.ui.define([
                 oBinding.filter([aFiltersCombo]);
             },
             /**
-      * Method for  customerVH fargment filter bar 
-      * @public
-      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
-      */
+        * Method for  customerVH fargment filter bar 
+        * @public
+        * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+        */
             _handleValueHelpSearchProduct: function (oEvent) {
                 var sQuery = oEvent.getParameter("value"), aFilters = [], aFiltersCombo = [];
                 if (sQuery && sQuery.length > constants.INTZERO) {
@@ -2025,10 +2220,10 @@ sap.ui.define([
                 oBinding.filter([aFiltersCombo]);
             },
             /**
-      * Method for  customerVH fargment filter bar 
-      * @public
-      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
-      */
+        * Method for  customerVH fargment filter bar 
+        * @public
+        * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+        */
             handleChangeOnDemand: function (oEvent) {
                 debugger;
                 var oDTP = oEvent.getSource(),

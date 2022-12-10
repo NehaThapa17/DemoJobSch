@@ -128,7 +128,7 @@ sap.ui.define([
                                     }
                                 });
                             } else {
-                                MessageBox.error(oData.updateCustomer.data.message);
+                                MessageBox.error(that.oBundle.getText("techError"));
                             }
                         },
                         error: function (err) {

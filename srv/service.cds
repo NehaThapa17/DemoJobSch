@@ -3,7 +3,7 @@ service CatalogService @(requires : 'authenticated-user')
     type response{
         data : String
     };
-    
+
     action MasterUpload() returns String;
     function createSchedule(time:String,desc:String) returns String;
     function createOnDemandSchedule(time:String,desc:String) returns String;

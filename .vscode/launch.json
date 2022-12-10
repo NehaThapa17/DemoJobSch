@@ -14,7 +14,7 @@
       ]
     },
     {
-      "name": "Run pricingNotification-1",
+      "name": "Run PricingCockpit-1",
       "request": "launch",
       "type": "pwa-node",
       "cwd": "${workspaceFolder}",
@@ -32,7 +32,7 @@
       "envFile": "${workspaceFolder}/.env1",
       "env": {
         "NODE_ENV": "development",
-        "run.config": "{\"handlerId\":\"cap_run_config_handler_id\",\"runnableId\":\"{\\\"projectPath\\\":\\\"/home/user/projects/pricingNotification\\\",\\\"profileName\\\":\\\"development\\\"}\"}"
+        "run.config": "{\"handlerId\":\"cap_run_config_handler_id\",\"runnableId\":\"{\\\"projectPath\\\":\\\"/home/user/projects/PricingCockpit\\\",\\\"profileName\\\":\\\"development\\\"}\"}"
       }
     }
   ]

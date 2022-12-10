@@ -27,33 +27,17 @@ const OA_CLIENTID = UAA.clientid;
 const OA_SECRET = UAA.clientsecret;
 const OA_ENDPOINT = UAA.url;
 const core = require('@sap-cloud-sdk/core');
-const onPremData = require('./onpremise/onpremiseGetOperations.js');
 const SapCfAxios = require('sap-cf-axios').default;
 const SapCfAxiosObj = SapCfAxios('CPI');
-const onPostData = require('./onpremise/onpremisePostOperations.js');
 const JobSchedulerClient = require('@sap/jobs-client');
 //Function referance to onpremiseGetOperations.js
 const {getOnPremDetails} = require('./onpremise/onpremiseGetOperations.js');
-const {getOnPremTerminalDetails} = require('./onpremise/onpremiseGetOperations.js');
-const {getOnPremCustomerDetails} = require('./onpremise/onpremiseGetOperations.js');
-const {getOnPremProductDetails} = require('./onpremise/onpremiseGetOperations.js');
-const {getOnPremCustomerValueHelp} = require('./onpremise/onpremiseGetOperations.js');
-const {getOnPremTerminalValueHelp} = require('./onpremise/onpremiseGetOperations.js');
-const {getOnPremProductValueHelp} = require('./onpremise/onpremiseGetOperations.js');
-const {getOnPremCCEmail} = require('./onpremise/onpremiseGetOperations.js');
+const {getOnPremCall} = require('./onpremise/onpremiseGetOperations.js');
 //Function referance to onpremisePostOperations.js
-const {createProductDetail} = require('./onpremise/onpremisePostOperations.js');
-const {editOnDemand} = require('./onpremise/onpremisePostOperations.js');
-const {createCCEmailDetail} = require('./onpremise/onpremisePostOperations.js');
-const {createTerminalDetail} = require('./onpremise/onpremisePostOperations.js');
-const {createCustomerDetail} = require('./onpremise/onpremisePostOperations.js');
-const {updateTerminalDetail} = require('./onpremise/onpremisePostOperations.js');
-const {updateCustomerDetail} = require('./onpremise/onpremisePostOperations.js');
-const {updateProductDetail} = require('./onpremise/onpremisePostOperations.js');
-const {deleteCustomerDetail} = require('./onpremise/onpremisePostOperations.js');
-const {deleteTerminalDetail} = require('./onpremise/onpremisePostOperations.js');
-const {deleteProductDetail} = require('./onpremise/onpremisePostOperations.js');
-
+const {createonPremCall} = require('./onpremise/onpremisePostOperations.js');
+const {updateonPremCall} = require('./onpremise/onpremisePostOperations.js');
+const {deleteonPremCall} = require('./onpremise/onpremisePostOperations.js');
+// const username = require('username');
 
 module.exports = cds.service.impl(async function () {
    /**
@@ -68,21 +52,36 @@ module.exports = cds.service.impl(async function () {
     const scheduler = new JobSchedulerClient.Scheduler(options);
     let jobID = await getJobId(constants.jobNAME, scheduler);
     let jobDetails = await getJobDetals(jobID,scheduler);
-    let sdisplayT,sdemandT;
+    let sdisplayT,sdemandT,sSuspendT,sSuspendF,sActiveT,sActiveF,SuspendActive;
     let resultJob = jobDetails.results;
     if(resultJob){
       for(var i=0; i<resultJob.length; i++ ){
         if(resultJob[i].description === constants.daily){
           sdisplayT = resultJob[i].repeatAt;
-        }
-        if(resultJob[i].description === constants.onDemand){
+        } else if(resultJob[i].description === constants.onDemand && resultJob[i].active === true){
           sdemandT = resultJob[i].time;
+        } else if(resultJob[i].description === constants.suspendTo){
+          sSuspendT = resultJob[i].time;
+          sActiveT = resultJob[i].active;
+        } else if(resultJob[i].description === constants.suspendFrom){
+          sSuspendF = resultJob[i].time;
+          sActiveF = resultJob[i].active;
         }
       };
+      if(sActiveF === false && sActiveT === true){
+        SuspendActive = true;
+      } else if(sActiveF === false && sActiveT === false) {
+        SuspendActive = "Completed";
+      } else {
+        SuspendActive = false;
+      }
     }
     let msg = {
       "DISPLAY":sdisplayT,
-      "ONDEMAND":sdemandT
+      "ONDEMAND":sdemandT,
+      "SUSPENDTo": sSuspendT,
+      "SUSPENDFrom": sSuspendF,
+      "sActive":SuspendActive
     };
 
     return JSON.stringify(msg);
@@ -151,6 +150,7 @@ module.exports = cds.service.impl(async function () {
         "active": true
       }
     };
+    log.info("Daily Schedule Created" +scJob);
     return new Promise((resolve, reject) => {
       scheduler.createJobSchedule(scJob, function (error, body) {
         if (error) {
@@ -209,6 +209,7 @@ module.exports = cds.service.impl(async function () {
         "active": true
       }
     };
+    log.info("OnDemand Schedule Created" +scJob);
     return new Promise((resolve, reject) => {
       scheduler.createJobSchedule(scJob, function (error, body) {
         if (error) {
@@ -234,13 +235,13 @@ module.exports = cds.service.impl(async function () {
     let jobID = await getJobId(constants.jobNAME, scheduler);
     let jobDetails = await getJobDetals(jobID,scheduler);
     // let oTemp = [timeArray];
-    let sDesc = req.data.desc;
+    // let sDesc = req.data.desc;
     
     let sSId;
     let resultJob = jobDetails.results;
     if(resultJob){
       for(var i=0; i<resultJob.length; i++ ){
-        if(resultJob[i].description === sDesc){
+        if(resultJob[i].description === constants.suspendTo || resultJob[i].description === constants.suspendFrom){
           sSId = resultJob[i].scheduleId;
           var req = {
             jobId: jobID._id,
@@ -260,14 +261,15 @@ for(var j=0; j<timeArray.length; j++){
   var scJob = {
     jobId: jobID._id,
     schedule: {
-      "time": timeArray[j],
-      "description": sDesc,
+      "time": timeArray[j].time,
+      "description": timeArray[j].Desc,
       "data": {
         "headers":{"Content-Type":"application/json"}
       },
       "active": true
     }
   };
+  log.info("Suspend Schedule Created" +scJob);
       scheduler.createJobSchedule(scJob, function (error, body) {
       if (error) {
         reject(error.message);
@@ -294,23 +296,6 @@ for(var j=0; j<timeArray.length; j++){
           //job details retrieved successfully
           resolve(result)
           
-        });
-    })
-
-  }
-  async function getJobDetals1(job_Id, scheduler) {
-    var req = {
-      jobId: job_Id
-    };
-      return new Promise((resolve, reject) => {
-        scheduler.fetchJobSchedules(req, function(err, result) {
-          if(err){
-            // return logger.log('Error retrieving job: %s', err);
-            reject(err.message);
-          }
-          //job details retrieved successfully
-          resolve(result)
-          // return logger.log('Fetched Job Details', req);
         });
     })
 
@@ -359,6 +344,7 @@ for(var j=0; j<timeArray.length; j++){
 */ 
   this.on('MasterUpload', async (req) => {
     try {
+      log.info("Job Schedular Endpoint hit successfully");
       const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);
       const options = {
         baseURL: baseURL,
@@ -371,15 +357,14 @@ for(var j=0; j<timeArray.length; j++){
         let oDesc = schDetails.description;
         let jobID = await getJobId(constants.jobNAME, scheduler);
         let jobDetails = await getJobDetals(jobID,scheduler);
-        let resultJob = jobDetails.result;
-        console.log("NEHA JOB: "+JSON.stringify(jobID));
-        console.log("NEHA1: "+JSON.stringify(jobDetails) +"JOBID:" +jobID._id);
+        let resultJob = jobDetails.results;
         // afterwards the actual processing
         let finalResult = await handleAsyncJob(req.headers, req,oDesc,resultJob,job_Id);
         return finalResult;
     }
     catch (error) {
         console.log(error);
+        log.info("Error in MasterUpload Enpoint" +error);
     }
 });
 const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
@@ -407,9 +392,14 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
 */  
   const operationTriggerEndpoint = async function (req,oDesc,resultJob,job_Id) {
     try {
+      log.info("Schedule Description" +oDesc);
+      console.log("Schedule Description" +oDesc);
       log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
       if(oDesc === constants.daily || oDesc === constants.onDemand ){
-      let sUrl = constants.CPI_DATA_URL+oDesc+"'";
+      // let sUrl = constants.CPI_DATA_URL+oDesc+"'";
+      // let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq '"+oDesc+"'";
+      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq 'D'";
+      // let responseData = await getOnPremCall(req,sUrl)
       let responseData = await getOnPremDetails(sUrl);
       let response = await SapCfAxiosObj({
         method: constants.httpPost,
@@ -421,25 +411,20 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       }).then(res => {
         return constants.SUCCESS;
       }).catch(async (error) => {
+        log.info("Error in CPI call");
         return error;
       })
       return response ;
-    } else if(oDesc === constants.suspend){
+    } else if(oDesc === constants.suspendFrom){
       if(resultJob){
-        console.log("NEHA2 " +resultJob);
-        console.log("NEHA3 "+resultJob.length);
-        // var req = {
-        //   jobId: job_Id
-        // };
-        // scheduler.deactivateAllSchedules(req, function(err, result) {
-        //   if(err){
-        //     return logger.log('Error deactivating bulk schedules: %s', err);
-        //   }
-        //   //All schedules deactivated successfully
-        // });
+        const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);
+        const options = {
+          baseURL: baseURL,
+          token: token
+        };
+          const scheduler = new JobSchedulerClient.Scheduler(options);        
         for(var k=0; k<resultJob.length; k++ ){
-          console.log("NEHA4 " +resultJob[k].description+" "+k);
-          if(resultJob[k].description !== oDesc){
+          if(resultJob[k].description === constants.daily || resultJob[k].description === constants.onDemand){
             sSId = resultJob[k].scheduleId;
             var scJob = {
               jobId: job_Id,
@@ -448,7 +433,34 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
                 "active": false
               }
             };
-            console.log("NEHA4 "+JSON.stringify(scJob));
+            scheduler.updateJobSchedule(scJob, function(err, result) {
+              if(err){
+                return logger.log('Error deleting schedule: %s', err);
+              }
+              //Schedule deleted successfully
+              log.info(constants.LOG_SCH_DEL);
+            });
+          }
+        }
+      }  
+    } else if(oDesc === constants.suspendTo){
+      if(resultJob){
+        const token = await  fetchJwtToken(OA_CLIENTID, OA_SECRET);
+        const options = {
+          baseURL: baseURL,
+          token: token
+        };
+          const scheduler = new JobSchedulerClient.Scheduler(options);        
+        for(var k=0; k<resultJob.length; k++ ){
+          if(resultJob[k].description === constants.daily || resultJob[k].description === constants.onDemand){
+            sSId = resultJob[k].scheduleId;
+            var scJob = {
+              jobId: job_Id,
+              scheduleId: sSId,
+              schedule: {
+                "active": true
+              }
+            };
             scheduler.updateJobSchedule(scJob, function(err, result) {
               if(err){
                 return logger.log('Error deleting schedule: %s', err);
@@ -465,6 +477,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
     }
     catch (error) {
       req.error({ code: constants.ERR, message: error.message });
+      log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", error.message);
     }
   }
 /********************Get Dynamic token for Jobscheduler***********************/
@@ -474,7 +487,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
         host: OA_ENDPOINT.replace('https://', ''),
         path: '/oauth/token?grant_type=client_credentials&response_type=token',
         headers: {
-          Authorization: "Basic " + Buffer.from(clientId + ':' + clientSecret).toString("base64")
+          Authorization: constants.preURL  + Buffer.from(clientId + ':' + clientSecret).toString("base64")
         }
       }
       https.get(options, res => {
@@ -497,6 +510,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
         })
       })
         .on("error", (error) => {
+          log.info("Error JWT token function" +error);
           return reject({ error: error })
         });
     })
@@ -544,19 +558,24 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
         })
     })
   }
+  
+
   /**
 * Function to get Terminal Details
 */ 
   this.on('getTerminalDetails', async (req) => {
     try {
+      
       let sUrl = constants.URL_TerDetails;
-      let response = await  getOnPremTerminalDetails(sUrl);
+      let response = await getOnPremCall(req,sUrl);
       let resultData = {
         data: response.data.d.results
       }
+      log.info("getTerminalDetails success");
       return resultData;
     }
     catch (error) {
+      log.info("getTerminalDetails Error" +error);
       return error
     }
   });
@@ -566,13 +585,15 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
   this.on('getCustomerDetails', async (req) => {
     try {
       let sUrl = constants.URL_CustDetails;
-      let response = await  getOnPremCustomerDetails(sUrl);
+      let response = await getOnPremCall(req,sUrl);
       let resultData = {
         data: response.data.d.results
       }
+      log.info("getCustomerDetails success");
       return resultData;
     }
     catch (error) {
+      log.info("getCustomerDetails error" +error);
       return error
     }
   });
@@ -582,14 +603,15 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
   this.on('getOnPremProductDetails', async (req) => {
     try {
       let sUrl = constants.URL_ProdDetails;
-      // let response = await  getOnPremProductDetails(sUrl);
-      let response = await  getOnPremProductDetails(req,sUrl);
+      let response = await  getOnPremCall(req,sUrl);
       let resultData = {
         data: response.data.d.results
       }
+      log.info("getOnPremProductDetails success");
       return resultData;
     }
     catch (error) {
+      log.info("getOnPremProductDetails error" +error);
       return error
     }
   });
@@ -599,13 +621,16 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
   this.on('getOnPremCustomerF4', async (req) => {
     try {
       let sUrl = constants.URL_F4cust;
-      let response = await  getOnPremCustomerValueHelp(sUrl);
+      let response = await  getOnPremCall(req,sUrl);
       let resultData = {
         data: response.data.d.results
       }
+      log.info("getOnPremCustomerF4 success");
       return resultData;
     }
     catch (error) {
+      log.info("getOnPremCustomerF4 error" +error);
+      return error
     }
   });
   /**
@@ -614,14 +639,16 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
   this.on('getOnPremTerminalF4', async (req) => {
     try {
       let sUrl = constants.URL_F4Ter;
-      let response = await  getOnPremTerminalValueHelp(sUrl);
+      let response = await  getOnPremCall(req,sUrl);
       let resultData = {
         data: response.data.d.results
       }
+      log.info("getOnPremTerminalF4 success");
       return resultData;
     }
     catch (error) {
-
+      log.info("getOnPremTerminalF4 error" +error);
+      return error
     }
   });
 /**
@@ -630,13 +657,16 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
   this.on('getOnPremProductF4', async (req) => {
     try {
       let sUrl = constants.URL_F4Prod;
-      let response = await  getOnPremProductValueHelp(sUrl);
+      let response = await  getOnPremCall(req,sUrl);
       let resultData = {
         data: response.data.d.results
       }
+      log.info("getOnPremProductF4 success");
       return resultData;
     }
     catch (error) {
+      log.info("getOnPremProductF4 error" +error);
+      return error;
     }
   });
 /**
@@ -645,13 +675,16 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
   this.on('getOnCCEmail', async (req) => {
     try {
       let sUrl = constants.URL_CC;
-      let response = await  getOnPremCCEmail(sUrl);
+      let response = await  getOnPremCall(req,sUrl);
       let resultData = {
         data: response.data.d.results
       }
+      log.info("getOnCCEmail success");
       return resultData;
     }
     catch (error) {
+      log.info("getOnCCEmail error" +error);
+      return error;
     }
   });
 /**
@@ -659,12 +692,15 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
 */     
   this.on("createCCEmail", async (req) => {
     try {
-      let response = await  createCCEmailDetail(req);
+      let sUrl = constants.URL_CCCreate;
+      let response = await  createonPremCall(req,sUrl);
       let resultData = { data: response };
+      log.info("createCCEmail success");
       return resultData;
     }
     catch (error) {
-      return error
+      log.info("createCCEmail error" +error);
+      return error;
     }
   });
   /**
@@ -674,12 +710,15 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
     try {
       let m = req.data.customer;
       let n = req.data.shipTo;
-      let response = await  deleteCustomerDetail(req, m, n);
+      let sUrl= "/CustomerShipToDetailSet(Customer='"+m+"',ShipTo='"+n+"')";
+      let response = await deleteonPremCall(req,sUrl);
       let resultData = { data: response };
+      log.info("deleteCustomer success");
       return resultData;
     }
     catch (error) {
-      return error
+      log.info("deleteCustomer error" +error);
+      return error;
     }
   });
 /**
@@ -688,12 +727,16 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
   this.on("deleteTerminal", async (req) => {
     try {
       let m = req.data.terminal;
-      let response = await  deleteTerminalDetail(req, m);
+      let sUrl = "/TerminalDetailSet('"+m+"')";
+      let response = await deleteonPremCall(req,sUrl);
+      // let response = await  deleteTerminalDetail(req, m);
       let resultData = { data: response };
+      log.info("deleteTerminal success");
       return resultData;
     }
     catch (error) {
-      return error
+      log.info("deleteTerminal error" +error);
+      return error;
     }
   });
 /**
@@ -702,12 +745,15 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
   this.on("deleteProduct", async (req) => {
     try {
       let m = req.data.product;
-      let response = await  deleteProductDetail(req, m);
+      let sUrl = "/ProductDetailSet('"+m+"')";
+      let response = await deleteonPremCall(req,sUrl);
       let resultData = { data: response };
+      log.info("deleteProduct success");
       return resultData;
     }
     catch (error) {
-      return error
+      log.info("deleteProduct error" +error);
+      return error;
     }
   });
 /**
@@ -715,12 +761,15 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
 */     
   this.on("createProduct", async (req) => {
     try {
-      let response = await  createProductDetail(req);
+      let sUrl = constants.URL_ProdCreate;
+      let response = await  createonPremCall(req,sUrl);
       let resultData = { data: response };
+      log.info("createProduct success");
       return resultData;
     }
     catch (error) {
-      return error
+      log.info("createProduct error" +error);
+      return error;
     }
   });
 /**
@@ -728,12 +777,15 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
 */   
   this.on("createTerminal", async (req) => {
     try {
-      let response = await  createTerminalDetail(req);
+      let sUrl = constants.URL_TerCreate;
+      let response = await  createonPremCall(req,sUrl);
       let resultData = { data: response };
+      log.info("createTerminal success");
       return resultData;
     }
     catch (error) {
-      return error
+      log.info("createTerminal error" +error);
+      return error;
     }
   });
 /**
@@ -741,12 +793,16 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
 */   
   this.on("createCustomer", async (req) => {
     try {
-      let response = await  createCustomerDetail(req);
+      // let response = await  createCustomerDetail(req);
+      let sUrl = constants.URL_CusCreate;
+      let response = await  createonPremCall(req,sUrl);
       let resultData = { data: response };
+      log.info("createCustomer success");
       return resultData;
     }
     catch (error) {
-      return error
+      log.info("createCustomer error" +error);
+      return error;
     }
   });
 /**
@@ -754,12 +810,15 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
 */
   this.on("updateOnDemand", async (req) => {
     try {
-      let response = await  editOnDemand(req);
+      let sUrl = constants.URL_DPCreate;
+      let response = await  createonPremCall(req,sUrl);
       let resultData = { data: response };
+      log.info("updateOnDemand success");
       return resultData;
     }
     catch (error) {
-      return error
+      log.info("updateOnDemand error" +error);
+      return error;
     }
   });
 /**
@@ -768,12 +827,15 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
   this.on("updateTerminal", async (req) => {
     try {
       let m = req.data.terminal;
-      let response = await  updateTerminalDetail(req, m);
+      let sUrl = "/TerminalDetailSet('"+m+"')";
+      let response = await  updateonPremCall(req,sUrl);
       let resultData = { data: response };
+      log.info("updateTerminal success");
       return resultData;
     }
     catch (error) {
-      return error
+      log.info("updateTerminal error" +error);
+      return error;
     }
   });
 /**
@@ -781,12 +843,16 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
 */    
   this.on("updateCustomer", async (req) => {
     try {
-      let response = await  updateCustomerDetail(req);
+      // let response = await  updateCustomerDetail(req);
+      let sUrl = constants.URL_CusCreate;
+      let response = await  createonPremCall(req,sUrl);
       let resultData = { data: response };
+      log.info("updateCustomer success");
       return resultData;
     }
     catch (error) {
-      return error
+      log.info("updateCustomer error" +error);
+      return error;
     }
   });
 /**
@@ -795,12 +861,16 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
   this.on("updateProduct", async (req) => {
     try {
       let m = req.data.product;
-      let response = await  updateProductDetail(req, m);
+      let sUrl="/ProductDetailSet('"+m+"')";
+      let response = await  updateonPremCall(req,sUrl);
+      // let response = await  updateProductDetail(req, m);
       let resultData = { data: response };
+      log.info("updateProduct success");
       return resultData;
     }
     catch (error) {
-      return error
+      log.info("updateProduct error" +error);
+      return error;
     }
   });
 });
