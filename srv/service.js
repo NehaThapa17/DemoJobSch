@@ -396,10 +396,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       console.log("Schedule Description" +oDesc);
       log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
       if(oDesc === constants.daily || oDesc === constants.onDemand ){
-      // let sUrl = constants.CPI_DATA_URL+oDesc+"'";
-      // let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq '"+oDesc+"'";
-      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq 'D'";
-      // let responseData = await getOnPremCall(req,sUrl)
+      let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq '"+oDesc+"'";
       let responseData = await getOnPremDetails(sUrl);
       let response = await SapCfAxiosObj({
         method: constants.httpPost,

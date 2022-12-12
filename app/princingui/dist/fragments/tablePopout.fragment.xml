@@ -1,13 +1,13 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:tnt="sap.tnt" xmlns:core="sap.ui.core">
-    <Dialog id="custTable" title="{i18n>customer}">
+    <Dialog id="custTable" title="{i18n>customerSH}">
         <Table class="sapUiSizeCompact" id="idTablePopout" width="auto" sticky="ColumnHeaders,HeaderToolbar" 
         growing="true" growingScrollToLoad="true" selectionChange="singlemode" growingThreshold="8" items="{oModel>/CustomerData}" mode="SingleSelectMaster">
             <headerToolbar>
                 <Toolbar>
                     <SearchField width="50%" change="onSearchCustomerPop" placeholder="{i18n>searchPlcHolder}"/>
                     <ToolbarSpacer />
-                    <Button icon="sap-icon://edit" press="onEditCustomerPopout" />
-                    <Button icon="sap-icon://delete" press="onDeleteCustomerPopout" />
+                    <Button icon="sap-icon://edit" tooltip="{i18n>editCustomer}" press="onEditCustomerPopout" />
+                    <Button icon="sap-icon://delete" tooltip="{i18n>delCustomer}" press="onDeleteCustomerPopout" />
                 </Toolbar>
             </headerToolbar>
             <columns>

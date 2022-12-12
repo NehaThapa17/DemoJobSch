@@ -50,11 +50,11 @@
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>onDemandStartTime}" required="true" />
                                 <DateTimePicker id="idDatePickerOnDemand" value="{oModel>/dateValue}" change="onhandleDateCheck" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
-                                <Label text="{i18n>customer}" required="true" />
+                                <Label text="{i18n>customerSH}" required="true" />
                                 <MultiInput id="idMultiInputCustomer" enabled="false" valueHelpRequest=".onValueHelpRequested" change="handleChangeOnDemand" />
                                 <Label text="{i18n>terminal}" required="true" />
-                                <MultiComboBox id="idMultiInputTerminal" enabled="false" showSecondaryValues="true" showSelectAll="true" width="350px" items="{oModel>/TerminalData}"> 
-                                <!-- selectionChange="handleSelectionChangeTerF4" selectionFinish="handleSelectionFinishTerF4"  -->
+                                <MultiComboBox id="idMultiInputTerminal" enabled="false" showSecondaryValues="true" showSelectAll="true" width="350px" items="{oModel>/TerminalData}">
+                                    <!-- selectionChange="handleSelectionChangeTerF4" selectionFinish="handleSelectionFinishTerF4"  -->
                                     <core:ListItem key="{oModel>Terminal}" text="{oModel>TerminalName}" additionalText="{oModel>Terminal}" />
                                 </MultiComboBox>
                             </forms:SimpleForm>
@@ -73,9 +73,19 @@
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>suspendFrom}" required="true" />
-                                <DateTimePicker id="idDatePickerSuspend" value="{oModel>/dateValueF}" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck"/>
+                                <DateTimePicker id="idDatePickerSuspend" value="{oModel>/dateValueF}" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
                                 <Label text="{i18n>suspendTo}" required="true" />
-                                <DateTimePicker id="idDatePicker2Suspend" value="{oModel>/dateValueT}" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" valueStateText="From Date cannot be greater than To Date" />
+                                <DateTimePicker
+                                    id="idDatePicker2Suspend"
+                                    value="{oModel>/dateValueT}"
+                                    timezone="America/Mexico_City"
+                                    enabled="false"
+                                    placeholder="Enter Date and Time"
+                                    afterValueHelpClose="onhandleChangeDP2Suspend"
+                                    class="sapUiSmallMarginBottom"
+                                    change="onhandleDateCheck"
+                                    valueStateText="{i18n>plcErrorDate}"
+                                />
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
@@ -88,7 +98,7 @@
             </uxap:ObjectPageSection>
             <uxap:ObjectPageSection titleUppercase="false" title="{i18n>processingData}">
                 <uxap:subSections>
-                    <uxap:ObjectPageSubSection id="personalSS1" title="{i18n>customer}" showTitle="false" titleUppercase="false">
+                    <uxap:ObjectPageSubSection id="personalSS1" title="{i18n>customerSH}" showTitle="false" titleUppercase="false">
                         <uxap:blocks>
                             <VBox>
                                 <Table
@@ -109,11 +119,11 @@
                                         <OverflowToolbar id="otbSubheader">
                                             <Title id="idTitleCustomer" level="H2" />
                                             <ToolbarSpacer />
-                                            <Button id="btnadd" icon="sap-icon://add" press="onCreateCustomer" />
-                                            <Button id="btnedit" icon="sap-icon://edit" press="onEditCustomer" />
-                                            <Button icon="sap-icon://delete" press="onDeleteCustomer" />
-                                            <Button text="{i18n>ccButton}" type="Emphasized" press="onEmailCCSelectDialogPress" />
-                                            <Button press="handleTableSelectDialogPress" type="Emphasized" icon="sap-icon://full-screen" />
+                                            <Button id="btnadd" tooltip="{i18n>addCustomer}" icon="sap-icon://add" press="onCreateCustomer" />
+                                            <Button id="btnedit" tooltip="{i18n>editCustomer}" icon="sap-icon://edit" press="onEditCustomer" />
+                                            <Button icon="sap-icon://delete" tooltip="{i18n>delCustomer}" press="onDeleteCustomer" />
+                                            <Button text="{i18n>ccButton}" tooltip="{i18n>addCCEmail}" type="Emphasized" press="onEmailCCSelectDialogPress" />
+                                            <Button press="handleTableSelectDialogPress" tooltip="{i18n>expand}" type="Emphasized" icon="sap-icon://full-screen" />
                                         </OverflowToolbar>
                                     </headerToolbar>
                                     <columns>
@@ -129,7 +139,7 @@
                                         </Column>
                                         <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="15rem">
                                             <header>
-                                                <Text text="{i18n>product}" />
+                                                <Text text="{i18n>products}" />
                                             </header>
                                         </Column>
                                         <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="17rem">
@@ -151,10 +161,15 @@
                                     <ColumnListItem>
                                         <ObjectIdentifier title="{oModel>Customer}" text="{oModel>CustomerName}" />
                                         <ObjectIdentifier title="{oModel>ShipTo}" text="{oModel>ShipToName}" />
-                                        <HBox>
-                                            <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog" />
-                                            <tnt:InfoLabel text="{oModel>CountProduct}" colorScheme="1" renderMode="Narrow" />
-                                        </HBox>
+                                        <!-- <HBox> -->
+                                        <VBox>
+                                            <HBox>
+                                                <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog" />
+                                                <tnt:InfoLabel text="{oModel>CountProduct}" colorScheme="1" renderMode="Narrow" />
+                                            </HBox>
+                                            <Text text="{oModel>ProdNameFirst}" />
+                                        </VBox>
+                                        <!-- </HBox> -->
                                         <HBox>
                                             <Link text="{path:'oModel>EmailTo', formatter: '.formatter.getFirstEmail'}" press="handleEmailPopoverPress" ariaHasPopup="Dialog" />
                                             <tnt:InfoLabel text="{oModel>CountEmail}" colorScheme="1" renderMode="Narrow" />
@@ -174,10 +189,10 @@
                                         <OverflowToolbar id="otbSubheaderterminal">
                                             <Title id="idTitleTerminal" level="H2" />
                                             <ToolbarSpacer />
-                                            <Button id="btnaddterminal" press="handleTerminalSelectDialogPress" icon="sap-icon://add" />
-                                            <Button id="btneditterminal" icon="sap-icon://edit" press="handleEditTerminalSelectDialogPress" />
-                                            <Button id="btndeleteterminal" icon="sap-icon://delete" press="onDeleteTerminal" />
-                                            <Button press="handleTerminalTableSelectDialogPress" type="Emphasized" icon="sap-icon://full-screen" />
+                                            <Button id="btnaddterminal" tooltip="{i18n>addTerminal}" press="handleTerminalSelectDialogPress" icon="sap-icon://add" />
+                                            <Button id="btneditterminal" tooltip="{i18n>editTerminal}" icon="sap-icon://edit" press="handleEditTerminalSelectDialogPress" />
+                                            <Button id="btndeleteterminal" tooltip="{i18n>delT}" icon="sap-icon://delete" press="onDeleteTerminal" />
+                                            <Button press="handleTerminalTableSelectDialogPress" tooltip="{i18n>expand}" type="Emphasized" icon="sap-icon://full-screen" />
                                         </OverflowToolbar>
                                     </headerToolbar>
                                     <columns>
@@ -220,10 +235,10 @@
                                         <OverflowToolbar id="otbSubheaderproduct">
                                             <Title id="idTitleProduct" level="H2" />
                                             <ToolbarSpacer />
-                                            <Button id="btnaddproduct" press="handleProductSelectDialogPress" icon="sap-icon://add" />
-                                            <Button id="btneditproduct" icon="sap-icon://edit" press="handleEditProductSelectDialogPress" />
-                                            <Button id="btndeleteproduct" icon="sap-icon://delete" press="onDeleteProduct" />
-                                            <Button press="handleProductTableSelectDialogPress" type="Emphasized" icon="sap-icon://full-screen" />
+                                            <Button id="btnaddproduct" tooltip="{i18n>addProduct}" press="handleProductSelectDialogPress" icon="sap-icon://add" />
+                                            <Button id="btneditproduct" tooltip="{i18n>editProduct}" icon="sap-icon://edit" press="handleEditProductSelectDialogPress" />
+                                            <Button id="btndeleteproduct" tooltip="{i18n>delP}" icon="sap-icon://delete" press="onDeleteProduct" />
+                                            <Button press="handleProductTableSelectDialogPress" tooltip="{i18n>expand}" type="Emphasized" icon="sap-icon://full-screen" />
                                         </OverflowToolbar>
                                     </headerToolbar>
                                     <columns>

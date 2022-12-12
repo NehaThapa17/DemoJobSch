@@ -227,7 +227,7 @@ sap.ui.define([
                             BusyIndicator.hide();
 
                             if (oData.createCustomer.data) {
-                                MessageBox.success(that.oBundle.getText("customerCreated", [oData.createCustomer.data.Customer]), {
+                                MessageBox.success(that.oBundle.getText("customerCreated", [oData.createCustomer.data.Customer,oData.createCustomer.data.ShipTo]), {
                                     onClose: function (sAction) {
                                         if (sAction === MessageBox.Action.OK) {
                                             that.onBack();

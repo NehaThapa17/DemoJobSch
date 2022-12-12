@@ -28,27 +28,10 @@
       ]
     },
     {
-      "name": "RoleTemplateForMPCJob",
-      "description": "Users of Job Schedullar need this special role",
-      "default-role-name": "JS Job Role",
-      "scope-references": [
-        "$XSAPPNAME.scopeformyapp"
-      ]
-    },
-    {
       "name": "Pricing_Analyst",
       "description": "Pricing Analyst Role",
       "scope-references": [
         "$XSAPPNAME.pricinganalyst"
-      ]
-    }
-  ],
-  "role-collections": [
-    {
-      "name": "app_job_schedular_MPC_Job",
-      "description": "job schedular",
-      "role-template-references": [
-        "$XSAPPNAME.scopeformyapp"
       ]
     }
   ]

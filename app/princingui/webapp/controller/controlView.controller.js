@@ -39,20 +39,15 @@ sap.ui.define([
                 this.oDataModelT = this.getOwnerComponent().getModel();
                 BusyIndicator.show();
                 var oModel = new JSONModel();
-                var oObj = new Date();
-                debugger;
-                var mindate = oObj.toLocaleString('en-US', {
-                    timeZone: "America/Mexico_City"
-                });
                 var oItemData = [];
                 oModel.setData(oItemData);
                 //set model 
                 this.getView().setModel(oModel, "oModel");
                 this.getOwnerComponent().setModel(oModel, "oModel");
                 this.getView().byId("idMultiInputTerminal").setModel(oModel, "oModel");
-                this.getView().byId("idDatePickerOnDemand").setMinDate(new Date(mindate));
-                this.getView().byId("idDatePickerSuspend").setMinDate(new Date(mindate));
-                this.getView().byId("idDatePicker2Suspend").setMinDate(new Date(mindate));
+                // this.getView().byId("idDatePickerOnDemand").setMinDate(new Date(mindate));
+                // this.getView().byId("idDatePickerSuspend").setMinDate(new Date(mindate));
+                // this.getView().byId("idDatePicker2Suspend").setMinDate(new Date(mindate));
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.getRoute("RoutecontrolView").attachPatternMatched(this.onRouteControl, this);
                 //OData call to get display data
@@ -144,7 +139,7 @@ sap.ui.define([
                             that.getView().getModel("oModel").setProperty("/dateValue", finalDate);
                         } else {
                             that.getView().byId("idTextOnDemandST").setText(constants.SPACE);
-                            that.getView().getModel("oModel").setProperty("/dateValue", constants.SPACE);
+                            // that.getView().getModel("oModel").setProperty("/dateValue", constants.SPACE);
                         }
                         if (oDataArr2.sActive !== "Completed" && oDataArr2.SUSPENDTo !== undefined && oDataArr2.SUSPENDFrom !== undefined) {
                             var dateTo = new Date(oDataArr2.SUSPENDTo);
@@ -335,7 +330,7 @@ sap.ui.define([
                         if (oDataCust) {
                             that.getView().byId("idTitleCustomer").setText(that.oBundle.getText("comCusText", [oData.getCustomerDetails.data.length]));
                             for (var a = constants.INTZERO; a < oDataCust.length; a++) {
-                                var oEmailArray = oDataCust[a].EmailTo.split(constants.spliter), oArray = [], oFirstProd;
+                                var oEmailArray = oDataCust[a].EmailTo.split(constants.spliter), oArray = [], oFirstProd,oFirstProdName;
                                 for (var b = constants.INTZERO; b < oEmailArray.length; b++) {
                                     var obj = {};
                                     obj.email = oEmailArray[b];
@@ -343,6 +338,8 @@ sap.ui.define([
                                 }
                                 if (oDataCust[a].ProductList.results.length != constants.INTZERO) {
                                     oFirstProd = oDataCust[a].ProductList.results[constants.INTZERO].Product;
+                                    oFirstProdName = oDataCust[a].ProductList.results[constants.INTZERO].ProductName;
+                                    // oFirstProd = oDataCust[a].ProductList.results[constants.INTZERO].Product + constants.SPACE + oDataCust[a].ProductList.results[constants.INTZERO].ProductName;
                                 }
                                 if (oDataCust[a].OnDemandJob === true) {
                                     var otokenD = new sap.m.Token({ key: oDataCust[a].Customer, text: oDataCust[a].ShipTo + "(" + oDataCust[a].Customer + ")" });
@@ -360,6 +357,7 @@ sap.ui.define([
                                     "OnDemandJob": oDataCust[a].OnDemandJob,
                                     "ProductList": oDataCust[a].ProductList,
                                     "ProductFirst": oFirstProd,
+                                    "ProdNameFirst":oFirstProdName, 
                                     "ShipTo": oDataCust[a].ShipTo,
                                     "ShipToName": oDataCust[a].ShipToName,
                                     "EmailArray": oArray
@@ -449,7 +447,7 @@ sap.ui.define([
                 var oTableData = this.getView().getModel("oModel").getProperty("/CustomerData");
                 if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
-                    MessageBox.confirm(that.oBundle.getText("customerDeleted", [oItems.Customer]), {
+                    MessageBox.confirm(that.oBundle.getText("customerDeleted", [oItems.Customer,oItems.CustomerName,oItems.ShipTo,oItems.ShipToName]), {
                         onClose: function (oAction) {
                             if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
@@ -491,7 +489,7 @@ sap.ui.define([
                 var oTableData = this.getView().getModel("oModel").getProperty("/CustomerData");
                 if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
-                    MessageBox.confirm(that.oBundle.getText("customerDeleted", [oItems.Customer]), {
+                    MessageBox.confirm(that.oBundle.getText("customerDeleted", [oItems.Customer,oItems.CustomerName,oItems.ShipTo,oItems.ShipToName]), {
                         onClose: function (oAction) {
                             if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
@@ -590,31 +588,7 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                // if (oData.createSchedule) {
-                                //     var jsonDT = {
-                                //         "Key": "DAILYT",
-                                //         "Value": oDaily
-                                //     }
-                                //     var oPayloadDT = JSON.stringify(jsonDT);
-                                //     debugger;
-                                //     that.oDataModelT.callFunction("/createCCEmail", {
-                                //         method: constants.httpPost,
-                                //         urlParameters: {
-                                //             createData: oPayloadDT
-                                //         },
-                                //         success: function (oData) {
-                                //             debugger;
-                                //         },
-                                //         error: function (err) {
-                                //             BusyIndicator.hide();
-                                //             MessageBox.error(that.oBundle.getText("techError"), {
-                                //                 details: err
-                                //             });
-
-                                //         }
-                                //     });
-                                // }
-                                MessageBox.success(that.oBundle.getText("succJS"));
+                                MessageBox.success(that.oBundle.getText("succJSDaily"));
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
@@ -644,6 +618,7 @@ sap.ui.define([
                         {
                             "label": this.oBundle.getText("customerID"), //"Customer ID"
                             "template": "Customer",
+                            "iskey":true
                         },
                         {
                             "label": "Customer Name",
@@ -651,7 +626,8 @@ sap.ui.define([
                         },
                         {
                             "label": "Ship-To",
-                            "template": "ShipTo"
+                            "template": "ShipTo",
+                            "iskey":true
                         },
                         {
                             "label": "Ship-To Name",
@@ -807,7 +783,7 @@ sap.ui.define([
             handlePopoverPress: function (oEvent) {
                 var oButton = oEvent.getSource(),
                     oView = this.getView(),
-                    oB_ID = oEvent.getSource().getParent().getParent().getBindingContextPath(),
+                    oB_ID = oEvent.getSource().getParent().getParent().getParent().getBindingContextPath(),
                     oB_len = oB_ID.length,
                     olen = oB_len - constants.INTONE,
                     oB_Indx = oB_ID.slice(olen),
@@ -990,7 +966,7 @@ sap.ui.define([
                     }
                 }
                 else {
-                    MessageBox.error("Select a Product to proceed");
+                    MessageBox.error(this.oBundle.getText("selectProduct"));
                 }
             },
             /**
@@ -998,7 +974,7 @@ sap.ui.define([
                * @public
                */
             handleEditProductPopout: function () {
-                var oTable = this.getView().byId("idProdTablePopout");
+                var oTable = this.getView().byId("idProdTablePopout"),that=this;
                 var oTableData = this.getView().getModel("oModel").getProperty("/ProductData");
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 if (itemIndex !== constants.INTNEGONE) {
@@ -1029,20 +1005,13 @@ sap.ui.define([
                     }
                 }
                 else {
-                    MessageBox.error("Select a Product to proceed");
+                    MessageBox.error(this.oBundle.getText("selectProduct"));
                 }
             },
             onProductClose: function () {
                 this.byId("addProduct").close();
                 this.byId("addProduct").destroy();
             },
-
-            //     onValueHelpOkEmail: function () {
-            //         var oMultiInput1 = oView.byId("multiInput1");
-            //         oMultiInput1.setTokens([
-            //             new Token({ text: { email }, key: { key } }),
-            //         ]);
-            //     },
             /**
                * Method called on Close Event for pop-out Tables
                * @public
@@ -1192,11 +1161,11 @@ sap.ui.define([
                     this.getView().getModel("oModel").setProperty("/selectedRow", oArray);
                     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                     oRouter.navTo("RouteEditView", {
-                        Data: "1"//JSON.stringify(oArray)
+                        Data: "1"
                     });
 
                 } else {
-                    MessageBox.error("Select a Customer to proceed");
+                    MessageBox.error(this.oBundle.getText("selectCustomerproceed"));
 
                 }
 
@@ -1209,7 +1178,6 @@ sap.ui.define([
                 var oTable = this.getView().byId("idTablePopout"), oArray = [];
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 if (itemIndex !== constants.INTNEGONE) {
-
                     var value = this.getView().getModel("oModel").getProperty("/CustomerData")[itemIndex];
                     var prodObj = [];
                     for (var g = constants.INTZERO; g < value.ProductList.results.length; g++) {
@@ -1229,14 +1197,14 @@ sap.ui.define([
                         DailyJob: value.DailyJob,
                         OnDemandJob: value.OnDemandJob
                     });
+                    this.getView().getModel("oModel").setProperty("/selectedRow", oArray);
                     var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-
                     oRouter.navTo("RouteEditView", {
-                        Data: JSON.stringify(oArray)
+                        Data: "1"
                     });
 
                 } else {
-                    MessageBox.error("Select a Customer to proceed");
+                    MessageBox.error(this.oBundle.getText("selectCustomerproceed"));
 
                 }
 
@@ -1254,7 +1222,7 @@ sap.ui.define([
                 var oTableData = this.getView().getModel("oModel").getProperty("/TerminalData");
                 if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
-                    MessageBox.confirm(that.oBundle.getText("terminalDeleted", [oItems.Terminal]), {
+                    MessageBox.confirm(that.oBundle.getText("terminalDeleted", [oItems.Terminal,oItems.TerminalName]), {
                         onClose: function (oAction) {
                             if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
@@ -1297,7 +1265,7 @@ sap.ui.define([
                 var oTableData = this.getView().getModel("oModel").getProperty("/ProductData");
                 if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
-                    MessageBox.confirm(that.oBundle.getText("productDeleted", [oItems.Product]), {
+                    MessageBox.confirm(that.oBundle.getText("productDeleted", [oItems.Product,oItems.ProductName]), {
                         onClose: function (oAction) {
                             if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
@@ -1342,7 +1310,7 @@ sap.ui.define([
                 var oTableData = this.getView().getModel("oModel").getProperty("/TerminalData");
                 if (itemIndex !== constants.INTNEGONE) {
                     var oItems = oTableData[itemIndex];
-                    MessageBox.confirm(that.oBundle.getText("terminalDeleted", [oItems.Terminal]), {
+                    MessageBox.confirm(that.oBundle.getText("terminalDeleted", [oItems.Terminal,oItems.TerminalName]), {
                         onClose: function (oAction) {
                             if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
@@ -1385,7 +1353,7 @@ sap.ui.define([
                 if (itemIndex !== constants.INTNEGONE) {
 
                     var oItems = oTableData[itemIndex];
-                    MessageBox.confirm(that.oBundle.getText("productDeleted", [oItems.Product]), {
+                    MessageBox.confirm(that.oBundle.getText("productDeleted", [oItems.Product,oItems.ProductName]), {
                         onClose: function (oAction) {
                             if (oAction === constants.actionOK) {
                                 BusyIndicator.show();
@@ -1569,7 +1537,6 @@ sap.ui.define([
                 this.getView().byId("idDatePickerOnDemand").setValueState("None");
                 this.getView().byId("idMultiInputTerminal").setValueState("None");
                 var r = this.getView().getModel("oModel").getProperty("/dateValue");
-                this.getView().byId("idDatePickerSuspend").setDateValue(rFrom);
                 this.getView().byId("idMultiInputCustomer").setValue("");
                 this.getView().byId("idDatePickerOnDemand").setDateValue(r);
                 this.getView().byId("idMultiInputTerminal").setValue("");
@@ -1631,7 +1598,9 @@ sap.ui.define([
                             BusyIndicator.hide();
                             if (oData.createOnDemandSchedule) {
                                 that.updateOndemandData(oJsonData);
-                                MessageBox.success(that.oBundle.getText("succJS"));
+                                MessageBox.success(that.oBundle.getText("succJSOD"));
+                                that.getCustomerDetails();
+                                that.getTerminalDetails();
                             }
 
                         },
@@ -1792,10 +1761,10 @@ sap.ui.define([
                         this.getView().byId("idButtonSuspendSave").setVisible(false);
                         this.getView().byId("idButtonSuspendEdit").setVisible(true);
                         this.getView().byId("idButtonSuspendCancel").setVisible(false);
-                        this.getView().byId("idObjStatusS1").setText(SuspendFrom);
-                        this.getView().byId("idObjStatusS2").setText(SuspendTo);
-                        this.getView().getModel("oModel").setProperty("/dateValueF", SuspendFrom);
-                        this.getView().getModel("oModel").setProperty("/dateValueT", SuspendTo);
+                        this.getView().byId("idObjStatusS1").setText(resultFrom);
+                        this.getView().byId("idObjStatusS2").setText(resultTo);
+                        this.getView().getModel("oModel").setProperty("/dateValueF", resultFrom);
+                        this.getView().getModel("oModel").setProperty("/dateValueT", resultTo);
                         oArr.push({
                             "time": SuspendFrom,
                             "Desc": "SUSPENDFROM"
@@ -1813,7 +1782,8 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                MessageBox.success(that.oBundle.getText("succJS"));
+                                MessageBox.success(that.oBundle.getText("succJSSus"));
+                                
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
@@ -2130,7 +2100,7 @@ sap.ui.define([
                                 break;
                             case constants.filterSH:
                                 aResult.push(new Filter({
-                                    path: constants.pathSH2,
+                                    path: constants.pathSH,
                                     operator: FilterOperator.Contains,
                                     value1: oControl.getValue()
                                 }));

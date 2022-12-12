@@ -6,8 +6,8 @@
                 <Toolbar>
                     <SearchField width="50%" change="onSearchTerminalPop" />
                     <ToolbarSpacer />
-                    <Button icon="sap-icon://edit" press="handleEditTerminalPopout" />
-                    <Button icon="sap-icon://delete" press="onDeleteTerminalPopout" />
+                    <Button icon="sap-icon://edit" tooltip="{i18n>editTerminal}" press="handleEditTerminalPopout" />
+                    <Button icon="sap-icon://delete"  tooltip="{i18n>delT}" press="onDeleteTerminalPopout" />
                 </Toolbar>
             </headerToolbar>
             <columns>
@@ -40,7 +40,7 @@
             </ColumnListItem>
         </Table>
         <beginButton>
-            <Button text="{i18n>btnAddNew}" type="Emphasized" press="onCreateCustomer" />
+            <Button text="{i18n>btnAddNew}" type="Emphasized" press="handleTerminalSelectDialogPress" />
         </beginButton>
         <endButton>
             <Button text="{i18n>cancel}" press="onCloseTer" />

@@ -6,8 +6,8 @@
                 <Toolbar>
                     <SearchField width="50%" change="onSearchProductPop" />
                     <ToolbarSpacer />
-                    <Button icon="sap-icon://edit" press="handleEditProductPopout" />
-                    <Button icon="sap-icon://delete" press="onDeleteProductPopout" />
+                    <Button icon="sap-icon://edit" tooltip="{i18n>editProduct}" press="handleEditProductPopout" />
+                    <Button icon="sap-icon://delete" tooltip="{i18n>delP}"  press="onDeleteProductPopout" />
                 </Toolbar>
             </headerToolbar>
             <columns>

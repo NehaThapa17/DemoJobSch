@@ -2,7 +2,7 @@
     xmlns:m="sap.m"
     xmlns:fb="sap.ui.comp.filterbar"
     xmlns:core="sap.ui.core">
-    <ValueHelpDialog  title="{i18n>selectCustomer}" ok=".onValueHelpOkPress" cancel=".onValueHelpCancelPress" 
+    <ValueHelpDialog  title="{i18n>customerSH}" ok=".onValueHelpOkPress" cancel=".onValueHelpCancelPress" 
     afterClose=".onValueHelpAfterClose" supportRanges="false" key="Customer" descriptionKey="ShipTo">
         <filterBar>
             <fb:FilterBar advancedMode="true" search=".onFilterBarSearch" isRunningInValueHelpDialog="true">
