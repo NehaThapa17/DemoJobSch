@@ -32,7 +32,7 @@ async function getOnPremCall(req,sUrl) {
         return respSchedule;    
     }
     catch (error) {
-        log.info("getOnPremCall error" +error);
+        log.error("getOnPremCall error" +error);
         return error;
     }
 }
@@ -55,10 +55,11 @@ async function getOnPremDetails(sUrl){
             }
         });
         console.log("EMAIL Data" +response);
+        
         return response;
     }
     catch (error) {
-        log.info("getOnPremDetails error" +error);
+        log.error("getOnPremDetails error" +error);
         return error;
     }
 }

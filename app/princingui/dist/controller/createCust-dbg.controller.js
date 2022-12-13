@@ -40,44 +40,6 @@ sap.ui.define([
                 oModel.setData(oItemData);
                 //set model 
                 this.getView().setModel(oModel, "oCustModel");
-                // this.getCustomerDetails2();
-                // this.getF4Product2();
-            },
-            getCustomerDetails2: function () {
-                var that = this;
-                debugger;
-                this.oDataModel.callFunction("/getOnPremCustomerF4", {
-                    method: constants.httpGet,
-                    success: function (oData) {
-                        that.getView().getModel("oCustModel").setProperty("/CustValHelp", oData.getOnPremCustomerF4.data);
-                        BusyIndicator.hide();
-                    },
-                    error: function (err) {
-                        BusyIndicator.hide();
-                        MessageBox.error(that.oBundle.getText("techError"), {
-                            details: err
-                        });
-
-                    }
-                })
-            },
-            getF4Product2: function () {
-                var that = this;
-                this.oDataModel.callFunction("/getOnPremProductDetails", {
-                    method: constants.httpGet,
-                    success: function (oData) {
-                        
-                        that.getView().getModel("oCustModel").setProperty("/ProductData", oData.getOnPremProductDetails.data);
-                        BusyIndicator.hide();
-                    },
-                    error: function (err) {
-                        BusyIndicator.hide();
-                        MessageBox.error(that.oBundle.getText("techError"), {
-                            details: err
-                        });
-
-                    }
-                })
             },
             /**
       * Method for  Routing

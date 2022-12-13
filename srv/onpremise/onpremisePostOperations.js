@@ -34,6 +34,7 @@ async function getToken(req, authorization, sap_client,url) {
         }
         return { xcsrfToken, cookie1 }
     } catch (e) {
+        log.error("Error in getToken" +e);
         return e;
     }
 }
@@ -67,7 +68,7 @@ let createonPremCall = async (req,sUrl) => {
         return result.data.d;
     }
     catch (error) {
-        log.info("createonPremCall error" +error);
+        log.error("createonPremCall error" +error);
         return error;
     }
 }
@@ -99,7 +100,7 @@ let updateonPremCall = async (req,sUrl) => {
         return constants.SUCCESS_EDIT;
     }
     catch (error) {
-        log.info("updateonPremCall error" +error);
+        log.error("updateonPremCall error" +error);
         return error;
     }
 }
@@ -131,7 +132,7 @@ let deleteonPremCall = async (req,sUrl) => {
         return constants.SUCCESS_DEL;
     }
     catch (error) {
-        log.info("deleteonPremCall error" +error);
+        log.error("deleteonPremCall error" +error);
         return error;
     }
 }

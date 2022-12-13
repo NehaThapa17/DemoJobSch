@@ -1,7 +1,6 @@
 const constants = require("./util/constants-util.js");
 const log = require('cf-nodejs-logging-support');
 const cds = require('@sap/cds');
-const axios = require('axios');
 const express = require('express');
 const passport = require('passport');
 const xsenv = require('@sap/xsenv');
@@ -26,17 +25,16 @@ const baseURL = CREDENTIALS.url;
 const OA_CLIENTID = UAA.clientid;
 const OA_SECRET = UAA.clientsecret;
 const OA_ENDPOINT = UAA.url;
-const core = require('@sap-cloud-sdk/core');
 const SapCfAxios = require('sap-cf-axios').default;
 const SapCfAxiosObj = SapCfAxios('CPI');
 const JobSchedulerClient = require('@sap/jobs-client');
 //Function referance to onpremiseGetOperations.js
-const {getOnPremDetails} = require('./onpremise/onpremiseGetOperations.js');
-const {getOnPremCall} = require('./onpremise/onpremiseGetOperations.js');
+const {getOnPremDetails,getOnPremCall} = require('./onpremise/onpremiseGetOperations.js');
+// const {getOnPremCall} = require('./onpremise/onpremiseGetOperations.js');
 //Function referance to onpremisePostOperations.js
-const {createonPremCall} = require('./onpremise/onpremisePostOperations.js');
-const {updateonPremCall} = require('./onpremise/onpremisePostOperations.js');
-const {deleteonPremCall} = require('./onpremise/onpremisePostOperations.js');
+const {createonPremCall,updateonPremCall,deleteonPremCall} = require('./onpremise/onpremisePostOperations.js');
+// const {updateonPremCall} = require('./onpremise/onpremisePostOperations.js');
+// const {deleteonPremCall} = require('./onpremise/onpremisePostOperations.js');
 // const username = require('username');
 
 module.exports = cds.service.impl(async function () {
@@ -363,8 +361,8 @@ for(var j=0; j<timeArray.length; j++){
         return finalResult;
     }
     catch (error) {
-        console.log(error);
-        log.info("Error in MasterUpload Enpoint" +error);
+        // console.log(error);
+        log.error("Error in MasterUpload Enpoint" +error);
     }
 });
 const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
@@ -373,9 +371,10 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
         if ((typeof result !== 'undefined') && (result !== null)) {
             await doUpdateStatus(headers, true, result)
             return result;
-        } else {
-            await operationTriggerEndpoint(req,oDesc,resultJob,job_Id)
-        }
+        } 
+        // else {
+        //     await operationTriggerEndpoint(req,oDesc,resultJob,job_Id)
+        // }
     } catch (error) {
         doUpdateStatus(headers, false, error.message)
             .then(() => {
@@ -383,7 +382,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
                 log.info(constants.LOG_JS_API);
             }).catch((error) => {
                 console.log(constants.LOG_JS_ERR + error);
-                log.info(constants.LOG_JS_ERR + error);   
+                log.error(constants.LOG_JS_ERR + error);   
             })
     }
 }
@@ -398,6 +397,8 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       if(oDesc === constants.daily || oDesc === constants.onDemand ){
       let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq '"+oDesc+"'";
       let responseData = await getOnPremDetails(sUrl);
+      console.log("Mail Body" +responseData);
+      log.info("Mail Body" +responseData);
       let response = await SapCfAxiosObj({
         method: constants.httpPost,
         url: constants.CPI_ENDPOINT,
@@ -406,9 +407,10 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
         },
         data: responseData.data 
       }).then(res => {
+        log.info("CPI execution was Successful " +res);
         return constants.SUCCESS;
       }).catch(async (error) => {
-        log.info("Error in CPI call");
+        log.error("Error in CPI call" +error);
         return error;
       })
       return response ;
@@ -474,7 +476,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
     }
     catch (error) {
       req.error({ code: constants.ERR, message: error.message });
-      log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", error.message);
+      log.error(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", error.message);
     }
   }
 /********************Get Dynamic token for Jobscheduler***********************/
@@ -550,7 +552,8 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
           req.end()
         })
         .catch((error) => {
-          console.log(error)
+          log.error("doUpdateStatus function error" +error);
+          
           reject(error)
         })
     })
@@ -572,7 +575,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("getTerminalDetails Error" +error);
+      log.error("getTerminalDetails Error" +error);
       return error
     }
   });
@@ -590,7 +593,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("getCustomerDetails error" +error);
+      log.error("getCustomerDetails error" +error);
       return error
     }
   });
@@ -608,7 +611,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("getOnPremProductDetails error" +error);
+      log.error("getOnPremProductDetails error" +error);
       return error
     }
   });
@@ -626,7 +629,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("getOnPremCustomerF4 error" +error);
+      log.error("getOnPremCustomerF4 error" +error);
       return error
     }
   });
@@ -644,7 +647,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("getOnPremTerminalF4 error" +error);
+      log.error("getOnPremTerminalF4 error" +error);
       return error
     }
   });
@@ -662,7 +665,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("getOnPremProductF4 error" +error);
+      log.error("getOnPremProductF4 error" +error);
       return error;
     }
   });
@@ -680,7 +683,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("getOnCCEmail error" +error);
+      log.error("getOnCCEmail error" +error);
       return error;
     }
   });
@@ -696,7 +699,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("createCCEmail error" +error);
+      log.error("createCCEmail error" +error);
       return error;
     }
   });
@@ -714,7 +717,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("deleteCustomer error" +error);
+      log.error("deleteCustomer error" +error);
       return error;
     }
   });
@@ -732,7 +735,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("deleteTerminal error" +error);
+      log.error("deleteTerminal error" +error);
       return error;
     }
   });
@@ -749,7 +752,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("deleteProduct error" +error);
+      log.error("deleteProduct error" +error);
       return error;
     }
   });
@@ -765,7 +768,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("createProduct error" +error);
+      log.error("createProduct error" +error);
       return error;
     }
   });
@@ -781,7 +784,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("createTerminal error" +error);
+      log.error("createTerminal error" +error);
       return error;
     }
   });
@@ -798,7 +801,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("createCustomer error" +error);
+      log.error("createCustomer error" +error);
       return error;
     }
   });
@@ -814,7 +817,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("updateOnDemand error" +error);
+      log.error("updateOnDemand error" +error);
       return error;
     }
   });
@@ -831,7 +834,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("updateTerminal error" +error);
+      log.error("updateTerminal error" +error);
       return error;
     }
   });
@@ -848,7 +851,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("updateCustomer error" +error);
+      log.error("updateCustomer error" +error);
       return error;
     }
   });
@@ -866,7 +869,7 @@ const handleAsyncJob = async function (headers, req,oDesc,resultJob,job_Id) {
       return resultData;
     }
     catch (error) {
-      log.info("updateProduct error" +error);
+      log.error("updateProduct error" +error);
       return error;
     }
   });
