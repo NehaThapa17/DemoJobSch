@@ -3,7 +3,7 @@
         <content>
         <VBox>
             <Label text="{i18n>ccEmail}:" />
-            <MultiInput id="multiInputemail" change="onEmailChangeCC" showValueHelp="false" />
+            <MultiInput id="multiInputemail" change="onEmailChangeCC" width="90%" showValueHelp="false" />
             </VBox>
         </content>
         <!-- <f:SimpleForm editable="true" layout="ColumnLayout" title="" columnsXL="2" columnsL="2" columnsM="2">

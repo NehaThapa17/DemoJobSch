@@ -1,7 +1,8 @@
 module.exports=Object.freeze({
+    INTZERO:0,
+    TOP:3,
     DESTINATIONNAME:"s4rt",
     DESTINATIONNAMEBASIC:"s4rt_basic",
-    // DESTINATIONNAME:"ds4rt_120",
     DEFAULTURL:"sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV",
     PPSERVICEURL:"sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/$metadata",
     httpPost: 'POST',
@@ -30,7 +31,7 @@ module.exports=Object.freeze({
     LOG_ONPREM_SELECT_ERR:"Error in getOnPremTerminalDetails",
     preURL:'Basic ',
     URL_TerDetails:"/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/TerminalDetailSet?$orderby=UpdDate Desc,UpdTime Desc",
-    URL_CustDetails:"/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/CustomerShipToDetailSet?$expand=ProductList",
+    URL_CustDetails:"/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/CustomerShipToDetailSet?$expand=ProductList&$orderby=UpdDate Desc,UpdTime Desc",
     URL_ProdDetails:"/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/ProductDetailSet?$orderby=UpdDate Desc,UpdTime Desc",
     URL_F4cust:"/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/CustomerShipTo_VHSet",
     URL_F4Ter:"/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/Terminal_VHSet",

@@ -163,7 +163,6 @@
                                     <ColumnListItem>
                                         <ObjectIdentifier title="{oModel>Customer}" text="{oModel>CustomerName}" />
                                         <ObjectIdentifier title="{oModel>ShipTo}" text="{oModel>ShipToName}" />
-                                        <!-- <HBox> -->
                                         <VBox>
                                             <HBox>
                                                 <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog" />
@@ -171,7 +170,6 @@
                                             </HBox>
                                             <Text text="{oModel>ProdNameFirst}" />
                                         </VBox>
-                                        <!-- </HBox> -->
                                         <HBox>
                                             <Link text="{path:'oModel>EmailTo', formatter: '.formatter.getFirstEmail'}" press="handleEmailPopoverPress" ariaHasPopup="Dialog" />
                                             <tnt:InfoLabel text="{oModel>CountEmail}" colorScheme="1" renderMode="Narrow" />
