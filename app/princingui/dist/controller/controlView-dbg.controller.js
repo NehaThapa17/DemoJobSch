@@ -45,9 +45,6 @@ sap.ui.define([
                 this.getView().setModel(oModel, "oModel");
                 this.getOwnerComponent().setModel(oModel, "oModel");
                 this.getView().byId("idMultiInputTerminal").setModel(oModel, "oModel");
-                // this.getView().byId("idDatePickerOnDemand").setMinDate(new Date(mindate));
-                // this.getView().byId("idDatePickerSuspend").setMinDate(new Date(mindate));
-                // this.getView().byId("idDatePicker2Suspend").setMinDate(new Date(mindate));
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.getRoute("RoutecontrolView").attachPatternMatched(this.onRouteControl, this);
                 //OData call to get display data
@@ -274,7 +271,6 @@ sap.ui.define([
                             var oDataTer = oData.getTerminalDetails.data, tokenArray = [];
                             for (var g = 0; g < oDataTer.length; g++) {
                                 if (oDataTer[g].OnDemandJob === true) {
-                                    // var otokenD = new sap.core.Item({ key: oDataTer[g].Terminal, text: oDataTer[g].TerminalName });
                                     var otokenD = oDataTer[g].Terminal;
                                     tokenArray.push(otokenD);
                                 }
@@ -535,118 +531,32 @@ sap.ui.define([
                 BusyIndicator.show();
                 var oState = oEvent.getSource().getState(),
                     oDaily = this.getView().byId("idTimePickerInput").getValue();
-                    // oStatus = this.getView().byId("idInfoLabel").getText();
-                this.getJSStatus(oState,oDaily);
-                // this.executeSchDaily(oStatus);
-                // if (oStatus !== "Suspended") {
-                //     if (oState === false) {
-                //         this.getView().byId("idTimePickerInput").setEnabled(true);
-                //         this.getView().byId("idInfoLabel").setText("InActive");
-                //         this.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
-                //         //Delete Schedule
-                //         this.oDataModelT.callFunction("/deleteSchedule", {
-                //             method: constants.httpGet,
-                //             urlParameters: {
-                //                 desc: constants.daily
-                //             },
-                //             success: function (oData) {
-                //                 BusyIndicator.hide();
-                //             },
-                //             error: function (err) {
-                //                 BusyIndicator.hide();
-                //                 MessageBox.error(that.oBundle.getText("techError"), {
-                //                     details: err
-                //                 });
-
-                //             }
-                //         });
-                //     } else {
-                //         if (oDaily !== "" && oDaily !== constants.SPACE && oDaily !== undefined) {
-                //             BusyIndicator.show();
-                //             var oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue()),
-                //                 dateH = oDate.getHours(),
-                //                 dateM = (oDate.getMinutes() < constants.INTTEN ? constants.ZERO : '') + oDate.getMinutes(),
-                //                 dateValue = new Date();
-                //             dateValue.setHours(dateH);
-                //             dateValue.setMinutes(dateM);
-                //             // Get dates for January and July
-                //             var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
-                //             var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
-                //             // Get timezone offset
-                //             var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                //             if (dateValue.getTimezoneOffset() < timezoneOffset) {
-                //                 // Adjust date by 5 hours
-                //                 dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                //             }
-                //             else {
-                //                 // Adjust date by 6 hours
-                //                 dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                //             }
-                //             var oMin = (dateValue.getMinutes() < constants.INTTEN ? constants.ZERO : '') + dateValue.getMinutes();
-                //             var oTime = dateValue.getHours() + constants.DIV + oMin;
-                //             this.getView().byId("idTimePickerInput").setEnabled(false);
-                //             this.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
-                //             this.getView().byId("idInfoLabel").setText("Active");
-                //             this.getView().byId("idTextDailyST").setText(oDaily);
-                //             //Create Daily Schedule
-                //             this.oDataModelT.callFunction("/createSchedule", {
-                //                 method: constants.httpGet,
-                //                 urlParameters: {
-                //                     time: oTime,
-                //                     desc: constants.daily
-                //                 },
-                //                 success: function (oData) {
-                //                     BusyIndicator.hide();
-                //                     MessageBox.success(that.oBundle.getText("succJSDaily"));
-                //                 },
-                //                 error: function (err) {
-                //                     BusyIndicator.hide();
-                //                     MessageBox.error(that.oBundle.getText("techError"), {
-                //                         details: err
-                //                     });
-
-                //                 }
-                //             });
-                //         } else {
-                //             that.getView().byId("idSwitchInput").setState(false);
-                //             MessageBox.error(that.oBundle.getText("manTime"));
-                //         }
-                //     }
-                // } else {
-                //     if (oState === false) {
-                //         that.getView().byId("idSwitchInput").setState(true);
-                //     } else {
-                //         that.getView().byId("idSwitchInput").setState(false);
-                //     }
-                //     MessageBox.error(that.oBundle.getText("susCheck"));
-                // }
-
-
+                this.getJSStatus(oState, oDaily);
             },
             /**
               * Method called inside onSwitchChange 
               * @public
               */
-            getJSStatus: function (oState,oDaily) {
+            getJSStatus: function (oState, oDaily) {
                 var that = this;
                 this.oDataModelT.callFunction("/getJobDetails", {
                     method: constants.httpGet,
                     success: function (oData) {
                         var oDataArr2 = JSON.parse(oData.getJobDetails);
-                            if (oDataArr2.sActive === true) {
-                                BusyIndicator.hide();
-                                if (oState === false) {
-                                    that.getView().byId("idSwitchInput").setState(true);
-                                } else {
-                                    that.getView().byId("idSwitchInput").setState(false);
-                                }
-                                that.getView().byId("idInfoLabel").setText("Suspended");
-                                that.getView().byId("idInfoLabel").setColorScheme(2);
-                                MessageBox.error(that.oBundle.getText("susCheck"));
+                        if (oDataArr2.sActive === true) {
+                            BusyIndicator.hide();
+                            if (oState === false) {
+                                that.getView().byId("idSwitchInput").setState(true);
                             } else {
-                                BusyIndicator.hide();
-                                that.executeSchDaily(oState,oDaily);
+                                that.getView().byId("idSwitchInput").setState(false);
                             }
+                            that.getView().byId("idInfoLabel").setText("Suspended");
+                            that.getView().byId("idInfoLabel").setColorScheme(2);
+                            MessageBox.error(that.oBundle.getText("susCheck"));
+                        } else {
+                            BusyIndicator.hide();
+                            that.executeSchDaily(oState, oDaily);
+                        }
                     },
                     error: function (err) {
                         BusyIndicator.hide();
@@ -657,21 +567,68 @@ sap.ui.define([
                     }
                 });
             },
-            executeSchDaily: function (oState,oDaily){
+            executeSchDaily: function (oState, oDaily) {
                 var that = this;
-                
-                    if (oState === false) {
-                        this.getView().byId("idTimePickerInput").setEnabled(true);
-                        this.getView().byId("idInfoLabel").setText("InActive");
-                        this.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
-                        //Delete Schedule
-                        this.oDataModelT.callFunction("/deleteSchedule", {
+
+                if (oState === false) {
+                    this.getView().byId("idTimePickerInput").setEnabled(true);
+                    this.getView().byId("idInfoLabel").setText("InActive");
+                    this.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
+                    //Delete Schedule
+                    this.oDataModelT.callFunction("/deleteSchedule", {
+                        method: constants.httpGet,
+                        urlParameters: {
+                            desc: constants.daily
+                        },
+                        success: function (oData) {
+                            BusyIndicator.hide();
+                        },
+                        error: function (err) {
+                            BusyIndicator.hide();
+                            MessageBox.error(that.oBundle.getText("techError"), {
+                                details: err
+                            });
+
+                        }
+                    });
+                } else {
+                    if (oDaily !== "" && oDaily !== constants.SPACE && oDaily !== undefined) {
+                        BusyIndicator.show();
+                        var oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue()),
+                            dateH = oDate.getHours(),
+                            dateM = (oDate.getMinutes() < constants.INTTEN ? constants.ZERO : '') + oDate.getMinutes(),
+                            dateValue = new Date();
+                        dateValue.setHours(dateH);
+                        dateValue.setMinutes(dateM);
+                        // Get dates for January and July
+                        var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
+                        var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
+                        // Get timezone offset
+                        var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                        if (dateValue.getTimezoneOffset() < timezoneOffset) {
+                            // Adjust date by 5 hours
+                            dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                        }
+                        else {
+                            // Adjust date by 6 hours
+                            dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                        }
+                        var oMin = (dateValue.getMinutes() < constants.INTTEN ? constants.ZERO : '') + dateValue.getMinutes();
+                        var oTime = dateValue.getHours() + constants.DIV + oMin;
+                        this.getView().byId("idTimePickerInput").setEnabled(false);
+                        this.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
+                        this.getView().byId("idInfoLabel").setText("Active");
+                        this.getView().byId("idTextDailyST").setText(oDaily);
+                        //Create Daily Schedule
+                        this.oDataModelT.callFunction("/createSchedule", {
                             method: constants.httpGet,
                             urlParameters: {
+                                time: oTime,
                                 desc: constants.daily
                             },
                             success: function (oData) {
                                 BusyIndicator.hide();
+                                MessageBox.success(that.oBundle.getText("succJSDaily"));
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
@@ -682,57 +639,10 @@ sap.ui.define([
                             }
                         });
                     } else {
-                        if (oDaily !== "" && oDaily !== constants.SPACE && oDaily !== undefined) {
-                            BusyIndicator.show();
-                            var oDate = new Date(this.getView().byId("idTimePickerInput").getDateValue()),
-                                dateH = oDate.getHours(),
-                                dateM = (oDate.getMinutes() < constants.INTTEN ? constants.ZERO : '') + oDate.getMinutes(),
-                                dateValue = new Date();
-                            dateValue.setHours(dateH);
-                            dateValue.setMinutes(dateM);
-                            // Get dates for January and July
-                            var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
-                            var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
-                            // Get timezone offset
-                            var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                            if (dateValue.getTimezoneOffset() < timezoneOffset) {
-                                // Adjust date by 5 hours
-                                dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                            }
-                            else {
-                                // Adjust date by 6 hours
-                                dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                            }
-                            var oMin = (dateValue.getMinutes() < constants.INTTEN ? constants.ZERO : '') + dateValue.getMinutes();
-                            var oTime = dateValue.getHours() + constants.DIV + oMin;
-                            this.getView().byId("idTimePickerInput").setEnabled(false);
-                            this.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
-                            this.getView().byId("idInfoLabel").setText("Active");
-                            this.getView().byId("idTextDailyST").setText(oDaily);
-                            //Create Daily Schedule
-                            this.oDataModelT.callFunction("/createSchedule", {
-                                method: constants.httpGet,
-                                urlParameters: {
-                                    time: oTime,
-                                    desc: constants.daily
-                                },
-                                success: function (oData) {
-                                    BusyIndicator.hide();
-                                    MessageBox.success(that.oBundle.getText("succJSDaily"));
-                                },
-                                error: function (err) {
-                                    BusyIndicator.hide();
-                                    MessageBox.error(that.oBundle.getText("techError"), {
-                                        details: err
-                                    });
-
-                                }
-                            });
-                        } else {
-                            that.getView().byId("idSwitchInput").setState(false);
-                            MessageBox.error(that.oBundle.getText("manTime"));
-                        }
+                        that.getView().byId("idSwitchInput").setState(false);
+                        MessageBox.error(that.oBundle.getText("manTime"));
                     }
+                }
             },
             /**
               * Method called for idMultiInputCustomer (Customer ID & Ship To Value Help) to fetch valuehelp dialog 
@@ -961,8 +871,6 @@ sap.ui.define([
             onTerminalClose: function () {
                 this.byId("addTerminal").close();
                 this.byId("addTerminal").destroy();
-                // oEvent.getSource().getParent().close();
-                // oEvent.getSource().getParent().destroy();
             },
             /**
               * Method called on click of edit button of terminal
@@ -1190,24 +1098,7 @@ sap.ui.define([
 
 
             },
-            //    /**
-            //       * Method called for filter customer table
-            //       * @public
-            //       * @param  oFilter An object consisting of filter values
-            //       */              
-            //     _filterTableC: function (oFilter) {
-            //         var oVHD = this.byId("custTable");
-            //         oVHD.getTableAsync().then(function (oTable) {
-            //             if (oTable.bindRows) {
-            //                 oTable.getBinding("rows").filter(oFilter);
-            //             }
-            //             if (oTable.bindItems) {
-            //                 oTable.getBinding("items").filter(oFilter);
-            //             }
-            //             // This method must be called after binding update of the table.
-            //             oVHD.update();
-            //         });
-            //     },
+
             /**
                * Method called on search of Terminal popout Table
                * @public
@@ -1581,9 +1472,9 @@ sap.ui.define([
                 if (sVal === "") {
                     oMultiInput1.setValueState(sap.ui.core.ValueState.None);
                 }
-                // else {
+                
                 oMultiInput1.addValidator(fnValidator);
-                // }
+                
 
             },
             onCCEmailClose: function () {
@@ -1646,26 +1537,26 @@ sap.ui.define([
                 BusyIndicator.show();
                 this.getJSStatusOnDemand();
             },
-            getJSStatusOnDemand: function (){
+            getJSStatusOnDemand: function () {
                 var that = this;
                 this.oDataModelT.callFunction("/getJobDetails", {
                     method: constants.httpGet,
                     success: function (oData) {
                         BusyIndicator.hide();
                         var oDataArr2 = JSON.parse(oData.getJobDetails);
-                            if (oDataArr2.sActive === true) {
-                                that.getView().byId("idInfoLabel").setText("Suspended");
-                                that.getView().byId("idInfoLabel").setColorScheme(2);
-                                MessageBox.error(that.oBundle.getText("susCheck"));
-                            } else {
-                                that.getView().byId("idMultiInputCustomer").setEnabled(true);
-                                that.getView().byId("idDatePickerOnDemand").setEnabled(true);
-                                that.getView().byId("idMultiInputTerminal").setEnabled(true);
-                                that.getView().byId("idButtonSave").setVisible(true);
-                                that.getView().byId("idButtonCancel").setVisible(true);
-                                that.getView().byId("idButtonEdit").setVisible(false);  
-                                
-                            }
+                        if (oDataArr2.sActive === true) {
+                            that.getView().byId("idInfoLabel").setText("Suspended");
+                            that.getView().byId("idInfoLabel").setColorScheme(2);
+                            MessageBox.error(that.oBundle.getText("susCheck"));
+                        } else {
+                            that.getView().byId("idMultiInputCustomer").setEnabled(true);
+                            that.getView().byId("idDatePickerOnDemand").setEnabled(true);
+                            that.getView().byId("idMultiInputTerminal").setEnabled(true);
+                            that.getView().byId("idButtonSave").setVisible(true);
+                            that.getView().byId("idButtonCancel").setVisible(true);
+                            that.getView().byId("idButtonEdit").setVisible(false);
+
+                        }
                     },
                     error: function (err) {
                         BusyIndicator.hide();
@@ -1728,7 +1619,7 @@ sap.ui.define([
                     minute: 'numeric',
                     hour12: true
                 }),
-                   onDemand = dateValue.toDateString().slice(4) + constants.SPACE + xTime;
+                    onDemand = dateValue.toDateString().slice(4) + constants.SPACE + xTime;
                 if (oStatus !== "Suspended") {
                     if ((oDate !== "" && oDate !== constants.SPACE && oDate !== undefined) && oCust.length !== constants.INTZERO && oTer.length !== constants.INTZERO) {
                         if (checkTer !== constants.ERROR || checkCus !== constants.ERROR || checkDate !== constants.ERROR) {
@@ -1784,11 +1675,10 @@ sap.ui.define([
                 var oCustArray = [], oTerArray = [];
                 for (var i = constants.INTZERO; i < oCust.length; i++) {
                     var len = oCust[i].getText().split('('),
-                        shipV = len[0].replace(/\s/g, ''),
                         key = oCust[i].getKey().split('/');
                     var obj = {
                         "Customer": key[0],
-                        "ShipTo": key[1] //shipV //oTData[oIdx].ShipTo
+                        "ShipTo": key[1] 
                     };
                     oCustArray.push(obj);
                 }
@@ -2228,16 +2118,7 @@ sap.ui.define([
                     MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
             },
-            //         /**
-            //   * Method to close the Busy Dialog
-            //   * @public
-            //   */
-            //         closeBusyDialog: function () {
-            //             this._pBusyDialog.then(function (oBusyDialog) {
-            //                 oBusyDialog.close();
-            //             });
-            //         },
-            /**
+/*
         * Method for  customerVH fargment filter bar 
         * @public
         * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
@@ -2345,50 +2226,6 @@ sap.ui.define([
                 }
                 var oBinding = oEvent.getSource().getBinding("items");
                 oBinding.filter([aFiltersCombo]);
-            },
-
-            //Suspend From
-            handleChangeSuspensStartTime: function (oEvent) {
-                this.getView().byId("idDatePicker2Suspend").setValueState("None");
-                var suspendstarttime = this.getView().byId("idObjStatusS1");
-                suspendstarttime.setText(this.getView().byId("idDatePickerSuspend").getValue());
-                const date = new Date(this.getView().byId("idDatePickerSuspend").getValue());
-                //  convert date to CST (Central Standard Time)
-                suspendstarttime.setText(date.toLocaleString('en-US', {
-
-                    timeZone: 'CST',
-
-                    dateStyle: 'medium',
-
-                    timeStyle: 'medium',
-
-                }));
-
-            },
-            //Suspend End
-            handleChangeSuspensEndTime: function (oEvent) {
-                this.getView().byId("idDatePicker2Suspend").setValueState("None");
-                var suspendendtime = this.getView().byId("idObjStatusS2");
-                const date = new Date(this.getView().byId("idDatePicker2Suspend").getValue());
-                //  convert date to CST (Central Standard Time)
-                suspendendtime.setText(date.toLocaleString('en-US', {
-                    timeZone: 'CST',
-                    dateStyle: 'medium',
-                    timeStyle: 'medium',
-                }));
-
-            },
-            // Daily Processing Start Time
-            handleChange: function (oEvent) {
-                var showondailytime = this.getView().byId("idTextDailyST");
-                showondailytime.setText(this.getView().byId("idTimePickerInput").getValue());
-                const date = new Date(this.getView().byId("idTimePickerInput").getValue());
-                //  convert date to CST (Central Standard Time)
-                showondailytime.setText(date.toLocaleString('en-US', {
-                    timeZone: 'CST',
-                    dateStyle: 'medium',
-                    timeStyle: 'medium',
-                }));
-            },
+            }
         });
     });

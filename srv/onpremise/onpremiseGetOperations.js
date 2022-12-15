@@ -45,7 +45,6 @@ async function getOnPremCall(req,sUrl) {
 async function getOnPremDetails(sUrl){
     try{
         log.info("getOnPremDetails Call to get Email Odata");
-        console.log("getOnPremDetails Call to get Email Odata");
         let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAMEBASIC }, {
             method: constants.httpGet,
             url: sUrl,
@@ -54,7 +53,7 @@ async function getOnPremDetails(sUrl){
                 'x-csrf-token': 'fetch'
             }
         });
-        console.log("EMAIL Data" +response);
+        
         
         return response;
     }

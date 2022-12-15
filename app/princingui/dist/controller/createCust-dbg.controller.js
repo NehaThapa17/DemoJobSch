@@ -100,7 +100,7 @@ sap.ui.define([
                     this.getView().byId("idInputCustomerNameAdd").setValue(aContexts.map(function (oContext) { return oContext.getObject().CustomerName; }));
                     this.getView().byId("idInputSHAdd").setValue(aContexts.map(function (oContext) { return oContext.getObject().Shipto; }));
                     this.getView().byId("idInputSHNameAdd").setValue(aContexts.map(function (oContext) { return oContext.getObject().ShiptoName; }));
-                    // var v = aContexts.map(function (oContext) { return oContext.getObject().Customer; });
+                    
                 }
             },
             /**

@@ -1,6 +1,6 @@
 module.exports=Object.freeze({
     INTZERO:0,
-    TOP:3,
+    TOP:2,
     DESTINATIONNAME:"s4rt",
     DESTINATIONNAMEBASIC:"s4rt_basic",
     DEFAULTURL:"sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV",

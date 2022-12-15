@@ -50,12 +50,12 @@
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>onDemandStartTime}" required="true" />
                                 <DateTimePicker id="idDatePickerOnDemand"  change="onhandleDateCheck" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
-                                <!-- value="{oModel>/dateValue}" -->
+                              
                                 <Label text="{i18n>customerSH}" required="true" />
                                 <MultiInput id="idMultiInputCustomer" enabled="false" valueHelpRequest=".onValueHelpRequested" change="handleChangeOnDemand" />
                                 <Label text="{i18n>terminal}" required="true" />
                                 <MultiComboBox id="idMultiInputTerminal" enabled="false" showSecondaryValues="true" showSelectAll="true" width="350px" items="{oModel>/TerminalData}">
-                                    <!-- selectionChange="handleSelectionChangeTerF4" selectionFinish="handleSelectionFinishTerF4"  -->
+                                
                                     <core:ListItem key="{oModel>Terminal}" text="{oModel>TerminalName}" additionalText="{oModel>Terminal}" />
                                 </MultiComboBox>
                             </forms:SimpleForm>
@@ -75,9 +75,7 @@
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>suspendFrom}" required="true" />
                                 <DateTimePicker id="idDatePickerSuspend"  timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
-                               <!-- value="{oModel>/dateValueF}" -->
                                 <Label text="{i18n>suspendTo}" required="true" />
-                                <!-- value="{oModel>/dateValueT}" -->
                                 <DateTimePicker
                                     id="idDatePicker2Suspend"
                                     timezone="America/Mexico_City"
@@ -91,9 +89,11 @@
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
-                            <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="onPressSuspendEdit" />
-                            <Button id="idButtonSuspendSave" text="{i18n>save}" type="Emphasized" visible="false" press="onPressSuspendSave" />
-                            <Button id="idButtonSuspendCancel" text="{i18n>cancel}" type="Emphasized" press="onPressSuspendClear" visible="false" />
+                            <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="" enabled="false"/>
+                            <!-- onPressSuspendEdit -->
+                            <Button id="idButtonSuspendSave" text="{i18n>save}" type="Emphasized" visible="false" press="" enabled="false"/> 
+                            <!-- //onPressSuspendSave -->
+                            <Button id="idButtonSuspendCancel" text="{i18n>cancel}" type="Emphasized" press="onPressSuspendClear" visible="false" enabled="false"/>
                         </uxap:actions>
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>

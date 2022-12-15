@@ -391,21 +391,21 @@ module.exports = cds.service.impl(async function () {
   const operationTriggerEndpoint = async function (req, oDesc, resultJob, job_Id) {
     try {
       log.info("Schedule Description" + oDesc);
-      console.log("Schedule Description" + oDesc);
       log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
       if (oDesc === constants.daily || oDesc === constants.onDemand) {
         let top = constants.TOP;
         let response;
-        let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq '" + oDesc + "'&$skip=0&$top=0&$format=json";
+        let sUrl = constants.CPI_DATA_URL + oDesc + "'&$skip=0&$top=0&$format=json";
         let responseData = await getOnPremDetails(sUrl);
         let count = responseData.data.d.__count;
-        log.info("No. of records: " + count);
+        log.info("CPI No. of records: " + count);
         for (var a = constants.INTZERO; a < count;) {
-          let sUrl = "/sap/opu/odata/sap/ZHSC_PRICING_NOTIF_SRV/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq '" + oDesc + "'&$skip=" + a + "&$top=" + top + "&$format=json";
+          let sUrl = constants.CPI_DATA_URL + oDesc + "'&$skip=" + a + "&$top=" + top + "&$format=json";
           let responseData = await getOnPremDetails(sUrl);
-          console.log("Mail Body" + a + "SKIP" + responseData);
-          log.info("Mail Body" + a + "SKIP" + responseData);
+          log.info(" CPI Mail Body" + a + "SKIP" + responseData.data.d);
           a = a + constants.TOP;
+          if(responseData.data.d.results.length !== constants.INTZERO){
+            log.info("CPI with Data:" +oDesc+ "/" +responseData.data.d.results.length + "/" +responseData.data.d);
           response = await SapCfAxiosObj({
             method: constants.httpPost,
             url: constants.CPI_ENDPOINT,
@@ -420,8 +420,11 @@ module.exports = cds.service.impl(async function () {
             log.error("Error in CPI call" + error);
             return error;
           })
-          console.log("CPI response" + a + "SKIP" + response);
-          log.info("CPI response" + a + "SKIP" + response);
+          
+          log.info("CPI response" +oDesc+ "/"+ a + "SKIP" + response);
+        } else {
+          log.info("CPI No Data:" +oDesc+ "/"+responseData.data.d.results.length + "/" +responseData.data.d);
+        }
         }
         return response;
       } else if (oDesc === constants.suspendFrom) {
