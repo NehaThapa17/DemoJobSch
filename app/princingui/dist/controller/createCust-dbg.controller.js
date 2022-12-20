@@ -47,7 +47,6 @@ sap.ui.define([
       */            
             onRouteCustomer: function () {
                 var pvModel = this.getOwnerComponent().getModel("oModel");
-                console.log(pvModel);
                 this.getView().getModel("oCustModel").setProperty("/CustValHelp", pvModel.oData.CustValHelp);
                 this.getView().getModel("oCustModel").setProperty("/ProductData", pvModel.oData.ProductData);
                 this.getView().byId("idInputCustomerIDAdd").setValue(""),
@@ -210,6 +209,7 @@ sap.ui.define([
                         }
                     });
                 } else {
+                    BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
             },

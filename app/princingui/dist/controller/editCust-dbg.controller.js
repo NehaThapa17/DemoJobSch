@@ -140,6 +140,7 @@ sap.ui.define([
                         }
                     });
                 } else {
+                    BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
             },

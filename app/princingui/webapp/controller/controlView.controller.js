@@ -66,6 +66,7 @@ sap.ui.define([
                 this.oDataModelT.callFunction("/getJobDetails", {
                     method: constants.httpGet,
                     success: function (oData) {
+                        BusyIndicator.hide();
                         var oDataArr2 = JSON.parse(oData.getJobDetails);
                         if (oDataArr2.DISPLAY !== undefined) {
                             var date = new Date(),
@@ -204,7 +205,7 @@ sap.ui.define([
                             that.getView().getModel("oModel").setProperty("/dateValueF", constants.SPACE);
                             that.getView().getModel("oModel").setProperty("/dateValueT", constants.SPACE);
                         }
-                        BusyIndicator.hide();
+
                     },
                     error: function (err) {
                         BusyIndicator.hide();
@@ -1411,9 +1412,11 @@ sap.ui.define([
                 var oView = this.getView(), aTokens = [],
                     oDataCC = oView.getModel("oModel").getProperty("/emailsCC");
                 if (oDataCC) {
-                    for (var e = constants.INTZERO; e < oDataCC.length; e++) {
-                        var otoken1 = new sap.m.Token({ key: oDataCC[e], text: oDataCC[e] });
-                        aTokens.push(otoken1);
+                    if (oDataCC[0] != '') {
+                        for (var e = constants.INTZERO; e < oDataCC.length; e++) {
+                            var otoken1 = new sap.m.Token({ key: oDataCC[e], text: oDataCC[e] });
+                            aTokens.push(otoken1);
+                        }
                     }
                 }
                 // create dialog lazily
@@ -1472,9 +1475,9 @@ sap.ui.define([
                 if (sVal === "") {
                     oMultiInput1.setValueState(sap.ui.core.ValueState.None);
                 }
-                
+
                 oMultiInput1.addValidator(fnValidator);
-                
+
 
             },
             onCCEmailClose: function () {
@@ -1487,7 +1490,7 @@ sap.ui.define([
               */
             onCCEmailSave: function () {
                 BusyIndicator.show();
-                var oCCEmail = this.getView().byId("multiInputemail").getTokens(), oCCEmailString, that = this;
+                var oCCEmail = this.getView().byId("multiInputemail").getTokens(), oCCEmailString = "", that = this;
                 if (oCCEmail.length !== constants.INTZERO) {
                     for (var j = constants.INTZERO; j < oCCEmail.length; j++) {
                         var objEmail = oCCEmail[j].getKey();
@@ -1497,37 +1500,38 @@ sap.ui.define([
                             oCCEmailString = oCCEmailString + constants.spliter + objEmail;
                         }
                     }
-                    var jsonCC = {
-                        "Key": constants.emailCC,
-                        "Value": oCCEmailString
-                    }
-                    var oPayloadCC = JSON.stringify(jsonCC);
-                    this.oDataModelT.callFunction("/createCCEmail", {
-                        method: constants.httpPost,
-                        urlParameters: {
-                            createData: oPayloadCC
-                        },
-                        success: function (oData) {
-                            console.log(oData);
-                            BusyIndicator.hide();
-                            MessageBox.success(that.oBundle.getText("savedSucc"), {
-                                onClose: function (sAction) {
-                                    if (sAction === MessageBox.Action.OK) {
-                                        that.onCCEmailClose();
-                                        that.getCCEmails();
-                                    }
-                                }
-                            });
-                        },
-                        error: function (err) {
-                            BusyIndicator.hide();
-                            MessageBox.error(that.oBundle.getText("techError"), {
-                                details: err
-                            });
-
-                        }
-                    });
                 }
+                var jsonCC = {
+                    "Key": constants.emailCC,
+                    "Value": oCCEmailString
+                }
+                var oPayloadCC = JSON.stringify(jsonCC);
+                this.oDataModelT.callFunction("/createCCEmail", {
+                    method: constants.httpPost,
+                    urlParameters: {
+                        createData: oPayloadCC
+                    },
+                    success: function (oData) {
+
+                        BusyIndicator.hide();
+                        MessageBox.success(that.oBundle.getText("savedSucc"), {
+                            onClose: function (sAction) {
+                                if (sAction === MessageBox.Action.OK) {
+                                    that.onCCEmailClose();
+                                    that.getCCEmails();
+                                }
+                            }
+                        });
+                    },
+                    error: function (err) {
+                        BusyIndicator.hide();
+                        MessageBox.error(that.oBundle.getText("techError"), {
+                            details: err
+                        });
+
+                    }
+                });
+
             },
             /**
               * Method called to handle Edit button for OnDemand Processing
@@ -1660,6 +1664,7 @@ sap.ui.define([
 
                         }
                     } else {
+
                         MessageBox.error(that.oBundle.getText("errormsgrequired"));
                     }
                 } else {
@@ -1678,7 +1683,7 @@ sap.ui.define([
                         key = oCust[i].getKey().split('/');
                     var obj = {
                         "Customer": key[0],
-                        "ShipTo": key[1] 
+                        "ShipTo": key[1]
                     };
                     oCustArray.push(obj);
                 }
@@ -1845,6 +1850,7 @@ sap.ui.define([
                         });
                     }
                 } else {
+                    BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
 
@@ -2045,12 +2051,13 @@ sap.ui.define([
               * @public
               */
             onPressProductSave: function () {
-                BusyIndicator.show();
+
                 var oProdID = this.getView().byId("idInputProductID").getValue(),
                     oProdName = this.getView().byId("idInputProductName").getValue(), oPayloadPro, oJsonData,
                     oInputStatus = this.getView().byId("idInputProductID").getEnabled();
                 var that = this;
                 if (oProdID !== "" && oProdName !== "") {
+                    BusyIndicator.show();
                     oJsonData = {
                         "Product": oProdID,
                         "ProductName": oProdName
@@ -2115,14 +2122,15 @@ sap.ui.define([
                     }
 
                 } else {
+
                     MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
             },
-/*
-        * Method for  customerVH fargment filter bar 
-        * @public
-        * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
-        */
+            /*
+                    * Method for  customerVH fargment filter bar 
+                    * @public
+                    * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+                    */
             onFilterBarSearch: function (oEvent) {
                 var sSearchQuery = this._oBasicSearchField.getValue(),
                     aSelectionSet = oEvent.getParameter("selectionSet");
