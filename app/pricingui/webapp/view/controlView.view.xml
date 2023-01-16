@@ -1,4 +1,4 @@
-<mvc:View controllerName="marathonpetroleum.hsc.pricingui.controller.controlView" xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:tnt="sap.tnt" xmlns:forms="sap.ui.layout.form" xmlns:uxap="sap.uxap">
+<mvc:View controllerName="marathonpetroleum.hsc.pricingui.controller.controlView" xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m" xmlns:ui="sap.ui.table" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:tnt="sap.tnt" xmlns:forms="sap.ui.layout.form" xmlns:uxap="sap.uxap">
     <uxap:ObjectPageLayout id="ObjectPageLayout" showTitleInHeaderContent="true" class="sapUiSizeCompact" preserveHeaderStateOnScroll="true" upperCaseAnchorBar="true">
         <uxap:headerTitle>
             <uxap:ObjectPageDynamicHeaderTitle>
@@ -49,13 +49,12 @@
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>onDemandStartTime}" required="true" />
-                                <DateTimePicker id="idDatePickerOnDemand"  change="onhandleDateCheck" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
-                              
+                                <DateTimePicker id="idDatePickerOnDemand" change="onhandleDateCheck" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
+
                                 <Label text="{i18n>customerSH}" required="true" />
                                 <MultiInput id="idMultiInputCustomer" enabled="false" valueHelpRequest=".onValueHelpRequested" change="handleChangeOnDemand" />
                                 <Label text="{i18n>terminal}" required="true" />
                                 <MultiComboBox id="idMultiInputTerminal" enabled="false" showSecondaryValues="true" showSelectAll="true" width="350px" items="{oModel>/TerminalData}">
-                                
                                     <core:ListItem key="{oModel>Terminal}" text="{oModel>TerminalName}" additionalText="{oModel>Terminal}" />
                                 </MultiComboBox>
                             </forms:SimpleForm>
@@ -74,26 +73,17 @@
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>suspendFrom}" required="true" />
-                                <DateTimePicker id="idDatePickerSuspend"  timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
+                                <DateTimePicker id="idDatePickerSuspend" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
                                 <Label text="{i18n>suspendTo}" required="true" />
-                                <DateTimePicker
-                                    id="idDatePicker2Suspend"
-                                    timezone="America/Mexico_City"
-                                    enabled="false"
-                                    placeholder="Enter Date and Time"
-                                    afterValueHelpClose="onhandleChangeDP2Suspend"
-                                    class="sapUiSmallMarginBottom"
-                                    change="onhandleDateCheck"
-                                    valueStateText="{i18n>plcErrorDate}"
-                                />
+                                <DateTimePicker id="idDatePicker2Suspend" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" valueStateText="{i18n>plcErrorDate}" />
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
-                            <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="" enabled="false"/>
+                            <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="" enabled="false" />
                             <!-- onPressSuspendEdit -->
-                            <Button id="idButtonSuspendSave" text="{i18n>save}" type="Emphasized" visible="false" press="" enabled="false"/> 
+                            <Button id="idButtonSuspendSave" text="{i18n>save}" type="Emphasized" visible="false" press="" enabled="false" />
                             <!-- //onPressSuspendSave -->
-                            <Button id="idButtonSuspendCancel" text="{i18n>cancel}" type="Emphasized" press="onPressSuspendClear" visible="false" enabled="false"/>
+                            <Button id="idButtonSuspendCancel" text="{i18n>cancel}" type="Emphasized" press="onPressSuspendClear" visible="false" enabled="false" />
                         </uxap:actions>
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
@@ -112,7 +102,7 @@
                                     growing="true"
                                     growingScrollToLoad="false"
                                     growingThreshold="3"
-                                    items="{oModel>/CustomerData}"
+                                    items= "{path: 'oModel>/CustomerData',sorter: { path: 'oModel>Customer', descending: false, group: '.getGroup' }, groupHeaderFactory: '.getGroupHeader'}"
                                     includeItemInSelection="true"
                                     mode="SingleSelectMaster"
                                     modeAnimationOn="false"
@@ -129,14 +119,19 @@
                                         </OverflowToolbar>
                                     </headerToolbar>
                                     <columns>
-                                        <Column mergeDuplicates="true" width="16rem">
+                                        <!-- <Column mergeDuplicates="true" width="16rem">
                                             <header>
                                                 <Text text="{i18n>customer}" />
                                             </header>
-                                        </Column>
-                                        <Column demandPopin="true" hAlign="Begin" width="15rem">
+                                        </Column> -->
+                                        <Column mergeDuplicates="true" demandPopin="true" hAlign="Begin" width="15rem">
                                             <header>
                                                 <Text text="{i18n>shipTo}" />
+                                            </header>
+                                        </Column>
+                                        <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="15rem">
+                                            <header>
+                                                <Text text="{i18n>terminal}" />
                                             </header>
                                         </Column>
                                         <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="15rem">
@@ -161,8 +156,15 @@
                                         </Column>
                                     </columns>
                                     <ColumnListItem>
-                                        <ObjectIdentifier title="{oModel>Customer}" text="{oModel>CustomerName}" />
+                                        <!-- <ObjectIdentifier title="{oModel>Customer}" text="{oModel>CustomerName}" /> -->
                                         <ObjectIdentifier title="{oModel>ShipTo}" text="{oModel>ShipToName}" />
+                                        <VBox>
+                                            <HBox>
+                                                <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog" />
+                                                <tnt:InfoLabel text="{oModel>CountProduct}" colorScheme="1" renderMode="Narrow" />
+                                            </HBox>
+                                            <Text text="{oModel>ProdNameFirst}" />
+                                        </VBox>
                                         <VBox>
                                             <HBox>
                                                 <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog" />
@@ -178,6 +180,60 @@
                                         <ObjectStatus icon="{path:'oModel>OnDemandJob', formatter: '.formatter.getIconOrder'}" />
                                     </ColumnListItem>
                                 </Table>
+                                <!-- <ui:Table id="idProductsTable" rows="{oModel>/CustomerData}" selectionMode="Single" enableGrouping="true" 
+                                visibleRowCount="7" ariaLabelledBy="title" 
+                                    >
+                                    <ui:extension>
+                                        <OverflowToolbar id="otbSubheader" style="Clear">
+                                            <Title id="idTitleCustomer" level="H2" />
+                                            <ToolbarSpacer />
+                                            <Button id="btnadd" tooltip="{i18n>addCustomer}" icon="sap-icon://add" press="onCreateCustomer" />
+                                            <Button id="btnedit" tooltip="{i18n>editCustomer}" icon="sap-icon://edit" press="onEditCustomer" />
+                                            <Button icon="sap-icon://delete" tooltip="{i18n>delCustomer}" press="onDeleteCustomer" />
+                                            <Button text="{i18n>ccButton}" tooltip="{i18n>addCCEmail}" type="Emphasized" press="onEmailCCSelectDialogPress" />
+                                            <Button press="handleTableSelectDialogPress" tooltip="{i18n>expand}" type="Emphasized" icon="sap-icon://full-screen" />
+                                        </OverflowToolbar>
+                                    </ui:extension>
+
+                                    <ui:columns>
+                                        <ui:Column  >
+                                            <Label text="Customer" />
+                                            <ui:template>
+                                                <ObjectIdentifier title="{oModel>Customer}" text="{oModel>CustomerName}" />
+                                            </ui:template>
+                                        </ui:Column>
+                                        <ui:Column width="11rem">
+                                            <Label text="Ship-to" />
+                                            <ui:template>
+                                                <ObjectIdentifier title="{oModel>ShipTo}" text="{oModel>ShipToName}" />
+                                            </ui:template>
+                                        </ui:Column>
+                                        <ui:Column width="6rem" hAlign="End">
+                                            <Label text="Products" />
+                                            <ui:template>
+                                                 <VBox>
+                                            <HBox>
+                                                <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog" />
+                                                <tnt:InfoLabel text="{oModel>CountProduct}" colorScheme="1" renderMode="Narrow" />
+                                            </HBox>
+                                            <Text text="{oModel>ProdNameFirst}" />
+                                        </VBox>
+                                            </ui:template>
+                                        </ui:Column>
+                                        <ui:Column width="9rem">
+                                            <Label text="Daily" />
+                                            <ui:template>
+                                  <ObjectStatus icon="{path:'oModel>DailyJob', formatter: '.formatter.getIconOrder'}" />
+                                            </ui:template>
+                                        </ui:Column>
+                                        <ui:Column width="9rem">
+                                            <Label text="OnDemand" />
+                                            <ui:template>
+                                                <ObjectStatus icon="{path:'oModel>OnDemandJob', formatter: '.formatter.getIconOrder'}" />
+                                            </ui:template>
+                                        </ui:Column>
+                                    </ui:columns>
+                                </ui:Table> -->
                             </VBox>
                         </uxap:blocks>
                     </uxap:ObjectPageSubSection>

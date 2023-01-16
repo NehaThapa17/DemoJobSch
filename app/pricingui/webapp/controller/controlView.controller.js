@@ -2234,6 +2234,22 @@ sap.ui.define([
                 }
                 var oBinding = oEvent.getSource().getBinding("items");
                 oBinding.filter([aFiltersCombo]);
+            },
+            getGroup: function (oContext) {
+                // return oContext.getProperty('Customer'); 
+                var gKey = oContext.getProperty("Customer"),
+                    gTitle = gKey + " " +oContext.getProperty("CustomerName");
+                // var gEmail = oContext.getProperty("CPECond") + "/" + oContext.getProperty("CPECondName");
+                return {
+                    key: gTitle,
+                    title: gTitle
+                };
+            },
+            getGroupHeader: function (oGroup) {
+                debugger;
+                return new sap.m.GroupHeaderListItem({
+                    title: oGroup.key
+                })
             }
         });
     });
