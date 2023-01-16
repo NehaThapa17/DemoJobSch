@@ -1,5 +1,5 @@
 {
-  "xsappname": "pricingNotification-srv",
+  "xsappname": "pricingNotificationV2-srv",
   "tenant-mode": "shared",
   "description": "Security profile of called application",
   "scopes": [
@@ -9,7 +9,7 @@
     },
     {
       "name": "$XSAPPNAME.scopeformyapp",
-      "description": "scope for pricingNotification App",
+      "description": "scope for pricingNotificationV2 App",
       "grant-as-authority-to-apps": [
         "$XSSERVICENAME(JS_PricingNotification)"
       ]

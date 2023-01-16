@@ -1,5 +1,5 @@
 _schema-version: "3.1"
-ID: pricingNotification
+ID: pricingNotificationV2
 version: 1.0.0
 description: "A CAP project for Pricing Notification "
 parameters:
@@ -11,7 +11,7 @@ build-parameters:
       commands:
         - npx -p @sap/cds-dk cds build --production
 modules:
-- name: pricingNotification-srv
+- name: pricingNotificationV2-srv
   type: nodejs
   path: gen/srv
   properties:
@@ -25,58 +25,58 @@ modules:
     properties:
       srv-url: ${default-url}         
   requires:
-  - name: uaa_pricingNotification
-  - name: pricingNotification-destination-service
-  - name: pricingNotification-connectivity
+  - name: uaa_pricingNotificationV2
+  - name: pricingNotificationV2-destination-service
+  - name: pricingNotificationV2-connectivity
   - name: JS_PricingNotification
   - name: AL_PricingNotification
-- name: pricingNotification-destination-content
+- name: pricingNotificationV2-destination-content
   type: com.sap.application.content
   requires:
-  - name: pricingNotification-destination-service
+  - name: pricingNotificationV2-destination-service
     parameters:
       content-target: true
-  - name: pricingNotification_html_repo_host
+  - name: pricingNotificationV2_html_repo_host
     parameters:
       service-key:
-        name: pricingNotification_html_repo_host-key
-  - name: uaa_pricingNotification
+        name: pricingNotificationV2_html_repo_host-key
+  - name: uaa_pricingNotificationV2
     parameters:
       service-key:
-        name: uaa_pricingNotification-key
+        name: uaa_pricingNotificationV2-key
   parameters:
     content:
       instance:
         destinations:
-        - Name: PricingNotification_pricingNotification_html_repo_host
-          ServiceInstanceName: pricingNotification-html5-app-host-service
-          ServiceKeyName: pricingNotification_html_repo_host-key
+        - Name: PricingNotification_pricingNotificationV2_html_repo_host
+          ServiceInstanceName: pricingNotificationV2-html5-app-host-service
+          ServiceKeyName: pricingNotificationV2_html_repo_host-key
           sap.cloud.service: PricingNotification
         - Authentication: OAuth2UserTokenExchange
-          Name: PricingNotification_uaa_pricingNotification
-          ServiceInstanceName: pricingNotification-xsuaa-service
-          ServiceKeyName: uaa_pricingNotification-key
+          Name: PricingNotification_uaa_pricingNotificationV2
+          ServiceInstanceName: pricingNotificationV2-xsuaa-service
+          ServiceKeyName: uaa_pricingNotificationV2-key
           sap.cloud.service: PricingNotification
         existing_destinations_policy: update
   build-parameters:
     no-source: true
-- name: pricingNotification-app-content
+- name: pricingNotificationV2-app-content
   type: com.sap.application.content
   path: .
   requires:
-  - name: pricingNotification_html_repo_host
+  - name: pricingNotificationV2_html_repo_host
     parameters:
       content-target: true
   build-parameters:
     build-result: resources
     requires:
     - artifacts:
-      - marathonppprincinguiprincingui.zip
-      name: marathonppprincinguiprincingui
+      - marathonpetroleumhscpricinguipricingui.zip
+      name: marathonpetroleumhscpricinguipricingui
       target-path: resources/
-- name: marathonppprincinguiprincingui
+- name: marathonpetroleumhscpricinguipricingui
   type: html5
-  path: app/princingui
+  path: app/pricingui
   build-parameters:
     build-result: dist
     builder: custom
@@ -85,7 +85,7 @@ modules:
     - npm run build:cf
     supported-platforms: []
 resources:
-- name: pricingNotification-destination-service
+- name: pricingNotificationV2-destination-service
   type: org.cloudfoundry.managed-service
   parameters:
     config:
@@ -96,7 +96,7 @@ resources:
           - Authentication: NoAuthentication
             HTML5.DynamicDestination: true
             HTML5.ForwardAuthToken: true
-            Name: pricingNotification-srv-api
+            Name: pricingNotificationV2-srv-api
             ProxyType: Internet
             Type: HTTP
             URL: '~{srv-api/srv-url}'
@@ -106,28 +106,28 @@ resources:
           existing_destinations_policy: update
       version: 1.0.0
     service: destination
-    service-name: pricingNotification-destination-service
+    service-name: pricingNotificationV2-destination-service
     service-plan: lite
   requires:
   - name: srv-api
-- name: pricingNotification_html_repo_host
+- name: pricingNotificationV2_html_repo_host
   type: org.cloudfoundry.managed-service
   parameters:
     service: html5-apps-repo
-    service-name: pricingNotification-html5-app-host-service
+    service-name: pricingNotificationV2-html5-app-host-service
     service-plan: app-host
-- name: uaa_pricingNotification
+- name: uaa_pricingNotificationV2
   type: org.cloudfoundry.managed-service
   parameters:
     path: ./xs-security.json
     service: xsuaa
-    service-name: pricingNotification-xsuaa-service
+    service-name: pricingNotificationV2-xsuaa-service
     service-plan: application
-- name: pricingNotification-connectivity
+- name: pricingNotificationV2-connectivity
   type: org.cloudfoundry.managed-service
   parameters:
     service: connectivity
-    service-name: pricingNotification-connectivity-service
+    service-name: pricingNotificationV2-connectivity-service
     service-plan: lite
 - name: JS_PricingNotification
   type: org.cloudfoundry.managed-service

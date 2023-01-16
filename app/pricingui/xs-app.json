@@ -1,0 +1,39 @@
+{
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/pricingNotificationV2-srv-api/(.*)$", 
+      "target": "$1",
+      "destination": "pricingNotificationV2-srv-api",
+      "authenticationType": "xsuaa",
+      "csrfProtection": true,
+      "scope":{
+        "GET":["$XSAPPNAME.pricinganalyst"],
+        "PATCH":["$XSAPPNAME.pricinganalyst"],
+        "POST":["$XSAPPNAME.pricinganalyst"],
+        "PUT":["$XSAPPNAME.pricinganalyst"],
+        "DELETE":["$XSAPPNAME.pricinganalyst"],
+        "default":["$XSAPPNAME.pricinganalyst"]
+      }
+    },
+    {
+      "source": "^/resources/(.*)$",
+      "target": "/resources/$1",
+      "authenticationType": "xsuaa",
+      "destination": "ui5"
+    },
+    {
+      "source": "^/test-resources/(.*)$",
+      "target": "/test-resources/$1",
+      "authenticationType": "xsuaa",
+      "destination": "ui5"
+    },
+    {
+      "source": "^(.*)$",
+      "target": "$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa"
+    }
+  ]
+}

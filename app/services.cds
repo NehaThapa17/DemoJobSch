@@ -1,2 +1,2 @@
 
-using from './princingui/annotations';
+using from './pricingui/annotations';
