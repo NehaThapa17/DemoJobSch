@@ -102,10 +102,11 @@
                                     growing="true"
                                     growingScrollToLoad="false"
                                     growingThreshold="3"
-                                    items= "{path: 'oModel>/CustomerData',sorter: { path: 'oModel>Customer', descending: false, group: '.getGroup' }, groupHeaderFactory: '.getGroupHeader'}"
+                                    items= "{path: 'oModel>/CustomerData',sorter: { path: 'Customer', descending: false, group: '.getGroup' }, groupHeaderFactory: '.getGroupHeader'}"
                                     includeItemInSelection="true"
                                     mode="SingleSelectMaster"
                                     modeAnimationOn="false"
+                                    autoPopinMode="true"
                                 >
                                     <headerToolbar>
                                         <OverflowToolbar id="otbSubheader">
@@ -139,7 +140,7 @@
                                                 <Text text="{i18n>products}" />
                                             </header>
                                         </Column>
-                                        <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin" width="17rem">
+                                        <Column minScreenWidth="Tablet" mergeDuplicates="true" demandPopin="true" hAlign="Begin" width="17rem">
                                             <header>
                                                 <Text text="{i18n>email}" />
                                             </header>
@@ -160,18 +161,20 @@
                                         <ObjectIdentifier title="{oModel>ShipTo}" text="{oModel>ShipToName}" />
                                         <VBox>
                                             <HBox>
-                                                <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog" />
-                                                <tnt:InfoLabel text="{oModel>CountProduct}" colorScheme="1" renderMode="Narrow" />
+                                                <Link text="{oModel>TerminalFirst}" press="handleTerPopoverPress" ariaHasPopup="Dialog" />
+                                                <!-- <tnt:InfoLabel text="{oModel>CountTerminal}" colorScheme="1" renderMode="Narrow" /> -->
+                                                <tnt:InfoLabel text="{oModel>CountTerminal}" visible="{path:'oModel>CountTerminal', formatter: '.formatter.getStatus'}" colorScheme="1" renderMode="Narrow" />
                                             </HBox>
-                                            <Text text="{oModel>ProdNameFirst}" />
+                                            <Text text="{oModel>TerNameFirst}" />
                                         </VBox>
                                         <VBox>
                                             <HBox>
                                                 <Link text="{oModel>ProductFirst}" press="handlePopoverPress" ariaHasPopup="Dialog" />
-                                                <tnt:InfoLabel text="{oModel>CountProduct}" colorScheme="1" renderMode="Narrow" />
+                                                <tnt:InfoLabel text="{oModel>CountProduct}" visible="{path:'oModel>CountProduct', formatter: '.formatter.getStatus'}" colorScheme="1" renderMode="Narrow" />
                                             </HBox>
                                             <Text text="{oModel>ProdNameFirst}" />
                                         </VBox>
+                                        <!-- <Link visible="false" text="{path:'oModel>EmailTo', formatter: '.formatter.getFirstEmail'}" press="handleEmailPopoverPress" ariaHasPopup="Dialog" /> -->
                                         <HBox>
                                             <Link text="{path:'oModel>EmailTo', formatter: '.formatter.getFirstEmail'}" press="handleEmailPopoverPress" ariaHasPopup="Dialog" />
                                             <tnt:InfoLabel text="{oModel>CountEmail}" colorScheme="1" renderMode="Narrow" />

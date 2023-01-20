@@ -21,7 +21,9 @@
                 <Input id="idInputSHAdd" maxLength="10" value="" width="360px" enabled="false" />
                 <Label text="{i18n>shipToName}" required="true" />
                 <Input id="idInputSHNameAdd" value="" maxLength="40" width="360px" />
-                <Label text="{i18n>products}" required="true" />
+                <Label text="{i18n>terminal}" />
+                <MultiInput id="idMultiComboBoxTerminalAdd" valueHelpOnly="true" valueHelpRequest=".onTerminalValueHelpRequestedAdd" width="360px" />
+                <Label text="{i18n>product}" />
                 <MultiInput id="idMultiComboBoxProductsAdd" valueHelpOnly="true" valueHelpRequest=".onProductsValueHelpRequestedAdd" width="360px" />
                 <Label text="{i18n>email}" required="true" />
                 <MultiInput id="idInputEmailAdd" width="500px" showValueHelp="false" change="onEmailChangeAddCust" />

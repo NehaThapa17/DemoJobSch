@@ -1,0 +1,11 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Popover showHeader="false" contentWidth="320px" contentHeight="500px" placement="Bottom" ariaLabelledBy="master-title">
+        <NavContainer>
+            <Page class="sapUiResponsivePadding--header" title="{i18n>terminals}">
+                <List items="{/results}">
+                    <StandardListItem title="{Terminal}" description="{TerminalName}" />
+                </List>
+            </Page>
+        </NavContainer>
+    </Popover>
+</core:FragmentDefinition>

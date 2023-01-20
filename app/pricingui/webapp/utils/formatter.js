@@ -27,6 +27,14 @@ sap.ui.define(
 getFirstEmail: function (sNum) {
     var oEmailArray = sNum.split(";");
     return oEmailArray[0];
-     }
+     },
+     getStatus:function(sCount){
+        debugger;
+        if (parseInt(sCount) === 0){
+            return false;
+        } else {
+            return true;
+        }
+     }     
     }
 });

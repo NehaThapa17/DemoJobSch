@@ -49,10 +49,12 @@ sap.ui.define([
                 var pvModel = this.getOwnerComponent().getModel("oModel");
                 this.getView().getModel("oCustModel").setProperty("/CustValHelp", pvModel.oData.CustValHelp);
                 this.getView().getModel("oCustModel").setProperty("/ProductData", pvModel.oData.ProductData);
+                this.getView().getModel("oCustModel").setProperty("/TerminalData", pvModel.oData.TerminalData);
                 this.getView().byId("idInputCustomerIDAdd").setValue(""),
                     this.getView().byId("idInputCustomerNameAdd").setValue(""),
                     this.getView().byId("idInputSHAdd").setValue(""),
                     this.getView().byId("idInputSHNameAdd").setValue(""),
+                    this.getView().byId("idMultiComboBoxTerminalAdd").removeAllTokens(),
                     this.getView().byId("idMultiComboBoxProductsAdd").removeAllTokens(),
                     this.getView().byId("idInputEmailAdd").removeAllTokens(),
                     this.getView().byId("daily_distribution").setSelected(false),
@@ -147,10 +149,19 @@ sap.ui.define([
                     oSh = this.getView().byId("idInputSHAdd").getValue(),
                     oSHName = this.getView().byId("idInputSHNameAdd").getValue(),
                     oProd = this.getView().byId("idMultiComboBoxProductsAdd").getTokens(),
+                    oTermi = this.getView().byId("idMultiComboBoxTerminalAdd").getTokens(),
                     oEmail = this.getView().byId("idInputEmailAdd").getTokens(), that = this,
-                    oDaily = this.getView().byId("daily_distribution").getSelected(), oProdArray = [],
+                    oDaily = this.getView().byId("daily_distribution").getSelected(), oProdArray = [],oTermiArray=[],
                     oDemand = this.getView().byId("on_demand_distribution").getSelected(), oEmailString = "";
-                if (oCustID !== "" && oCustName !== "" && oSh !== "" && oSHName !== "" && oProd.length !== constants.INTZERO && oEmail.length !== constants.INTZERO) {
+                    if ( oDaily === true || oDemand === true ){
+                        if (oProd.length === constants.INTZERO || oTermi.length === constants.INTZERO){ 
+                            BusyIndicator.hide();
+                            MessageBox.error(that.oBundle.getText("errormsgCheckBox"));
+                            return;
+                        } 
+                    } 
+                if (oCustID !== "" && oCustName !== "" && oSh !== "" && oSHName !== "" && oEmail.length !== constants.INTZERO) {
+
                     for (var i = constants.INTZERO; i < oProd.length; i++) {
                         var objProd = {
                             "Customer": oCustID,
@@ -158,6 +169,14 @@ sap.ui.define([
                             "Product": oProd[i].getKey()
                         };
                         oProdArray.push(objProd);
+                    }
+                    for (var i = constants.INTZERO; i < oTermi.length; i++) {
+                        var objProd = {
+                            "Customer": oCustID,
+                            "ShipTo": oSh,
+                            "Terminal": oTermi[i].getKey()
+                        };
+                        oTermiArray.push(objProd);
                     }
                     for (var j = constants.INTZERO; j < oEmail.length; j++) {
                         var objEmail = oEmail[j].getKey();
@@ -176,7 +195,8 @@ sap.ui.define([
                         "DailyJob": oDaily,
                         "OnDemandJob": oDemand,
                         "EmailTo": oEmailString,
-                        "ProductList": oProdArray
+                        "ProductList": oProdArray,
+                        "TerminalList":oTermiArray
                     }
                     var oPayloadCus = JSON.stringify(oJsonData)
                     this.oDataModel.callFunction("/createCustomer", {
@@ -186,8 +206,10 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-
-                            if (oData.createCustomer.data) {
+                            if (oData.createCustomer.data.err) {
+                                MessageBox.error(oData.createCustomer.data.err.message);
+                            }
+                            else if (oData.createCustomer.data) {
                                 MessageBox.success(that.oBundle.getText("customerCreated", [oData.createCustomer.data.Customer,oData.createCustomer.data.ShipTo]), {
                                     onClose: function (sAction) {
                                         if (sAction === MessageBox.Action.OK) {
@@ -196,9 +218,9 @@ sap.ui.define([
                                     }
                                 });
                             }
-                            else {
-                                MessageBox.error(that.oBundle.getText("techError"));
-                            }
+                            // else {
+                            //     MessageBox.error(that.oBundle.getText("techError"));
+                            // }
                         },
                         error: function (err) {
                             BusyIndicator.hide();
@@ -208,7 +230,8 @@ sap.ui.define([
 
                         }
                     });
-                } else {
+
+             } else {
                     BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
@@ -265,9 +288,9 @@ sap.ui.define([
                     this._oValueHelpDialog.update();
                 }.bind(this));
 
-
+                this._oValueHelpDialog.setTokens(this.getView().byId("idMultiComboBoxProductsAdd").getTokens());
                 this._oValueHelpDialog.open();
-            },
+            },           
             /**
       * Method to handle search on Product F4 
       * @public
@@ -333,6 +356,126 @@ sap.ui.define([
                 this._oValueHelpDialog.close();
                 this._oValueHelpDialog.destroy();
             },
+                /**
+      * Method to handle the fragment TerminalVH
+      * @public
+      */               
+                 onTerminalValueHelpRequestedAdd: function () {
+                    this._oBasicSearchField = new SearchField();
+                    this.oColModel = new JSONModel();
+                    var aCols = {
+                        "cols": [
+                            {
+                                "label": "Terminal ID",
+                                "template": "Terminal",
+                            },
+                            {
+                                "label": "Terminal Name",
+                                "template": "TerminalName"
+                            }
+                        ]
+                    };
+                    this.oProductsModel = this.getView().getModel("oCustModel");
+                    this.oColModel.setData(aCols);
+                    this._oValueHelpDialogTr = sap.ui.xmlfragment(constants.fragmentTerVH, this);
+                    this.getView().addDependent(this._oValueHelpDialogTr);
+                    // Set Basic Search for FilterBar
+                    var oFilterBar = this._oValueHelpDialogTr.getFilterBar();
+                    oFilterBar.setFilterBarExpanded(false);
+                    oFilterBar.setBasicSearch(this._oBasicSearchField);
+    
+                    // Trigger filter bar search when the basic search is fired
+                    this._oBasicSearchField.attachSearch(function () {
+                        oFilterBar.search();
+                    });
+                    this._oValueHelpDialogTr.getTableAsync().then(function (oTable) {
+                        oTable.setModel(this.oProductsModel);
+                        oTable.setModel(this.oColModel, "columns");
+    
+                        if (oTable.bindRows) {
+                            oTable.bindAggregation("rows", "/TerminalData");
+                        }
+    
+                        if (oTable.bindItems) {
+                            oTable.bindAggregation("items", "/TerminalData", function () {
+                                return new ColumnListItem({
+                                    cells: aCols.map(function (column) {
+                                        return new Label({ text: "{" + column.template + "}" });
+                                    })
+                                });
+                            });
+                        }
+                        this._oValueHelpDialogTr.update();
+                    }.bind(this));
+    
+                    this._oValueHelpDialogTr.setTokens(this.getView().byId("idMultiComboBoxTerminalAdd").getTokens());
+                    this._oValueHelpDialogTr.open();
+                }, 
+           /**
+      * Method to handle search on Terminal F4 
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */               
+            onFilterBarSearchTer: function (oEvent) {
+                var sSearchQuery = this._oBasicSearchField.getValue(),
+                    aSelectionSet = oEvent.getParameter("selectionSet");
+                var aFilters = aSelectionSet.reduce(function (aResult, oControl) {
+                    if (oControl.getValue()) {
+                        if (oControl.getName() === constants.terID) {
+                            aResult.push(new Filter({
+                                path: constants.pathTer,
+                                operator: FilterOperator.Contains,
+                                value1: oControl.getValue()
+                            }));
+                        } else if (oControl.getName() === constants.terName) {
+                            aResult.push(new Filter({
+                                path: constants.pathTName,
+                                operator: FilterOperator.Contains,
+                                value1: oControl.getValue()
+                            }));
+                        }
+                    }
+                    return aResult;
+                }, []);
+                aFilters.push(new Filter({
+                    filters: [
+                        new Filter({ path: constants.pathTer, operator: FilterOperator.Contains, value1: sSearchQuery }),
+                        new Filter({ path: constants.pathTName, operator: FilterOperator.Contains, value1: sSearchQuery })
+                    ],
+                    and: false
+                }));
+                this._filterTableTr(new Filter({
+                    filters: aFilters,
+                    and: true
+                }));
+            },
+            _filterTableTr: function (oFilter) {
+                var oVHD = this._oValueHelpDialogTr;
+                oVHD.getTableAsync().then(function (oTable) {
+                    if (oTable.bindRows) {
+                        oTable.getBinding("rows").filter(oFilter);
+                    }
+                    if (oTable.bindItems) {
+                        oTable.getBinding("items").filter(oFilter);
+                    }
+                    // This method must be called after binding update of the table.
+                    oVHD.update();
+                });
+            },                 
+                /**
+      * Method to handle confirm on TerminalVH
+      * @public
+      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+      */               
+                 onValueHelpOkPressTer: function (oEvent) {
+                    var aTokens = oEvent.getParameter("tokens");
+                    this.getView().byId("idMultiComboBoxTerminalAdd").setTokens(aTokens);
+                    this._oValueHelpDialogTr.close();
+                },
+                onValueHelpCancelPressTer: function () {
+                    this._oValueHelpDialogTr.close();
+                    this._oValueHelpDialogTr.destroy();
+                },               
             /**
       * Method to validation on Email MutiInput
       * @public

@@ -330,16 +330,19 @@ sap.ui.define([
                         if (oDataCust) {
                             that.getView().byId("idTitleCustomer").setText(that.oBundle.getText("comCusText", [oData.getCustomerDetails.data.length]));
                             for (var a = constants.INTZERO; a < oDataCust.length; a++) {
-                                var oEmailArray = oDataCust[a].EmailTo.split(constants.spliter), oArray = [], oFirstProd, oFirstProdName;
+                                var oEmailArray = oDataCust[a].EmailTo.split(constants.spliter), oArray = [];
                                 for (var b = constants.INTZERO; b < oEmailArray.length; b++) {
-                                    var obj = {};
+                                    var obj = {},oFirstTer="",oFirstTerName="",oFirstProd="", oFirstProdName="";
                                     obj.email = oEmailArray[b];
                                     oArray.push(obj);
+                                }
+                                if (oDataCust[a].TerminalList.results.length != constants.INTZERO) {
+                                    oFirstTer = oDataCust[a].TerminalList.results[constants.INTZERO].Terminal;
+                                    oFirstTerName = oDataCust[a].TerminalList.results[constants.INTZERO].TerminalName;
                                 }
                                 if (oDataCust[a].ProductList.results.length != constants.INTZERO) {
                                     oFirstProd = oDataCust[a].ProductList.results[constants.INTZERO].Product;
                                     oFirstProdName = oDataCust[a].ProductList.results[constants.INTZERO].ProductName;
-                                    // oFirstProd = oDataCust[a].ProductList.results[constants.INTZERO].Product + constants.SPACE + oDataCust[a].ProductList.results[constants.INTZERO].ProductName;
                                 }
                                 if (oDataCust[a].OnDemandJob === true) {
                                     var otokenD = new sap.m.Token({ key: oDataCust[a].Customer + "/" + oDataCust[a].ShipTo, text: oDataCust[a].ShipToName + "(" + oDataCust[a].Customer + "/" + oDataCust[a].ShipTo + ")" });
@@ -350,14 +353,19 @@ sap.ui.define([
                                 objData = {
                                     "CountEmail": oDataCust[a].CountEmail,
                                     "CountProduct": oDataCust[a].CountProduct,
+                                    "CountTerminal":oDataCust[a].CountTerminal,
+                                    "CountShipTo":oDataCust[a].CountShipTo,
                                     "Customer": oDataCust[a].Customer,
                                     "CustomerName": oDataCust[a].CustomerName,
                                     "DailyJob": oDataCust[a].DailyJob,
                                     "EmailTo": oDataCust[a].EmailTo,
                                     "OnDemandJob": oDataCust[a].OnDemandJob,
                                     "ProductList": oDataCust[a].ProductList,
+                                    "TerminalList": oDataCust[a].TerminalList,
                                     "ProductFirst": oFirstProd,
                                     "ProdNameFirst": oFirstProdName,
+                                    "TerminalFirst": oFirstTer,
+                                    "TerNameFirst": oFirstTerName,
                                     "ShipTo": oDataCust[a].ShipTo,
                                     "ShipToName": oDataCust[a].ShipToName,
                                     "EmailArray": oArray,
@@ -443,11 +451,12 @@ sap.ui.define([
               * @public
               */
             onDeleteCustomer: function () {
-                var oTable = this.getView().byId("idProductsTable"), that = this;
+                var oTable = this.getView().byId("idProductsTable"), that = this,
+                iDx = oTable.getSelectedContextPaths()[0];
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
-                var oTableData = this.getView().getModel("oModel").getProperty("/CustomerData");
+                var oTableData = this.getView().getModel("oModel").getProperty(iDx);
                 if (itemIndex !== constants.INTNEGONE) {
-                    var oItems = oTableData[itemIndex];
+                    var oItems = oTableData;
                     MessageBox.confirm(that.oBundle.getText("customerDeleted", [oItems.Customer, oItems.CustomerName, oItems.ShipTo, oItems.ShipToName]), {
                         onClose: function (oAction) {
                             if (oAction === constants.actionOK) {
@@ -485,11 +494,12 @@ sap.ui.define([
               * @public
               */
             onDeleteCustomerPopout: function () {
-                var oTable = this.getView().byId("idTablePopout"), that = this;
+                var oTable = this.getView().byId("idTablePopout"), that = this,
+                iDx = oTable.getSelectedContextPaths()[0];
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
-                var oTableData = this.getView().getModel("oModel").getProperty("/CustomerData");
+                var oTableData = this.getView().getModel("oModel").getProperty(iDx);
                 if (itemIndex !== constants.INTNEGONE) {
-                    var oItems = oTableData[itemIndex];
+                    var oItems = oTableData;
                     MessageBox.confirm(that.oBundle.getText("customerDeleted", [oItems.Customer, oItems.CustomerName, oItems.ShipTo, oItems.ShipToName]), {
                         onClose: function (oAction) {
                             if (oAction === constants.actionOK) {
@@ -732,6 +742,8 @@ sap.ui.define([
               */
             handleTableSelectDialogPress: function () {
                 var oView = this.getView();
+                // that=this,
+                // oCount=this.getView().getModel("oModel").getProperty("/CustomerData").length;
                 if (!this.byId("custTable")) {
                     Fragment.load({
                         id: oView.getId(),
@@ -740,6 +752,8 @@ sap.ui.define([
                     }).then(function (oDialog) {
                         oView.addDependent(oDialog);
                         oDialog.open();
+                        // var txt = that.oBundle.getText("comCusText", [oCount]);
+                        // oDialog.setTitle(txt);
                     });
                 } else {
                     this.byId("custTable").open();
@@ -760,6 +774,7 @@ sap.ui.define([
                     }).then(function (oDialog) {
                         oView.addDependent(oDialog);
                         oDialog.open();
+                       
                     });
                 } else {
                     this.byId("prodTable").open();
@@ -793,10 +808,10 @@ sap.ui.define([
                 var oButton2 = oEvent.getSource(),
                     oView = this.getView(),
                     oB_ID = oEvent.getSource().getParent().getParent().getBindingContextPath(),
-                    oB_len = oB_ID.length,
-                    olen = oB_len - constants.INTONE,
-                    oB_Indx = oB_ID.slice(olen),
-                    oCustData = this.getView().getModel("oModel").getProperty("/CustomerData")[oB_Indx],
+                    // oB_len = oB_ID.length,
+                    // olen = oB_len - constants.INTONE,
+                    // oB_Indx = oB_ID.slice(olen),
+                    oCustData = this.getView().getModel("oModel").getProperty(oB_ID), //[oB_Indx],
                     oTempModel = new JSONModel();
                 oTempModel.setData(oCustData.EmailArray);
                 if (!this._pPopoverEmail) {
@@ -823,10 +838,10 @@ sap.ui.define([
                 var oButton = oEvent.getSource(),
                     oView = this.getView(),
                     oB_ID = oEvent.getSource().getParent().getParent().getParent().getBindingContextPath(),
-                    oB_len = oB_ID.length,
-                    olen = oB_len - constants.INTONE,
-                    oB_Indx = oB_ID.slice(olen),
-                    oCustData = this.getView().getModel("oModel").getProperty("/CustomerData")[oB_Indx],
+                    // oB_len = oB_ID.length,
+                    // olen = oB_len - constants.INTONE,
+                    // oB_Indx = oB_ID.slice(olen),
+                    oCustData = this.getView().getModel("oModel").getProperty(oB_ID),
                     oTempModel = new JSONModel();
                 oTempModel.setData(oCustData.ProductList);
                 if (!this._pPopover) {
@@ -843,6 +858,31 @@ sap.ui.define([
                     oPopover.openBy(oButton);
                     oPopover.setModel(oTempModel);
                 });
+            },
+            handleTerPopoverPress:function(oEvent){
+                var oButton = oEvent.getSource(),
+                oView = this.getView(),
+                oB_ID = oEvent.getSource().getParent().getParent().getParent().getBindingContextPath(),
+                // oB_len = oB_ID.length,
+                // olen = oB_len - constants.INTONE,
+                // oB_Indx = oB_ID.slice(olen),
+                oCustData = this.getView().getModel("oModel").getProperty(oB_ID), //[oB_Indx],
+                oTempModel = new JSONModel();
+            oTempModel.setData(oCustData.TerminalList);
+            if (!this._tPopover) {
+                this._tPopover = Fragment.load({
+                    id: oView.getId(),
+                    name: constants.fragmentTerPopover,
+                    controller: this
+                }).then(function (oPopover) {
+                    oView.addDependent(oPopover);
+                    return oPopover;
+                });
+            }
+            this._tPopover.then(function (oPopover) {
+                oPopover.openBy(oButton);
+                oPopover.setModel(oTempModel);
+            });
             },
             /**
               * Method called on click of add button of add terminal
@@ -1157,14 +1197,21 @@ sap.ui.define([
                */
             onEditCustomer: function () {
                 var oTable = this.getView().byId("idProductsTable"), oArray = [];
-                var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
-                if (itemIndex !== constants.INTNEGONE) {
-                    var value = this.getView().getModel("oModel").getProperty("/CustomerData")[itemIndex];
-                    var prodObj = [];
+                var itemIndex = oTable.getSelectedContextPaths()[0],
+                iDx = oTable.indexOfItem(oTable.getSelectedItem());
+                if (iDx !== constants.INTNEGONE) {
+                    var value = this.getView().getModel("oModel").getProperty(itemIndex);
+                    var prodObj = [],terObj=[];
                     for (var g = constants.INTZERO; g < value.ProductList.results.length; g++) {
                         prodObj.push({
                             Product: value.ProductList.results[g].Product,
                             ProductName: value.ProductList.results[g].ProductName
+                        });
+                    }
+                    for (var g = constants.INTZERO; g < value.TerminalList.results.length; g++) {
+                        terObj.push({
+                            Terminal: value.TerminalList.results[g].Terminal,
+                            TerminalName: value.TerminalList.results[g].TerminalName
                         });
                     }
                     oArray.push({
@@ -1173,6 +1220,7 @@ sap.ui.define([
                         ShipTo: value.ShipTo,
                         ShipToName: value.ShipToName,
                         ProductList: prodObj,
+                        TerminalList:terObj,
                         EmailTo: value.EmailTo,
                         EmailArray: value.EmailArray,
                         DailyJob: value.DailyJob,
@@ -1196,14 +1244,22 @@ sap.ui.define([
                */
             onEditCustomerPopout: function () {
                 var oTable = this.getView().byId("idTablePopout"), oArray = [];
-                var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
-                if (itemIndex !== constants.INTNEGONE) {
-                    var value = this.getView().getModel("oModel").getProperty("/CustomerData")[itemIndex];
-                    var prodObj = [];
+                var itemIndex = oTable.getSelectedContextPaths()[0], 
+                iDx = oTable.indexOfItem(oTable.getSelectedItem());
+                if (iDx !== constants.INTNEGONE) {
+                    // var value = this.getView().getModel("oModel").getProperty("/CustomerData")[itemIndex];
+                    var value = this.getView().getModel("oModel").getProperty(itemIndex);
+                    var prodObj = [], terObj = [];
                     for (var g = constants.INTZERO; g < value.ProductList.results.length; g++) {
                         prodObj.push({
                             Product: value.ProductList.results[g].Product,
                             ProductName: value.ProductList.results[g].ProductName
+                        });
+                    }
+                    for (var g = constants.INTZERO; g < value.TerminalList.results.length; g++) {
+                        terObj.push({
+                            Terminal: value.TerminalList.results[g].Terminal,
+                            TerminalName: value.TerminalList.results[g].TerminalName
                         });
                     }
                     oArray.push({
@@ -1212,6 +1268,7 @@ sap.ui.define([
                         ShipTo: value.ShipTo,
                         ShipToName: value.ShipToName,
                         ProductList: prodObj,
+                        TerminalList:terObj,
                         EmailTo: value.EmailTo,
                         EmailArray: value.EmailArray,
                         DailyJob: value.DailyJob,
@@ -2234,6 +2291,27 @@ sap.ui.define([
                 }
                 var oBinding = oEvent.getSource().getBinding("items");
                 oBinding.filter([aFiltersCombo]);
+            },
+            getGroup: function (oContext) {
+                // return oContext.getProperty('Customer'); 
+                var gKey = oContext.getProperty("Customer"),
+                    gTitle = gKey + " " +oContext.getProperty("CustomerName");
+                // var gEmail = oContext.getProperty("CPECond") + "/" + oContext.getProperty("CPECondName");
+                return {
+                    key: gTitle,
+                    title: oContext.getProperty("CountShipTo").trim()
+                };
+            },
+            getGroupHeader: function (oGroup) {
+                
+                var oTitleTxt = this.oBundle.getText("TABLE_GROUP_HEADER");
+                return new sap.m.GroupHeaderListItem({
+                    title: oGroup.key,
+                    count: oGroup.title
+                    // title:oTitleTxt
+                    // type:"Detail"
+                    // title:"<a href>link text</a>"
+                })
             }
         });
     });

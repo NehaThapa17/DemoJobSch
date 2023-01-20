@@ -1,5 +1,5 @@
 
-
+const log = require('cf-nodejs-logging-support');
 const constants = require("../util/constants-util.js");
 const {getClientFromDestination} = require("../sap_client.js");
 const xsuaaService = constants.xsuaaService;
@@ -69,7 +69,10 @@ let createonPremCall = async (req,sUrl) => {
     }
     catch (error) {
         log.error("createonPremCall error" +error);
-        return error;
+        let errorData = {
+            err: error.response.data.error.innererror.errordetails[0]
+        }
+        return errorData;
     }
 }
 /**

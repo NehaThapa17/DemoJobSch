@@ -43,6 +43,8 @@ sap.ui.define([],
             pathProdName:"ProductName",
             prodID:"Product ID",
             prodName:"Product Name",
+            terID:"Terminal ID",
+            terName:"Terminal Name",
             dateError:"Enter a valid date",
             errormsgrequired:"Kindly fill the mandatory fields to proceed",
             errorInp:"Kindly correct the input to proceed",
@@ -53,12 +55,14 @@ sap.ui.define([],
             fragmentTerTablePopout:"marathonpetroleum.hsc.pricingui.fragments.tableTerPopout",
             fragmentEmailPopover:"marathonpetroleum.hsc.pricingui.fragments.emailPopover",
             fragmentProdPopover:"marathonpetroleum.hsc.pricingui.fragments.productPopover",
+            fragmentTerPopover:"marathonpetroleum.hsc.pricingui.fragments.terminalPopover",
             fragmentAddTerminal:"marathonpetroleum.hsc.pricingui.fragments.addTerminal",
             fragmentAddProd:"marathonpetroleum.hsc.pricingui.fragments.addProduct",
             fragmentAddCCEmail:"marathonpetroleum.hsc.pricingui.fragments.addEmailCc",
             fragmentTerF4:"marathonpetroleum.hsc.pricingui.fragments.terminalF4",
             fargmentCusF4:"marathonpetroleum.hsc.pricingui.fragments.customerF4",
-            fragmentProdVH:"marathonpetroleum.hsc.pricingui.fragments.productListVH"
+            fragmentProdVH:"marathonpetroleum.hsc.pricingui.fragments.productListVH",
+            fragmentTerVH:"marathonpetroleum.hsc.pricingui.fragments.terminalListVH"
         };
         return constants;
     });
