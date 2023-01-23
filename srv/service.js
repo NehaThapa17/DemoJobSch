@@ -17,14 +17,14 @@ app.use(passport.authenticate('JWT', { session: false }));
 const https = require('https');
 const LG_SERVICE = 'Service: ';
 // access credentials from environment variable (alternatively use xsenv)
-// const VCAP_SERVICES = JSON.parse(process.env.VCAP_SERVICES)
-// const CREDENTIALS = VCAP_SERVICES.jobscheduler[0].credentials
-// // oauth
-// const UAA = CREDENTIALS.uaa;
-// const baseURL = CREDENTIALS.url;
-// const OA_CLIENTID = UAA.clientid;
-// const OA_SECRET = UAA.clientsecret;
-// const OA_ENDPOINT = UAA.url;
+const VCAP_SERVICES = JSON.parse(process.env.VCAP_SERVICES)
+const CREDENTIALS = VCAP_SERVICES.jobscheduler[0].credentials
+// oauth
+const UAA = CREDENTIALS.uaa;
+const baseURL = CREDENTIALS.url;
+const OA_CLIENTID = UAA.clientid;
+const OA_SECRET = UAA.clientsecret;
+const OA_ENDPOINT = UAA.url;
 const SapCfAxios = require('sap-cf-axios').default;
 const SapCfAxiosObj = SapCfAxios('CPI');
 const JobSchedulerClient = require('@sap/jobs-client');
@@ -731,6 +731,7 @@ module.exports = cds.service.impl(async function () {
     }
     catch (error) {
       log.error("deleteCustomer error" + error);
+      // return req.error({ message: error.message });
       return error;
     }
   });
@@ -749,6 +750,7 @@ module.exports = cds.service.impl(async function () {
     }
     catch (error) {
       log.error("deleteTerminal error" + error);
+      // return req.error({ message: error.message });
       return error;
     }
   });
@@ -766,6 +768,7 @@ module.exports = cds.service.impl(async function () {
     }
     catch (error) {
       log.error("deleteProduct error" + error);
+      
       return error;
     }
   });
@@ -799,6 +802,7 @@ module.exports = cds.service.impl(async function () {
     catch (error) {
       log.error("createTerminal error" + error);
       return error;
+      
     }
   });
   /**
@@ -816,6 +820,7 @@ module.exports = cds.service.impl(async function () {
     catch (error) {
       log.error("createCustomer error" + error);
       return error;
+      // return req.error({ message: error.message });
     }
   });
   /**
@@ -849,6 +854,7 @@ module.exports = cds.service.impl(async function () {
     catch (error) {
       log.error("updateTerminal error" + error);
       return error;
+      // return req.error({ message: error.message });
     }
   });
   /**

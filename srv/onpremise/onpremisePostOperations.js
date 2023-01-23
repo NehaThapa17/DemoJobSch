@@ -69,10 +69,15 @@ let createonPremCall = async (req,sUrl) => {
     }
     catch (error) {
         log.error("createonPremCall error" +error);
-        let errorData = {
-            err: error.response.data.error.innererror.errordetails[0]
+        if (error.response.data.error.innererror.errordetails !== undefined){
+            error.message = error.response.data.error.innererror.errordetails[0].message;
         }
-        return errorData;
+        else {
+            error.message = error.response.data.error.message.value;
+        }
+        return error;
+        // req.error({ message: error.response.data.error.innererror.errordetails[0].message });
+       
     }
 }
 /**
@@ -104,7 +109,14 @@ let updateonPremCall = async (req,sUrl) => {
     }
     catch (error) {
         log.error("updateonPremCall error" +error);
+        if (error.response.data.error.innererror.errordetails !== undefined){
+            error.message = error.response.data.error.innererror.errordetails[0].message;
+        }
+        else {
+            error.message = error.response.data.error.message.value;
+        }
         return error;
+        // req.error({ message: error.response.data.error.innererror.errordetails[0].message });
     }
 }
 
@@ -136,6 +148,8 @@ let deleteonPremCall = async (req,sUrl) => {
     }
     catch (error) {
         log.error("deleteonPremCall error" +error);
+        error.message = error.response.data.error.message.value;
+        // req.error({ message: error.response.data.error.message.value });
         return error;
     }
 }

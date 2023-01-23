@@ -54,7 +54,7 @@ sap.ui.define([
                 this.getF4Terminal();
                 this.getF4Product();
                 this.getCCEmails();
-                this.getJSTime();
+                // this.getJSTime();
             },
             /**
               * Method called on init() to get Job Schedule Time.
@@ -324,7 +324,6 @@ sap.ui.define([
                 this.oDataModelT.callFunction("/getCustomerDetails", {
                     method: constants.httpGet,
                     success: function (oData) {
-
                         var finalArray = [], tokenArray = [];
                         var oDataCust = oData.getCustomerDetails.data;
                         if (oDataCust) {
@@ -332,7 +331,7 @@ sap.ui.define([
                             for (var a = constants.INTZERO; a < oDataCust.length; a++) {
                                 var oEmailArray = oDataCust[a].EmailTo.split(constants.spliter), oArray = [];
                                 for (var b = constants.INTZERO; b < oEmailArray.length; b++) {
-                                    var obj = {},oFirstTer="",oFirstTerName="",oFirstProd="", oFirstProdName="";
+                                    var obj = {}, oFirstTer = "", oFirstTerName = "", oFirstProd = "", oFirstProdName = "";
                                     obj.email = oEmailArray[b];
                                     oArray.push(obj);
                                 }
@@ -353,8 +352,8 @@ sap.ui.define([
                                 objData = {
                                     "CountEmail": oDataCust[a].CountEmail,
                                     "CountProduct": oDataCust[a].CountProduct,
-                                    "CountTerminal":oDataCust[a].CountTerminal,
-                                    "CountShipTo":oDataCust[a].CountShipTo,
+                                    "CountTerminal": oDataCust[a].CountTerminal,
+                                    "CountShipTo": oDataCust[a].CountShipTo,
                                     "Customer": oDataCust[a].Customer,
                                     "CustomerName": oDataCust[a].CustomerName,
                                     "DailyJob": oDataCust[a].DailyJob,
@@ -379,6 +378,7 @@ sap.ui.define([
                         }
                     },
                     error: function (err) {
+                        
                         BusyIndicator.hide();
                         MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
@@ -452,7 +452,7 @@ sap.ui.define([
               */
             onDeleteCustomer: function () {
                 var oTable = this.getView().byId("idProductsTable"), that = this,
-                iDx = oTable.getSelectedContextPaths()[0];
+                    iDx = oTable.getSelectedContextPaths()[0];
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 var oTableData = this.getView().getModel("oModel").getProperty(iDx);
                 if (itemIndex !== constants.INTNEGONE) {
@@ -469,12 +469,18 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
+                                        if(oData.deleteCustomer.data.message !== undefined) {
+                                            MessageBox.error(oData.deleteCustomer.data.message);
+                                        }
+                                        else {
                                         MessageToast.show(that.oBundle.getText("delSucc"));
                                         that.getCustomerDetails();
+                                        }
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error(that.oBundle.getText("techError"), {
+                                        var msg = err.message; 
+                                        MessageBox.error(msg, {
                                             details: err
                                         });
                                     }
@@ -495,7 +501,7 @@ sap.ui.define([
               */
             onDeleteCustomerPopout: function () {
                 var oTable = this.getView().byId("idTablePopout"), that = this,
-                iDx = oTable.getSelectedContextPaths()[0];
+                    iDx = oTable.getSelectedContextPaths()[0];
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 var oTableData = this.getView().getModel("oModel").getProperty(iDx);
                 if (itemIndex !== constants.INTNEGONE) {
@@ -512,12 +518,18 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
+                                        if(oData.deleteCustomer.data.message !== undefined) {
+                                            MessageBox.error(oData.deleteCustomer.data.message);
+                                        }
+                                        else {
                                         MessageToast.show(that.oBundle.getText("delSucc"));
                                         that.getCustomerDetails();
+                                        }
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error(that.oBundle.getText("techError"), {
+                                        var msg = err.message;
+                                        MessageBox.error(msg, {
                                             details: err
                                         });
 
@@ -774,7 +786,7 @@ sap.ui.define([
                     }).then(function (oDialog) {
                         oView.addDependent(oDialog);
                         oDialog.open();
-                       
+
                     });
                 } else {
                     this.byId("prodTable").open();
@@ -859,30 +871,30 @@ sap.ui.define([
                     oPopover.setModel(oTempModel);
                 });
             },
-            handleTerPopoverPress:function(oEvent){
+            handleTerPopoverPress: function (oEvent) {
                 var oButton = oEvent.getSource(),
-                oView = this.getView(),
-                oB_ID = oEvent.getSource().getParent().getParent().getParent().getBindingContextPath(),
-                // oB_len = oB_ID.length,
-                // olen = oB_len - constants.INTONE,
-                // oB_Indx = oB_ID.slice(olen),
-                oCustData = this.getView().getModel("oModel").getProperty(oB_ID), //[oB_Indx],
-                oTempModel = new JSONModel();
-            oTempModel.setData(oCustData.TerminalList);
-            if (!this._tPopover) {
-                this._tPopover = Fragment.load({
-                    id: oView.getId(),
-                    name: constants.fragmentTerPopover,
-                    controller: this
-                }).then(function (oPopover) {
-                    oView.addDependent(oPopover);
-                    return oPopover;
+                    oView = this.getView(),
+                    oB_ID = oEvent.getSource().getParent().getParent().getParent().getBindingContextPath(),
+                    // oB_len = oB_ID.length,
+                    // olen = oB_len - constants.INTONE,
+                    // oB_Indx = oB_ID.slice(olen),
+                    oCustData = this.getView().getModel("oModel").getProperty(oB_ID), //[oB_Indx],
+                    oTempModel = new JSONModel();
+                oTempModel.setData(oCustData.TerminalList);
+                if (!this._tPopover) {
+                    this._tPopover = Fragment.load({
+                        id: oView.getId(),
+                        name: constants.fragmentTerPopover,
+                        controller: this
+                    }).then(function (oPopover) {
+                        oView.addDependent(oPopover);
+                        return oPopover;
+                    });
+                }
+                this._tPopover.then(function (oPopover) {
+                    oPopover.openBy(oButton);
+                    oPopover.setModel(oTempModel);
                 });
-            }
-            this._tPopover.then(function (oPopover) {
-                oPopover.openBy(oButton);
-                oPopover.setModel(oTempModel);
-            });
             },
             /**
               * Method called on click of add button of add terminal
@@ -1198,10 +1210,10 @@ sap.ui.define([
             onEditCustomer: function () {
                 var oTable = this.getView().byId("idProductsTable"), oArray = [];
                 var itemIndex = oTable.getSelectedContextPaths()[0],
-                iDx = oTable.indexOfItem(oTable.getSelectedItem());
+                    iDx = oTable.indexOfItem(oTable.getSelectedItem());
                 if (iDx !== constants.INTNEGONE) {
                     var value = this.getView().getModel("oModel").getProperty(itemIndex);
-                    var prodObj = [],terObj=[];
+                    var prodObj = [], terObj = [];
                     for (var g = constants.INTZERO; g < value.ProductList.results.length; g++) {
                         prodObj.push({
                             Product: value.ProductList.results[g].Product,
@@ -1220,7 +1232,7 @@ sap.ui.define([
                         ShipTo: value.ShipTo,
                         ShipToName: value.ShipToName,
                         ProductList: prodObj,
-                        TerminalList:terObj,
+                        TerminalList: terObj,
                         EmailTo: value.EmailTo,
                         EmailArray: value.EmailArray,
                         DailyJob: value.DailyJob,
@@ -1244,8 +1256,8 @@ sap.ui.define([
                */
             onEditCustomerPopout: function () {
                 var oTable = this.getView().byId("idTablePopout"), oArray = [];
-                var itemIndex = oTable.getSelectedContextPaths()[0], 
-                iDx = oTable.indexOfItem(oTable.getSelectedItem());
+                var itemIndex = oTable.getSelectedContextPaths()[0],
+                    iDx = oTable.indexOfItem(oTable.getSelectedItem());
                 if (iDx !== constants.INTNEGONE) {
                     // var value = this.getView().getModel("oModel").getProperty("/CustomerData")[itemIndex];
                     var value = this.getView().getModel("oModel").getProperty(itemIndex);
@@ -1268,7 +1280,7 @@ sap.ui.define([
                         ShipTo: value.ShipTo,
                         ShipToName: value.ShipToName,
                         ProductList: prodObj,
-                        TerminalList:terObj,
+                        TerminalList: terObj,
                         EmailTo: value.EmailTo,
                         EmailArray: value.EmailArray,
                         DailyJob: value.DailyJob,
@@ -1310,12 +1322,18 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
+                                        if(oData.deleteTerminal.data.message !== undefined) {
+                                            MessageBox.error(oData.deleteTerminal.data.message);
+                                        }
+                                        else {
                                         MessageToast.show(that.oBundle.getText("delSucc"));
                                         that.getTerminalDetails();
+                                        }
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error(that.oBundle.getText("techError"), {
+                                        var msg = JSON.parse(err.responseText).error.message.value;
+                                        MessageBox.error(msg, {
                                             details: err
                                         });
 
@@ -1353,7 +1371,10 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        if (oData.deleteProduct.data) {
+                                        if(oData.deleteProduct.data.message !== undefined) {
+                                            MessageBox.error(oData.deleteProduct.data.message);
+                                        }
+                                        else {
                                             MessageToast.show(that.oBundle.getText("delSucc"));
                                             that.getProductDetails();
                                             that.getCustomerDetails();
@@ -1361,7 +1382,8 @@ sap.ui.define([
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error(that.oBundle.getText("techError"), {
+                                        var msg = JSON.parse(err.responseText).error.message.value;
+                                        MessageBox.error(msg, {
                                             details: err
                                         });
 
@@ -1398,14 +1420,18 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        if (oData.deleteTerminal.data) {
-                                            MessageToast.show(that.oBundle.getText("delSucc"));
-                                            that.getTerminalDetails();
+                                        if(oData.deleteTerminal.data.message !== undefined) {
+                                            MessageBox.error(oData.deleteTerminal.data.message);
+                                        }
+                                        else {
+                                        MessageToast.show(that.oBundle.getText("delSucc"));
+                                        that.getTerminalDetails();
                                         }
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error(that.oBundle.getText("techError"), {
+                                        var msg = JSON.parse(err.responseText).error.message.value;
+                                        MessageBox.error(msg, {
                                             details: err
                                         });
 
@@ -1441,14 +1467,19 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        if (oData.deleteProduct.data) {
+                                        if(oData.deleteProduct.data.message !== undefined) {
+                                            MessageBox.error(oData.deleteProduct.data.message);
+                                        }
+                                        else {
                                             MessageToast.show(that.oBundle.getText("delSucc"));
                                             that.getProductDetails();
+                                            that.getCustomerDetails();
                                         }
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        MessageBox.error(that.oBundle.getText("techError"), {
+                                        var msg = JSON.parse(err.responseText).error.message.value;
+                                        MessageBox.error(msg, {
                                             details: err
                                         });
 
@@ -2022,7 +2053,11 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.createTerminal.data) {
+                                if (oData.createTerminal.data.status !== undefined && oData.createTerminal.data.status !== 200 ) {
+                                    MessageBox.error(oData.createTerminal.data.message);
+                                }
+                                else 
+                                 {
                                     MessageBox.success(that.oBundle.getText("terminalCreated", [oData.createTerminal.data.Terminal]), {
                                         onClose: function (sAction) {
                                             if (sAction === MessageBox.Action.OK) {
@@ -2031,13 +2066,15 @@ sap.ui.define([
                                             }
                                         }
                                     });
-                                } else {
-                                    MessageBox.error(oData.createTerminal.data);
-                                }
+                                } 
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
-                                MessageBox.error(that.oBundle.getText("techError"), {
+                                // MessageBox.error(that.oBundle.getText("techError"), {
+                                //     details: err
+                                // });
+                                var msg = err.message;
+                                MessageBox.error(msg, {
                                     details: err
                                 });
 
@@ -2055,25 +2092,26 @@ sap.ui.define([
 
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.updateTerminal.data) {
+                                if (oData.updateTerminal.data.status !== undefined && oData.updateTerminal.data.status !== 200 ) {
+                                    MessageBox.error(oData.updateTerminal.data.message);
+                                }
+                                else 
+                                 {
                                     MessageBox.success(that.oBundle.getText("savedSucc"));
                                     that.onTerminalClose();
                                     that.getTerminalDetails();
-                                } else {
-                                    MessageBox.error(that.oBundle.getText("techError"));
-                                }
-
+                                } 
+                                
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
-                                MessageBox.error(that.oBundle.getText("techError"), {
+                                var msg = err.message;
+                                MessageBox.error(msg, {
                                     details: err
                                 });
-
                             }
                         });
                     }
-
 
                 } else {
                     MessageBox.error(that.oBundle.getText("errormsgrequired"));
@@ -2128,7 +2166,11 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.createProduct.data) {
+                                if (oData.createProduct.data.status !== undefined && oData.createProduct.data.status !== 200 ) {
+                                    MessageBox.error(oData.createProduct.data.message);
+                                }
+                                else 
+                                 {
                                     MessageBox.success(that.oBundle.getText("productCreated", [oData.createProduct.data.Product]), { //
                                         onClose: function (sAction) {
                                             if (sAction === MessageBox.Action.OK) {
@@ -2137,13 +2179,13 @@ sap.ui.define([
                                             }
                                         }
                                     });
-                                } else {
-                                    MessageBox.error(that.oBundle.getText("techError"));
-                                }
+                                } 
+                                
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
-                                MessageBox.error(that.oBundle.getText("techError"), {
+                                var msg = err.message;
+                                MessageBox.error(msg, {
                                     details: err
                                 });
 
@@ -2157,23 +2199,25 @@ sap.ui.define([
                                 createData: oPayloadPro,
                                 product: oProdID,
                             },
-
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.updateProduct.data) {
+                                if (oData.updateProduct.data.status !== undefined && oData.updateProduct.data.status !== 200 ) {
+                                    MessageBox.error(oData.updateProduct.data.message);
+                                }
+                                else 
+                                {
                                     MessageBox.success(that.oBundle.getText("savedSucc"));
                                     that.onProductClose();
                                     that.getProductDetails();
-                                } else {
-                                    MessageBox.error(that.oBundle.getText("techError"));
-                                }
+                                } 
+                                
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
-                                MessageBox.error(that.oBundle.getText("techError"), {
+                                var msg = err.message;
+                                MessageBox.error(msg, {
                                     details: err
                                 });
-
                             }
                         });
                     }
@@ -2295,7 +2339,7 @@ sap.ui.define([
             getGroup: function (oContext) {
                 // return oContext.getProperty('Customer'); 
                 var gKey = oContext.getProperty("Customer"),
-                    gTitle = gKey + " " +oContext.getProperty("CustomerName");
+                    gTitle = gKey + " " + oContext.getProperty("CustomerName");
                 // var gEmail = oContext.getProperty("CPECond") + "/" + oContext.getProperty("CPECondName");
                 return {
                     key: gTitle,
@@ -2303,7 +2347,7 @@ sap.ui.define([
                 };
             },
             getGroupHeader: function (oGroup) {
-                
+
                 var oTitleTxt = this.oBundle.getText("TABLE_GROUP_HEADER");
                 return new sap.m.GroupHeaderListItem({
                     title: oGroup.key,

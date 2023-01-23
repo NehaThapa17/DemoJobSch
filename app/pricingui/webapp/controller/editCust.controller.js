@@ -144,7 +144,12 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            if (oData.updateCustomer !== undefined) {
+                            if (oData.updateCustomer.data.status !== undefined && oData.updateCustomer.data.status !== 200 ) {
+                                MessageBox.error(oData.updateCustomer.data.message);
+                            }
+                            else 
+                            // if (oData.updateCustomer !== undefined)
+                             {
                                 MessageBox.success(that.oBundle.getText("savedSucc"), {
                                     onClose: function (sAction) {
                                         if (sAction === MessageBox.Action.OK) {
@@ -154,13 +159,12 @@ sap.ui.define([
                                         }
                                     }
                                 });
-                            } else {
-                                MessageBox.error(that.oBundle.getText("techError"));
-                            }
+                            } 
                         },
                         error: function (err) {
                             BusyIndicator.hide();
-                            MessageBox.error(that.oBundle.getText("techError"), {
+                            var msg = err.message; //JSON.parse(err.responseText).error.message.value;
+                            MessageBox.error(msg,{
                                 details: err
                             });
 

@@ -29,7 +29,7 @@ getFirstEmail: function (sNum) {
     return oEmailArray[0];
      },
      getStatus:function(sCount){
-        debugger;
+        
         if (parseInt(sCount) === 0){
             return false;
         } else {
