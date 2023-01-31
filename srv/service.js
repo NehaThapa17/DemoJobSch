@@ -892,4 +892,21 @@ module.exports = cds.service.impl(async function () {
       return error;
     }
   });
+  /**
+  * Function to unbind Terminal Ship-to
+  */
+   this.on("unbindShipTo", async (req) => {
+    try {
+      let m = req.data.terminal;
+      let sUrl = "/TerminalDetailSet('" + m + "')";
+      let response = await updateonPremCall(req, sUrl);
+      let resultData = { data: response };
+      log.info("unbindShipTo success");
+      return resultData;
+    }
+    catch (error) {
+      log.error("unbindShipTo error" + error);
+      return error;
+    }
+  }); 
 });

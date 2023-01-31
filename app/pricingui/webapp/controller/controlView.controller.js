@@ -48,7 +48,7 @@ sap.ui.define([
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.getRoute("RoutecontrolView").attachPatternMatched(this.onRouteControl, this);
                 //OData call to get display data
-                this.getTerminalDetails();
+                // this.getTerminalDetails();
                 this.getProductDetails();
                 this.getF4Customer();
                 this.getF4Terminal();
@@ -223,6 +223,7 @@ sap.ui.define([
                */
             onRouteControl: function () {
                 this.getCustomerDetails();
+                this.getTerminalDetails();
             },
             /**
               * Method called on init() to get CC Emails.
@@ -268,7 +269,11 @@ sap.ui.define([
                 this.oDataModelT.callFunction("/getTerminalDetails", {
                     method: constants.httpGet,
                     success: function (oData) {
-                        if (oData.getTerminalDetails.data) {
+
+                        if (oData.getTerminalDetails.data.status !== undefined && oData.getTerminalDetails.data.status !== 200) {
+                            MessageBox.error(oData.getTerminalDetails.data.message);
+                        }
+                        else {
                             var oDataTer = oData.getTerminalDetails.data, tokenArray = [];
                             for (var g = 0; g < oDataTer.length; g++) {
                                 if (oDataTer[g].OnDemandJob === true) {
@@ -284,7 +289,7 @@ sap.ui.define([
                     },
                     error: function (err) {
                         BusyIndicator.hide();
-                        MessageBox.error(that.oBundle.getText("techError"), {
+                        MessageBox.error(err.message, {
                             details: err
                         });
 
@@ -378,7 +383,7 @@ sap.ui.define([
                         }
                     },
                     error: function (err) {
-                        
+
                         BusyIndicator.hide();
                         MessageBox.error(that.oBundle.getText("techError"), {
                             details: err
@@ -469,17 +474,17 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        if(oData.deleteCustomer.data.message !== undefined) {
+                                        if (oData.deleteCustomer.data.message !== undefined) {
                                             MessageBox.error(oData.deleteCustomer.data.message);
                                         }
                                         else {
-                                        MessageToast.show(that.oBundle.getText("delSucc"));
-                                        that.getCustomerDetails();
+                                            MessageToast.show(that.oBundle.getText("delSucc"));
+                                            that.getCustomerDetails();
                                         }
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
-                                        var msg = err.message; 
+                                        var msg = err.message;
                                         MessageBox.error(msg, {
                                             details: err
                                         });
@@ -518,12 +523,12 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        if(oData.deleteCustomer.data.message !== undefined) {
+                                        if (oData.deleteCustomer.data.message !== undefined) {
                                             MessageBox.error(oData.deleteCustomer.data.message);
                                         }
                                         else {
-                                        MessageToast.show(that.oBundle.getText("delSucc"));
-                                        that.getCustomerDetails();
+                                            MessageToast.show(that.oBundle.getText("delSucc"));
+                                            that.getCustomerDetails();
                                         }
                                     },
                                     error: function (err) {
@@ -820,9 +825,6 @@ sap.ui.define([
                 var oButton2 = oEvent.getSource(),
                     oView = this.getView(),
                     oB_ID = oEvent.getSource().getParent().getParent().getBindingContextPath(),
-                    // oB_len = oB_ID.length,
-                    // olen = oB_len - constants.INTONE,
-                    // oB_Indx = oB_ID.slice(olen),
                     oCustData = this.getView().getModel("oModel").getProperty(oB_ID), //[oB_Indx],
                     oTempModel = new JSONModel();
                 oTempModel.setData(oCustData.EmailArray);
@@ -850,9 +852,6 @@ sap.ui.define([
                 var oButton = oEvent.getSource(),
                     oView = this.getView(),
                     oB_ID = oEvent.getSource().getParent().getParent().getParent().getBindingContextPath(),
-                    // oB_len = oB_ID.length,
-                    // olen = oB_len - constants.INTONE,
-                    // oB_Indx = oB_ID.slice(olen),
                     oCustData = this.getView().getModel("oModel").getProperty(oB_ID),
                     oTempModel = new JSONModel();
                 oTempModel.setData(oCustData.ProductList);
@@ -875,10 +874,7 @@ sap.ui.define([
                 var oButton = oEvent.getSource(),
                     oView = this.getView(),
                     oB_ID = oEvent.getSource().getParent().getParent().getParent().getBindingContextPath(),
-                    // oB_len = oB_ID.length,
-                    // olen = oB_len - constants.INTONE,
-                    // oB_Indx = oB_ID.slice(olen),
-                    oCustData = this.getView().getModel("oModel").getProperty(oB_ID), //[oB_Indx],
+                    oCustData = this.getView().getModel("oModel").getProperty(oB_ID), 
                     oTempModel = new JSONModel();
                 oTempModel.setData(oCustData.TerminalList);
                 if (!this._tPopover) {
@@ -915,6 +911,7 @@ sap.ui.define([
                         oView.addDependent(oDialog);
                         oDialog.open();
                         oDialog.setTitle("Add Terminal");
+                        sap.ui.core.Fragment.byId(oView.getId(), "idTxtShCount").setText(constants.INTZERO);
                     });
                 } else {
                     this.byId("addTerminal").open();
@@ -950,8 +947,9 @@ sap.ui.define([
                             oInputTer.setEnabled(false);
                             sap.ui.core.Fragment.byId(oView.getId(), "idInputTerminalID").setValue(oItems.Terminal);
                             sap.ui.core.Fragment.byId(oView.getId(), "idInputTerminalName").setValue(oItems.TerminalName);
-                            sap.ui.core.Fragment.byId(oView.getId(), "idCheckBoxDaily").setSelected(oItems.DailyJob);
-                            sap.ui.core.Fragment.byId(oView.getId(), "idCheckBoxOnDemand").setSelected(oItems.OnDemandJob);
+                            sap.ui.core.Fragment.byId(oView.getId(), "idTxtShCount").setText(oItems.ShiptoCount);
+                            // sap.ui.core.Fragment.byId(oView.getId(), "idCheckBoxDaily").setSelected(oItems.DailyJob);
+                            // sap.ui.core.Fragment.byId(oView.getId(), "idCheckBoxOnDemand").setSelected(oItems.OnDemandJob);
                         });
                     }
                 }
@@ -984,8 +982,9 @@ sap.ui.define([
                             oInputTer.setEnabled(false);
                             sap.ui.core.Fragment.byId(oView.getId(), "idInputTerminalID").setValue(oItems.Terminal);
                             sap.ui.core.Fragment.byId(oView.getId(), "idInputTerminalName").setValue(oItems.TerminalName);
-                            sap.ui.core.Fragment.byId(oView.getId(), "idCheckBoxDaily").setSelected(oItems.DailyJob);
-                            sap.ui.core.Fragment.byId(oView.getId(), "idCheckBoxOnDemand").setSelected(oItems.OnDemandJob);
+                            sap.ui.core.Fragment.byId(oView.getId(), "idTxtShCount").setText(oItems.ShiptoCount);
+                            // sap.ui.core.Fragment.byId(oView.getId(), "idCheckBoxDaily").setSelected(oItems.DailyJob);
+                            // sap.ui.core.Fragment.byId(oView.getId(), "idCheckBoxOnDemand").setSelected(oItems.OnDemandJob);
                         });
 
                     }
@@ -1322,12 +1321,12 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        if(oData.deleteTerminal.data.message !== undefined) {
+                                        if (oData.deleteTerminal.data.message !== undefined) {
                                             MessageBox.error(oData.deleteTerminal.data.message);
                                         }
                                         else {
-                                        MessageToast.show(that.oBundle.getText("delSucc"));
-                                        that.getTerminalDetails();
+                                            MessageToast.show(that.oBundle.getText("delSucc"));
+                                            that.getTerminalDetails();
                                         }
                                     },
                                     error: function (err) {
@@ -1371,7 +1370,7 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        if(oData.deleteProduct.data.message !== undefined) {
+                                        if (oData.deleteProduct.data.message !== undefined) {
                                             MessageBox.error(oData.deleteProduct.data.message);
                                         }
                                         else {
@@ -1420,12 +1419,12 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        if(oData.deleteTerminal.data.message !== undefined) {
+                                        if (oData.deleteTerminal.data.message !== undefined) {
                                             MessageBox.error(oData.deleteTerminal.data.message);
                                         }
                                         else {
-                                        MessageToast.show(that.oBundle.getText("delSucc"));
-                                        that.getTerminalDetails();
+                                            MessageToast.show(that.oBundle.getText("delSucc"));
+                                            that.getTerminalDetails();
                                         }
                                     },
                                     error: function (err) {
@@ -1467,7 +1466,7 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        if(oData.deleteProduct.data.message !== undefined) {
+                                        if (oData.deleteProduct.data.message !== undefined) {
                                             MessageBox.error(oData.deleteProduct.data.message);
                                         }
                                         else {
@@ -2032,17 +2031,19 @@ sap.ui.define([
                 var oTerID = this.getView().byId("idInputTerminalID").getValue(),
                     oTerName = this.getView().byId("idInputTerminalName").getValue(), oJsonData,
                     isEnabled = this.getView().byId("idInputTerminalID").getEnabled(),
-                    oDaily = this.getView().byId("idCheckBoxDaily").getSelected(),
-                    oDemand = this.getView().byId("idCheckBoxOnDemand").getSelected(),
+                    oSHCount= this.getView().byId("idTxtShCount").getText(),
+                    // oDaily = this.getView().byId("idCheckBoxDaily").getSelected(),
+                    // oDemand = this.getView().byId("idCheckBoxOnDemand").getSelected(),
                     that = this;
 
                 if (oTerID !== "" && oTerName !== "") {
                     BusyIndicator.show();
                     oJsonData = {
                         "Terminal": oTerID,
-                        "TerminalName": oTerName,
-                        "DailyJob": oDaily,
-                        "OnDemandJob": oDemand
+                        "TerminalName": oTerName
+                        // "ShiptoCount" : oSHCount
+// "                        "DailyJob": oDaily,
+//                         "OnDemandJob": oDemand"
                     }
                     var oPayloadTer = JSON.stringify(oJsonData)
                     if (isEnabled === true) {
@@ -2053,11 +2054,10 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.createTerminal.data.status !== undefined && oData.createTerminal.data.status !== 200 ) {
+                                if (oData.createTerminal.data.status !== undefined && oData.createTerminal.data.status !== 200) {
                                     MessageBox.error(oData.createTerminal.data.message);
                                 }
-                                else 
-                                 {
+                                else {
                                     MessageBox.success(that.oBundle.getText("terminalCreated", [oData.createTerminal.data.Terminal]), {
                                         onClose: function (sAction) {
                                             if (sAction === MessageBox.Action.OK) {
@@ -2066,7 +2066,7 @@ sap.ui.define([
                                             }
                                         }
                                     });
-                                } 
+                                }
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
@@ -2092,16 +2092,15 @@ sap.ui.define([
 
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.updateTerminal.data.status !== undefined && oData.updateTerminal.data.status !== 200 ) {
+                                if (oData.updateTerminal.data.status !== undefined && oData.updateTerminal.data.status !== 200) {
                                     MessageBox.error(oData.updateTerminal.data.message);
                                 }
-                                else 
-                                 {
+                                else {
                                     MessageBox.success(that.oBundle.getText("savedSucc"));
                                     that.onTerminalClose();
                                     that.getTerminalDetails();
-                                } 
-                                
+                                }
+
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
@@ -2166,11 +2165,10 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.createProduct.data.status !== undefined && oData.createProduct.data.status !== 200 ) {
+                                if (oData.createProduct.data.status !== undefined && oData.createProduct.data.status !== 200) {
                                     MessageBox.error(oData.createProduct.data.message);
                                 }
-                                else 
-                                 {
+                                else {
                                     MessageBox.success(that.oBundle.getText("productCreated", [oData.createProduct.data.Product]), { //
                                         onClose: function (sAction) {
                                             if (sAction === MessageBox.Action.OK) {
@@ -2179,8 +2177,8 @@ sap.ui.define([
                                             }
                                         }
                                     });
-                                } 
-                                
+                                }
+
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
@@ -2201,16 +2199,15 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 BusyIndicator.hide();
-                                if (oData.updateProduct.data.status !== undefined && oData.updateProduct.data.status !== 200 ) {
+                                if (oData.updateProduct.data.status !== undefined && oData.updateProduct.data.status !== 200) {
                                     MessageBox.error(oData.updateProduct.data.message);
                                 }
-                                else 
-                                {
+                                else {
                                     MessageBox.success(that.oBundle.getText("savedSucc"));
                                     that.onProductClose();
                                     that.getProductDetails();
-                                } 
-                                
+                                }
+
                             },
                             error: function (err) {
                                 BusyIndicator.hide();
@@ -2356,6 +2353,163 @@ sap.ui.define([
                     // type:"Detail"
                     // title:"<a href>link text</a>"
                 })
+            },
+            onPressUnbind: function (oEvt) {
+                debugger;
+             
+                var oPath = oEvt.oSource.getParent().getBindingContextPath(), that = this,
+                    oData = this.getView().getModel("oModel").getProperty(oPath);
+                MessageBox.confirm(that.oBundle.getText("unBindconfirm", [oData.Terminal, oData.TerminalName]), {
+                    onClose: function (oAction) {
+                        if (oAction === constants.actionOK) {
+                            BusyIndicator.show();
+                            var jsonData = {
+                                "Terminal" : oData.Terminal,
+                                "RemoveShipto" : true
+                                };
+                               var oPayload = JSON.stringify(jsonData);
+                            that.oDataModelT.callFunction("/unbindShipTo", {
+                                method: constants.httpPost,
+                                urlParameters: {
+                                    createData: oPayload,
+                                    terminal:oData.Terminal
+                                  
+                                },
+                                success: function (oData) {
+                                    BusyIndicator.hide();
+                                    if (oData.unbindShipTo.data.message !== undefined) {
+                                        MessageBox.error(oData.unbindShipTo.data.message);
+                                    }
+                                    else {
+                                        MessageToast.show(that.oBundle.getText("terminalunBind"), [oData.unbindShipTo.data.Terminal]);
+                                        that.getTerminalDetails();
+                                        that.getCustomerDetails();
+                                    }
+                                },
+                                error: function (err) {
+                                    BusyIndicator.hide();
+                                    var msg = err.message;
+                                    MessageBox.error(msg, {
+                                        details: err
+                                    });
+
+                                }
+
+                            });
+                        }
+                    }
+                });
+            },
+            onUnbindTerminal: function (oEvt) {
+                var oTable = this.getView().byId("idTableTerminal"), that = this;
+                var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
+                // var oPath = oEvt.oSource.getParent().getBindingContextPath(),
+                if (itemIndex !== constants.INTNEGONE) { 
+                    var  oData = this.getView().getModel("oModel").getProperty("/TerminalData")[itemIndex];
+                    // oData = oPath[itemIndex];
+                    if(oData.ShiptoCount !== constants.INTZERO){
+                    MessageBox.confirm(that.oBundle.getText("unBindconfirm", [oData.Terminal, oData.TerminalName]), {
+                        onClose: function (oAction) {
+                            if (oAction === constants.actionOK) {
+                                BusyIndicator.show();
+                                var jsonData = {
+                                    "Terminal" : oData.Terminal,
+                                    "RemoveShipto" : true
+                                    };
+                                   var oPayload = JSON.stringify(jsonData);
+                                that.oDataModelT.callFunction("/unbindShipTo", {
+                                    method: constants.httpPost,
+                                    urlParameters: {
+                                        createData: oPayload,
+                                        terminal:oData.Terminal
+                                      
+                                    },
+                                    success: function (oData) {
+                                        BusyIndicator.hide();
+                                        if (oData.unbindShipTo.data.message !== undefined) {
+                                            MessageBox.error(oData.unbindShipTo.data.message);
+                                        }
+                                        else {
+                                            MessageToast.show(that.oBundle.getText("terminalunBind"), [oData.unbindShipTo.data.Terminal]);
+                                            that.getTerminalDetails();
+                                            that.getCustomerDetails();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        BusyIndicator.hide();
+                                        var msg = err.message;
+                                        MessageBox.error(msg, {
+                                            details: err
+                                        });
+    
+                                    }
+    
+                                });
+                            }
+                        }
+                    });
+                } else {
+                    MessageBox.error(that.oBundle.getText("checkSH",[oData.Terminal, oData.TerminalName]));
+                }
+                }
+                else {
+                    MessageBox.error(that.oBundle.getText("delCheck"));
+                }
+            },
+            onUnbindTerminalPopout:function(oEvent){
+                var oTable = this.getView().byId("idTerTablePopout"), that = this;
+                var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
+                if (itemIndex !== constants.INTNEGONE) { 
+                    var  oData = this.getView().getModel("oModel").getProperty("/TerminalData")[itemIndex];
+                    // oData = oPath[itemIndex];
+                    if(oData.ShiptoCount !== constants.INTZERO){
+                    MessageBox.confirm(that.oBundle.getText("unBindconfirm", [oData.Terminal, oData.TerminalName]), {
+                        onClose: function (oAction) {
+                            if (oAction === constants.actionOK) {
+                                BusyIndicator.show();
+                                var jsonData = {
+                                    "Terminal" : oData.Terminal,
+                                    "RemoveShipto" : true
+                                    };
+                                   var oPayload = JSON.stringify(jsonData);
+                                that.oDataModelT.callFunction("/unbindShipTo", {
+                                    method: constants.httpPost,
+                                    urlParameters: {
+                                        createData: oPayload,
+                                        terminal:oData.Terminal
+                                      
+                                    },
+                                    success: function (oData) {
+                                        BusyIndicator.hide();
+                                        if (oData.unbindShipTo.data.message !== undefined) {
+                                            MessageBox.error(oData.unbindShipTo.data.message);
+                                        }
+                                        else {
+                                            MessageToast.show(that.oBundle.getText("terminalunBind"));
+                                            that.getTerminalDetails();
+                                            that.getCustomerDetails();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        BusyIndicator.hide();
+                                        var msg = err.message;
+                                        MessageBox.error(msg, {
+                                            details: err
+                                        });
+    
+                                    }
+    
+                                });
+                            }
+                        }
+                    });
+                } else {
+                    MessageBox.error(that.oBundle.getText("checkSH",[oData.Terminal, oData.TerminalName]));
+                }
+                }
+                else {
+                    MessageBox.error(that.oBundle.getText("delCheck"));
+                }   
             }
         });
     });

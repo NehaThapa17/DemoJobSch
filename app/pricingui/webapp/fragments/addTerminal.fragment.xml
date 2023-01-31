@@ -6,10 +6,11 @@
                 <Input id="idInputTerminalID" maxLength="10" valueHelpRequest="onHandleValueHelpTerminal" width="360px" showValueHelp="true" valueHelpOnly="true" />
                 <Label text="{i18n>terminalName}" required="true" />
                 <Input id="idInputTerminalName" maxLength="40" width="360px" />
-                <Label text="{i18n>daily}" />
-                <CheckBox id="idCheckBoxDaily" enabled="true" />
-                <Label text="{i18n>onDemandlbl}" />
-                <CheckBox id="idCheckBoxOnDemand" enabled="true" />
+                <Label text="{i18n>shipTo}" />
+                <Text id="idTxtShCount" text="3" />
+                <!-- <CheckBox id="idCheckBoxDaily" enabled="true" /> -->
+                <!-- <Label text="{i18n>onDemandlbl}" />
+                <CheckBox id="idCheckBoxOnDemand" enabled="true" /> -->
             </f:content>
         </f:SimpleForm>
         <beginButton>

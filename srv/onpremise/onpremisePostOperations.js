@@ -109,7 +109,7 @@ let updateonPremCall = async (req,sUrl) => {
     }
     catch (error) {
         log.error("updateonPremCall error" +error);
-        if (error.response.data.error.innererror.errordetails !== undefined){
+        if (error.response.data.error.innererror.errordetails !== undefined && error.response.data.error.innererror.errordetails.length !== 0){
             error.message = error.response.data.error.innererror.errordetails[0].message;
         }
         else {

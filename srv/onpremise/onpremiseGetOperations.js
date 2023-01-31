@@ -33,7 +33,7 @@ async function getOnPremCall(req,sUrl) {
     }
     catch (error) {
         log.error("getOnPremCall error" +error);
-        req.error({ message: error.response.data.error.message });
+        error.message = error.response.data.error.message.value;     
         return error;
     }
 }
@@ -60,6 +60,7 @@ async function getOnPremDetails(sUrl){
     }
     catch (error) {
         log.error("getOnPremDetails error" +error);
+        error.message = error.response.data.error.message.value;
         return error;
     }
 }

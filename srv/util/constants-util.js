@@ -42,6 +42,7 @@ module.exports=Object.freeze({
     URL_CusCreate:"/CustomerShipToDetailSet",
     URL_CCCreate:"/KeyValueSet",
     URL_DPCreate:"/OnDemandDetailSet",
+
     xsuaaService:"pricingNotificationV2-xsuaa-service",
     destService:"pricingNotificationV2-destination-service",
     dest:"s4rt",
