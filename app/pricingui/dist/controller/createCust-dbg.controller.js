@@ -240,9 +240,6 @@ sap.ui.define([
                                     }
                                 });
                             }
-                            // else {
-                            //     MessageBox.error(that.oBundle.getText("techError"));
-                            // }
                         },
                         error: function (err) {
                             BusyIndicator.hide();

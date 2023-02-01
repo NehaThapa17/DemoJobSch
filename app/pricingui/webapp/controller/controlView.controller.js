@@ -49,10 +49,10 @@ sap.ui.define([
                 oRouter.getRoute("RoutecontrolView").attachPatternMatched(this.onRouteControl, this);
                 //OData call to get display data
                 // this.getTerminalDetails();
-                this.getProductDetails();
+                
                 this.getF4Customer();
-                this.getF4Terminal();
-                this.getF4Product();
+                // this.getF4Terminal();
+                // this.getF4Product();
                 this.getCCEmails();
                 // this.getJSTime();
             },
@@ -224,6 +224,7 @@ sap.ui.define([
             onRouteControl: function () {
                 this.getCustomerDetails();
                 this.getTerminalDetails();
+                this.getProductDetails();
             },
             /**
               * Method called on init() to get CC Emails.
@@ -1327,6 +1328,7 @@ sap.ui.define([
                                         else {
                                             MessageToast.show(that.oBundle.getText("delSucc"));
                                             that.getTerminalDetails();
+                                            that.getCustomerDetails();
                                         }
                                     },
                                     error: function (err) {
@@ -1994,6 +1996,7 @@ sap.ui.define([
         * @public
         */
             onHandleValueHelpTerminal: function () {
+                this.getF4Terminal();
                 var oView = this.getView();
                 // create dialog lazily
                 if (!this.byId("idDialogTerminalF4")) {
@@ -2099,6 +2102,7 @@ sap.ui.define([
                                     MessageBox.success(that.oBundle.getText("savedSucc"));
                                     that.onTerminalClose();
                                     that.getTerminalDetails();
+                                    that.getCustomerDetails();
                                 }
 
                             },
@@ -2121,6 +2125,7 @@ sap.ui.define([
               * @public
               */
             onHandleValueHelpProduct: function () {
+                this.getF4Product();
                 var oView = this.getView();
                 // create dialog lazily
                 this._oValueHelpDialogListProd = sap.ui.xmlfragment(constants.fragmentProdF4, this);
