@@ -70,7 +70,12 @@ sap.ui.define([
                 this.oDataModel.callFunction("/getOnPremCustomerF4", {
                     method: constants.httpGet,
                     success: function (oData) {
-                        that.getView().getModel("oCustModel").setProperty("/CustValHelp", oData.getOnPremCustomerF4.data);
+                        debugger;
+                        var data = oData.getOnPremCustomerF4.data;
+                        data.sort(function (a, b) {
+                            return a.Customer.localeCompare(b.Customer) || b.Shipto - a.Shipto;
+                        });
+                        that.getView().getModel("oCustModel").setProperty("/CustValHelp", data);
                         BusyIndicator.hide();
                     },
                     error: function (err) {

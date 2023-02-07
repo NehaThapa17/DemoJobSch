@@ -72,18 +72,20 @@
                     <uxap:ObjectPageSubSection title="{i18n>suspend}" titleUppercase="true">
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
+                                 
                                 <Label text="{i18n>suspendFrom}" required="true" />
-                                <DateTimePicker id="idDatePickerSuspend" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
+                                <DateTimePicker id="idDatePickerSuspend" timezone="America/Mexico_City"  placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
                                 <Label text="{i18n>suspendTo}" required="true" />
-                                <DateTimePicker id="idDatePicker2Suspend" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" valueStateText="{i18n>plcErrorDate}" />
+                                <DateTimePicker id="idDatePicker2Suspend"  timezone="America/Mexico_City"  placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" valueStateText="{i18n>plcErrorDate}" />                           
+                                <!-- <Switch id="idSwitchInputSuspend" change="onSwtichChangeSuspend" /> -->
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
-                            <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="" enabled="false" />
+                            <!-- <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="" enabled="false" /> -->
                             <!-- onPressSuspendEdit -->
-                            <Button id="idButtonSuspendSave" text="{i18n>save}" type="Emphasized" visible="false" press="" enabled="false" />
+                            <!-- <Button id="idButtonSuspendSave" text="{i18n>save}" type="Emphasized" visible="false" press="" enabled="false" /> -->
                             <!-- //onPressSuspendSave -->
-                            <Button id="idButtonSuspendCancel" text="{i18n>cancel}" type="Emphasized" press="onPressSuspendClear" visible="false" enabled="false" />
+                            <!-- <Button id="idButtonSuspendCancel" text="{i18n>cancel}" type="Emphasized" press="onPressSuspendClear" visible="false" enabled="false" /> -->
                         </uxap:actions>
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>

@@ -21,7 +21,7 @@ module.exports=Object.freeze({
     LOG_JS_API:'Successfully called REST api of Jobscheduler',
     LOG_JS_ERR:'Error occurred while calling REST api of Jobscheduler',
     CPI_DATA_URL:"/sap/opu/odata/sap/zhsc_pricing_notification_srv/EmailCustomerDetailsSet?$expand=ShipToNav/Terminal/ProdText,ShipToNav/Terminal/Price&$filter=JobCategory eq '",
-    CPI_ENDPOINT:"/http//httpendpointv2",
+    CPI_ENDPOINT:"/http/httpendpointv2",
     SUCCESS:"Mail sent Successfully",
     SUCCESS_DEL:"Successfully Deleted",
     SUCCESS_EDIT:"Successfully Updated",

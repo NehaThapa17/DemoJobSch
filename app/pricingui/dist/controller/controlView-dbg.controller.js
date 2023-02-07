@@ -54,7 +54,7 @@ sap.ui.define([
                 // this.getF4Terminal();
                 // this.getF4Product();
                 this.getCCEmails();
-                // this.getJSTime();
+                this.getJSTime();
             },
             /**
               * Method called on init() to get Job Schedule Time.
@@ -198,12 +198,18 @@ sap.ui.define([
                             that.getView().getModel("oModel").setProperty("/dateValueT", finalTextTo);
                             that.getView().byId("idDatePickerSuspend").setValue(finalText);
                             that.getView().byId("idDatePicker2Suspend").setValue(finalTextTo);
+                            that.getView().byId("idDatePickerSuspend").setEnabled(false);
+                            that.getView().byId("idDatePicker2Suspend").setEnabled(false);
+                            that.getView().byId("idSwitchInputSuspend").setState(true);
 
                         } else {
                             that.getView().byId("idObjStatusS2").setText(constants.SPACE);
                             that.getView().byId("idObjStatusS1").setText(constants.SPACE);
                             that.getView().getModel("oModel").setProperty("/dateValueF", constants.SPACE);
                             that.getView().getModel("oModel").setProperty("/dateValueT", constants.SPACE);
+                            that.getView().byId("idDatePickerSuspend").setEnabled(true);
+                            that.getView().byId("idDatePicker2Suspend").setEnabled(true);
+                            that.getView().byId("idSwitchInputSuspend").setState(false);
                         }
 
                     },
@@ -1816,21 +1822,21 @@ sap.ui.define([
               * Method called to handle Edit button for Suspend
               * @public
               */
-            onPressSuspendEdit: function () {
-                this.getView().byId("idDatePickerSuspend").setEnabled(true);
-                this.getView().byId("idDatePicker2Suspend").setEnabled(true);
-                this.getView().byId("idButtonSuspendSave").setVisible(true);
-                this.getView().byId("idButtonSuspendCancel").setVisible(true);
-                this.getView().byId("idButtonSuspendEdit").setVisible(false);
-            },
+            // onPressSuspendEdit: function () {
+            //     this.getView().byId("idDatePickerSuspend").setEnabled(true);
+            //     this.getView().byId("idDatePicker2Suspend").setEnabled(true);
+            //     this.getView().byId("idButtonSuspendSave").setVisible(true);
+            //     this.getView().byId("idButtonSuspendCancel").setVisible(true);
+            //     this.getView().byId("idButtonSuspendEdit").setVisible(false);
+            // },
             /**
               * Method called to handle Cancel button for Suspend
               * @public
               */
             onPressSuspendClear: function () {
-                this.getView().byId("idButtonSuspendCancel").setVisible(false);
-                this.getView().byId("idButtonSuspendSave").setVisible(false);
-                this.getView().byId("idButtonSuspendEdit").setVisible(true);
+                // this.getView().byId("idButtonSuspendCancel").setVisible(false);
+                // this.getView().byId("idButtonSuspendSave").setVisible(false);
+                // this.getView().byId("idButtonSuspendEdit").setVisible(true);
                 this.getView().byId("idDatePickerSuspend").setEnabled(false);
                 this.getView().byId("idDatePicker2Suspend").setEnabled(false);
                 this.getView().byId("idDatePicker2Suspend").setValueState("None");
@@ -1901,9 +1907,9 @@ sap.ui.define([
                     if (checkVSF !== constants.ERROR || checkVST !== constants.ERROR) {
                         this.getView().byId("idDatePickerSuspend").setEnabled(false);
                         this.getView().byId("idDatePicker2Suspend").setEnabled(false);
-                        this.getView().byId("idButtonSuspendSave").setVisible(false);
-                        this.getView().byId("idButtonSuspendEdit").setVisible(true);
-                        this.getView().byId("idButtonSuspendCancel").setVisible(false);
+                        // this.getView().byId("idButtonSuspendSave").setVisible(false);
+                        // this.getView().byId("idButtonSuspendEdit").setVisible(true);
+                        // this.getView().byId("idButtonSuspendCancel").setVisible(false);
                         this.getView().byId("idObjStatusS1").setText(resultFrom);
                         this.getView().byId("idObjStatusS2").setText(resultTo);
                         this.getView().getModel("oModel").setProperty("/dateValueF", resultFrom);
@@ -1943,6 +1949,151 @@ sap.ui.define([
                     MessageBox.error(that.oBundle.getText("errormsgrequired"));
                 }
 
+            },
+            onSwtichChangeSuspend: function(oEvent){
+                BusyIndicator.show();
+                var oState = oEvent.getSource().getState();
+                if (oState === false) {
+                    this.getView().byId("idTimePickerInput").setEnabled(true);
+                    this.getView().byId("idInfoLabel").setText("InActive");
+                    this.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
+                    var dateValue = new Date();
+                    // Get dates for January and July
+                    var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
+                    var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
+                    // Get timezone offset
+                    var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                    if (dateValue.getTimezoneOffset() < timezoneOffset) {
+                        // Adjust date by 5 hours
+                        dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                    }
+                    else {
+                        // Adjust date by 6 hours
+                        dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                    }
+                    var xTime = dateValue.toLocaleString('en-US', {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                    }),
+                        onSusTime = dateValue.toDateString().slice(4) + constants.SPACE + xTime;
+                    //Delete Schedule
+                    this.oDataModelT.callFunction("/deleteSuspendSchedule", {
+                        method: constants.httpGet,
+                        urlParameters: {
+                            desc: constants.suspend,
+                            time: onSusTime
+                        },
+                        success: function (oData) {
+                            BusyIndicator.hide();
+                        },
+                        error: function (err) {
+                            BusyIndicator.hide();
+                            MessageBox.error(that.oBundle.getText("techError"), {
+                                details: err
+                            });
+
+                        }
+                    });
+                } else {
+                var oDateSuspendFrom = this.getView().byId("idDatePickerSuspend").getValue(),
+                    oDateSuspendTo = this.getView().byId("idDatePicker2Suspend").getValue(),
+                    checkVSF = this.getView().byId("idDatePickerSuspend").getValueState(),
+                    checkVST = this.getView().byId("idDatePicker2Suspend").getValueState(),
+                    oArr = [], that = this,
+                    len = oDateSuspendTo.length - 21,
+                    lenF = oDateSuspendFrom.length - 21,
+                    resultTo = oDateSuspendTo.substring(0, len),
+                    resultFrom = oDateSuspendFrom.substring(0, lenF),
+                    oSusFrom = new Date(resultFrom),
+                    oSusTo = new Date(resultTo),
+                    // Get dates for January and July
+                    dateJanF = new Date(oSusFrom.getFullYear(), constants.INTZERO, constants.INTONE),
+                    dateJulF = new Date(oSusFrom.getFullYear(), constants.INTSIX, constants.INTONE),
+                    dateJanT = new Date(oSusTo.getFullYear(), constants.INTZERO, constants.INTONE),
+                    dateJulT = new Date(oSusTo.getFullYear(), constants.INTSIX, constants.INTONE);
+                // Get timezone offset
+                var timezoneOffsetFrom = Math.max(dateJanF.getTimezoneOffset(), dateJulF.getTimezoneOffset());
+                var timezoneOffsetTo = Math.max(dateJanT.getTimezoneOffset(), dateJulT.getTimezoneOffset());
+                if (oSusFrom.getTimezoneOffset() < timezoneOffsetFrom) {
+                    // Adjust date by 5 hours
+                    oSusFrom = new Date(oSusFrom.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                }
+                else {
+                    // Adjust date by 6 hours
+                    oSusFrom = new Date(oSusFrom.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                }
+                if (oSusTo.getTimezoneOffset() < timezoneOffsetTo) {
+                    // Adjust date by 5 hours
+                    oSusTo = new Date(oSusTo.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                }
+                else {
+                    // Adjust date by 6 hours
+                    oSusTo = new Date(oSusTo.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                }
+                var xSuspendTo = oSusTo.toLocaleString('en-US', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                }),
+                    SuspendTo = oSusTo.toDateString().slice(4) + constants.SPACE + xSuspendTo,
+                    // SuspendTo = oSusTo.toDateString() + oSusTo.toString().substring(xSuspendTo, xSuspendTo + constants.INTNINE),
+                    xSuspendFrom = oSusFrom.toLocaleString('en-US', {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                    }),
+                    SuspendFrom = oSusFrom.toDateString().slice(4) + constants.SPACE + xSuspendFrom;
+
+
+                if ((oDateSuspendTo !== "" && oDateSuspendTo !== constants.SPACE && oDateSuspendTo !== undefined) && (oDateSuspendFrom !== "" && oDateSuspendFrom !== constants.SPACE && oDateSuspendFrom !== undefined)) {
+
+                    if (checkVSF !== constants.ERROR || checkVST !== constants.ERROR) {
+                        this.getView().byId("idDatePickerSuspend").setEnabled(false);
+                        this.getView().byId("idDatePicker2Suspend").setEnabled(false);
+                        // this.getView().byId("idButtonSuspendSave").setVisible(false);
+                        // this.getView().byId("idButtonSuspendEdit").setVisible(true);
+                        // this.getView().byId("idButtonSuspendCancel").setVisible(false);
+                        this.getView().byId("idObjStatusS1").setText(resultFrom);
+                        this.getView().byId("idObjStatusS2").setText(resultTo);
+                        this.getView().getModel("oModel").setProperty("/dateValueF", resultFrom);
+                        this.getView().getModel("oModel").setProperty("/dateValueT", resultTo);
+                        oArr.push({
+                            "time": SuspendFrom,
+                            "Desc": "SUSPENDFROM"
+                        });
+                        oArr.push({
+                            "time": SuspendTo,
+                            "Desc": "SUSPENDTO"
+                        });
+                        var oPayloadSus = JSON.stringify(oArr);
+                        this.oDataModelT.callFunction("/createSuspendSchedule", {
+                            method: constants.httpGet,
+                            urlParameters: {
+                                time: oPayloadSus,
+                                desc: constants.suspend
+                            },
+                            success: function (oData) {
+                                BusyIndicator.hide();
+                                MessageBox.success(that.oBundle.getText("succJSSus"));
+                                // window.location.reload()
+
+                            },
+                            error: function (err) {
+                                BusyIndicator.hide();
+                                MessageBox.error(that.oBundle.getText("techError"), {
+                                    details: err
+                                });
+
+                            }
+                        });
+                    }
+                } else {
+                    BusyIndicator.hide();
+                    MessageBox.error(that.oBundle.getText("errormsgrequired"));
+                }
+            }
+   
             },
             /**
               * Method called to change events for Suspend To
