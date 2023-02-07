@@ -77,7 +77,7 @@
                                 <DateTimePicker id="idDatePickerSuspend" timezone="America/Mexico_City"  placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
                                 <Label text="{i18n>suspendTo}" required="true" />
                                 <DateTimePicker id="idDatePicker2Suspend"  timezone="America/Mexico_City"  placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" valueStateText="{i18n>plcErrorDate}" />                           
-                                <Switch id="idSwitchInputSuspend" change="onSwtichChangeSuspend" />
+                                <!-- <Switch id="idSwitchInputSuspend" change="onSwtichChangeSuspend" /> -->
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
