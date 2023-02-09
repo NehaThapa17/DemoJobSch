@@ -54,7 +54,7 @@ sap.ui.define([
                 // this.getF4Terminal();
                 // this.getF4Product();
                 this.getCCEmails();
-                this.getJSTime();
+                // this.getJSTime();
             },
             /**
               * Method called on init() to get Job Schedule Time.
@@ -231,6 +231,7 @@ sap.ui.define([
                 this.getCustomerDetails();
                 this.getTerminalDetails();
                 this.getProductDetails();
+                this.getJSTime();
             },
             /**
               * Method called on init() to get CC Emails.
@@ -610,7 +611,8 @@ sap.ui.define([
                     this.getView().byId("idInfoLabel").setText("InActive");
                     this.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
                     //Delete Schedule
-                    this.oDataModelT.callFunction("/deleteSchedule", {
+                    // this.oDataModelT.callFunction("/deleteSchedule", {
+                        this.oDataModelT.callFunction("/updateSchedule", { 
                         method: constants.httpGet,
                         urlParameters: {
                             desc: constants.daily
@@ -1954,35 +1956,16 @@ sap.ui.define([
                 BusyIndicator.show();
                 var oState = oEvent.getSource().getState();
                 if (oState === false) {
-                    this.getView().byId("idTimePickerInput").setEnabled(true);
+                    this.getView().byId("idDatePickerSuspend").setEnabled(true);
+                    this.getView().byId("idDatePicker2Suspend").setEnabled(true);
                     this.getView().byId("idInfoLabel").setText("InActive");
                     this.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
-                    var dateValue = new Date();
-                    // Get dates for January and July
-                    var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
-                    var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
-                    // Get timezone offset
-                    var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                    if (dateValue.getTimezoneOffset() < timezoneOffset) {
-                        // Adjust date by 5 hours
-                        dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                    }
-                    else {
-                        // Adjust date by 6 hours
-                        dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                    }
-                    var xTime = dateValue.toLocaleString('en-US', {
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        hour12: true
-                    }),
-                        onSusTime = dateValue.toDateString().slice(4) + constants.SPACE + xTime;
+                    
                     //Delete Schedule
                     this.oDataModelT.callFunction("/deleteSuspendSchedule", {
                         method: constants.httpGet,
                         urlParameters: {
-                            desc: constants.suspend,
-                            time: onSusTime
+                            desc: constants.suspend
                         },
                         success: function (oData) {
                             BusyIndicator.hide();

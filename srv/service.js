@@ -50,7 +50,7 @@ module.exports = cds.service.impl(async function () {
     let resultJob = jobDetails.results;
     if (resultJob) {
       for (var i = 0; i < resultJob.length; i++) {
-        if (resultJob[i].description === constants.daily) {
+        if (resultJob[i].description === constants.daily && resultJob[i].active === true) {
           sdisplayT = resultJob[i].repeatAt;
         } else if (resultJob[i].description === constants.onDemand && resultJob[i].active === true) {
           sdemandT = resultJob[i].time;
@@ -114,6 +114,33 @@ module.exports = cds.service.impl(async function () {
           });
           break;
         }
+        // if(resultJob[i].description === sDesc){
+        //   for (var k = 0; k < resultJob.length; k++) {
+        //     if (resultJob[k].description === constants.daily || resultJob[k].description === constants.onDemand) {
+        //       sSId = resultJob[k].scheduleId;
+        //       var scJob = {
+        //         jobId: job_Id,
+        //         scheduleId: sSId,
+        //         // schedule: {
+        //         //   "active": false
+        //         // }
+        //         schedule: {
+        //           "data": {
+        //             "headers": { "Content-Type": "application/json" },
+        //             "suspendStatus": "INACTIVE"
+        //           }
+        //         }
+        //       };
+        //       scheduler.updateJobSchedule(scJob, function (err, result) {
+        //         if (err) {
+        //           return logger.log('Error deleting schedule: %s', err);
+        //         }
+        //         //Schedule deleted successfully
+        //         log.info(constants.LOG_SCH_DEL);
+        //       });
+        //     }
+        //   }
+        // }
       };
     }
   });
@@ -129,13 +156,12 @@ module.exports = cds.service.impl(async function () {
     const scheduler = new JobSchedulerClient.Scheduler(options);
     let jobID = await getJobId(constants.jobNAME, scheduler);
     let jobDetails = await getJobDetals(jobID, scheduler);
-    let nTime = req.data.time;
     let sSId;
     let resultJob = jobDetails.results;
 
     if (resultJob) {
       for (var i = 0; i < resultJob.length; i++) {
-        if ( resultJob[i].description === constants.suspendFrom) {
+        if (resultJob[i].description === constants.suspendFrom) {
           sSId = resultJob[i].scheduleId;
           var req = {
             jobId: jobID._id,
@@ -149,7 +175,19 @@ module.exports = cds.service.impl(async function () {
             log.info(constants.LOG_JS_DEL);
           });
         } else if (resultJob[i].description === constants.suspendTo) {
-          let nRes = await suspendToOperation(resultJob,jobID._id,nTime);
+          sSId = resultJob[i].scheduleId;
+          var req = {
+            jobId: jobID._id,
+            scheduleId: sSId
+          };
+          scheduler.deleteJobSchedule(req, function (err, result) {
+            if (err) {
+              return logger.log('Error deleting schedule: %s', err);
+            }
+            //Schedule deleted successfully
+            log.info(constants.LOG_JS_DEL);
+          });
+          let nRes = await suspendToOperation(resultJob, jobID._id);
           return nRes;
         }
       };
@@ -166,33 +204,120 @@ module.exports = cds.service.impl(async function () {
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
     let jobID = await getJobId(constants.jobNAME, scheduler);
+    let jobDetails = await getJobDetals(jobID, scheduler);
     let sTime = req.data.time;
     let sDesc = req.data.desc;
+    let dFlag="";
+    let resultJob = jobDetails.results;
+    if (resultJob) {
+      for (var i = 0; i < resultJob.length; i++) {
+        if (resultJob[i].description === sDesc) {
+          dFlag = "X";
+          sSId = resultJob[i].scheduleId;
+          var scJob = {
+            jobId: jobID._id,
+            scheduleId: sSId,
+            schedule: {
+              "repeatAt": sTime,
+              "active": true
+            }
+          };
 
-    var scJob = {
-      jobId: jobID._id,
-      schedule: {
-        "repeatAt": sTime,
-        "type": "recurring",
-        "description": sDesc,
-        "data": {
-          "headers": { "Content-Type": "application/json" },
-          "sDesc": sDesc
-        },
-        "active": true
-      }
-    };
-    log.info("Daily Schedule Created" + scJob);
-    return new Promise((resolve, reject) => {
-      scheduler.createJobSchedule(scJob, function (error, body) {
-        if (error) {
-          reject(error.message);
         }
-        // Job successfully created.
-        resolve('Job successfully created')
-      });
-    })
-
+      };
+    }
+    if (dFlag === "X") {
+      log.info("Schedule Updated" + scJob);
+      console.log("Schedule Updated" + scJob);
+      // return new Promise((resolve, reject) => {
+        scheduler.updateJobSchedule(scJob, function (err, result) {
+          if (err) {
+            return logger.log('Error deleting schedule: %s', err);
+          }
+          //Schedule deleted successfully
+          log.info(constants.LOG_SCH_DEL);
+        });
+      // })
+    } else {
+      var scJob = {
+        jobId: jobID._id,
+        schedule: {
+          "repeatAt": sTime,
+          "type": "recurring",
+          "description": sDesc,
+          "data": {
+            "headers": { "Content-Type": "application/json" },
+            "suspendStatus": "INACTIVE"
+          },
+          "active": true
+        }
+      };
+      log.info("Daily Schedule Created" + scJob);
+      console.log("Schedule Created" + JSON.stringify(scJob));
+      // return new Promise((resolve, reject) => {
+        scheduler.createJobSchedule(scJob, function (error, body) {
+          if (error) {
+            reject(error.message);
+          }
+          // Job successfully created.
+          resolve('Job successfully created')
+        });
+      // })
+    }
+  });
+  /**
+* Function to deactivate Daily Schedule
+*/
+  this.on('updateSchedule', async (req) => {
+    const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
+    const options = {
+      baseURL: baseURL,
+      token: token
+    };
+    const scheduler = new JobSchedulerClient.Scheduler(options);
+    let jobID = await getJobId(constants.jobNAME, scheduler);
+    let jobDetails = await getJobDetals(jobID, scheduler);
+    let sSId;
+    let resultJob = jobDetails.results;
+    let sDesc = req.data.desc;
+    if (resultJob) {
+      for (var k = 0; k < resultJob.length; k++) {
+        if (resultJob[k].description === sDesc) {
+          sSId = resultJob[k].scheduleId;
+          var scJob = {
+            jobId: jobID._id,
+            scheduleId: sSId,
+            schedule: {
+              "active": false
+            }
+          };
+          // var scJob = {
+          //   jobId: jobID._id,
+          //   schedule: {
+          //     "repeatAt": sTime,
+          //     "type": "recurring",
+          //     "description": sDesc,
+          //     "data": {
+          //       "headers": { "Content-Type": "application/json" },
+          //       "suspendStatus": "INACTIVE"
+          //     },
+          //     "active": true
+          //   }
+          // };
+          log.info("Schedule Updated" + JSON.stringify(scJob));
+          console.log("Schedule Updated" + JSON.stringify(scJob));
+          
+            scheduler.updateJobSchedule(scJob, function (err, result) {
+              if (err) {
+                return logger.log('Error deleting schedule: %s', err);
+              }
+              //Schedule deleted successfully
+              log.info(constants.LOG_SCH_DEL);
+            });
+         
+        }
+      }
+    }
   });
   /**
 * Function to create On-Demand Schedule
@@ -236,7 +361,8 @@ module.exports = cds.service.impl(async function () {
         "time": sTime,
         "description": sDesc,
         "data": {
-          "headers": { "Content-Type": "application/json" }
+          "headers": { "Content-Type": "application/json" },
+          "suspendStatus": "INACTIVE"
         },
         "active": true
       }
@@ -265,29 +391,27 @@ module.exports = cds.service.impl(async function () {
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
     let jobID = await getJobId(constants.jobNAME, scheduler);
-    // let jobDetails = await getJobDetals(jobID, scheduler);
-
-
-    // let sSId;
-    // let resultJob = jobDetails.results;
-    // if (resultJob) {
-    //   for (var i = 0; i < resultJob.length; i++) {
-    //     if (resultJob[i].description === constants.suspendTo || resultJob[i].description === constants.suspendFrom) {
-    //       sSId = resultJob[i].scheduleId;
-    //       var req = {
-    //         jobId: jobID._id,
-    //         scheduleId: sSId
-    //       };
-    //       scheduler.deleteJobSchedule(req, function (err, result) {
-    //         if (err) {
-    //           return logger.log('Error deleting schedule: %s', err);
-    //         }
-    //         //Schedule deleted successfully
-    //         log.info(constants.LOG_JS_DEL);
-    //       });
-    //     }
-    //   };
-    // }
+    let jobDetails = await getJobDetals(jobID, scheduler);
+    let sSId;
+    let resultJob = jobDetails.results;
+    if (resultJob) {
+      for (var i = 0; i < resultJob.length; i++) {
+        if (resultJob[i].description === constants.suspendTo || resultJob[i].description === constants.suspendFrom) {
+          sSId = resultJob[i].scheduleId;
+          var req = {
+            jobId: jobID._id,
+            scheduleId: sSId
+          };
+          scheduler.deleteJobSchedule(req, function (err, result) {
+            if (err) {
+              return logger.log('Error deleting schedule: %s', err);
+            }
+            //Schedule deleted successfully
+            log.info(constants.LOG_JS_DEL);
+          });
+        }
+      };
+    }
     for (var j = 0; j < timeArray.length; j++) {
       var scJob = {
         jobId: jobID._id,
@@ -428,9 +552,20 @@ module.exports = cds.service.impl(async function () {
   */
   const operationTriggerEndpoint = async function (req, oDesc, resultJob, job_Id) {
     try {
+      let suspendStatus;
+      for (var q = 0; q < resultJob.length; q++) {
+        if (resultJob[q].description === constants.daily || resultJob[q].description === constants.onDemand) {
+          let test = JSON.parse(resultJob[q].data);
+          suspendStatus = test.suspendStatus;
+          // console.log("NEHA1" +resultJob[q].data);
+          // console.log("NEHA" + test.suspendStatus);
+
+        }
+      }
       log.info("Schedule Description" + oDesc);
       log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
-      if (oDesc === constants.daily || oDesc === constants.onDemand) {
+      if (suspendStatus === constants.inactive && (oDesc === constants.daily || oDesc === constants.onDemand)) {
+        // if (oDesc === constants.daily || oDesc === constants.onDemand) {
         let top = constants.TOP;
         let response;
         let sUrl = constants.CPI_DATA_URL + oDesc + "'&$skip=0&$top=0&$format=json";
@@ -465,6 +600,7 @@ module.exports = cds.service.impl(async function () {
           }
         }
         return response;
+
       } else if (oDesc === constants.suspendFrom) {
         if (resultJob) {
           const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
@@ -479,8 +615,14 @@ module.exports = cds.service.impl(async function () {
               var scJob = {
                 jobId: job_Id,
                 scheduleId: sSId,
+                // schedule: {
+                //   "active": false
+                // }
                 schedule: {
-                  "active": false
+                  "data": {
+                    "headers": { "Content-Type": "application/json" },
+                    "suspendStatus": "ACTIVE"
+                  }
                 }
               };
               scheduler.updateJobSchedule(scJob, function (err, result) {
@@ -495,14 +637,15 @@ module.exports = cds.service.impl(async function () {
         }
       } else if (oDesc === constants.suspendTo) {
         if (resultJob) {
-          let nTime;
-          for (var p = 0; p < resultJob.length; p++) {
-            if (resultJob[p].description === constants.suspendTo) {
-              nTime = resultJob[p].time;
-              console.log("NEHA SUSPEND TIME "+nTime);
-            }
-          }
-          let iRes = await suspendToOperation(resultJob,job_Id,nTime);
+
+          // let nTime;
+          // for (var p = 0; p < resultJob.length; p++) {
+          //   if (resultJob[p].description === constants.suspendTo) {
+          //     nTime = resultJob[p].time;
+          //     console.log("NEHA SUSPEND TIME " + nTime);
+          //   }
+          // }
+          let iRes = await suspendToOperation(resultJob, job_Id);
           return iRes;
         }
       }
@@ -512,79 +655,115 @@ module.exports = cds.service.impl(async function () {
       log.error(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", error.message);
     }
   }
-  const suspendToOperation = async function (resultJob,job_Id,nTime) {
-    
+  // const suspendToOperation1 = async function (resultJob, job_Id, nTime) {
+
+  //   const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
+  //   const options = {
+  //     baseURL: baseURL,
+  //     token: token
+  //   };
+  //   const scheduler = new JobSchedulerClient.Scheduler(options);
+
+  //   for (var k = 0; k < resultJob.length; k++) {
+  //     if (resultJob[k].description === constants.daily) {
+  //       sSId = resultJob[k].scheduleId;
+  //       let iTime = resultJob[k].time;
+  //       let nDesc = resultJob[k].description;
+  //       var req = {
+  //         jobId: job_Id,
+  //         scheduleId: sSId
+  //       };
+  //       scheduler.deleteJobSchedule(req, function (err, result) {
+  //         if (err) {
+  //           return logger.log('Error deleting schedule: %s', err);
+  //         }
+  //         //Schedule deleted successfully
+  //         log.info(constants.LOG_JS_DEL);
+  //       });
+  //       var scJobN = {
+  //         jobId: job_Id,
+  //         schedule: {
+  //           "repeatAt": iTime,
+  //           "type": "recurring",
+  //           "description": nDesc,
+  //           "data": {
+  //             "headers": { "Content-Type": "application/json" },
+  //             "sDesc": nDesc
+  //           },
+  //           "active": true
+  //         }
+  //       };
+  //       log.info("Daily Schedule Created" + scJobN);
+  //       scheduler.createJobSchedule(scJobN, function (error, body) {
+  //         if (error) {
+  //           // return logger.log('Error creating schedule: %s', error);
+  //           reject(error.message);
+
+  //         }
+  //         // Job successfully created.
+  //         resolve('Job successfully created')
+  //       });
+
+  //       // var scJob = {
+  //       //   jobId: job_Id,
+  //       //   scheduleId: sSId,
+  //       //   schedule: {
+  //       //     "active": true
+  //       //   }
+  //       // };
+  //       // scheduler.updateJobSchedule(scJob, function (err, result) {
+  //       //   if (err) {
+  //       //     return logger.log('Error deleting schedule: %s', err);
+  //       //   }
+  //       //   //Schedule deleted successfully
+  //       //   log.info(constants.LOG_SCH_DEL);
+  //       // });
+  //     } else if (resultJob[k].description === constants.onDemand) {
+  //       let jobTime = new Date(resultJob[k].time);
+  //       let jTime = new Date(nTime);
+  //       console.log("NEHA JOB TIME " + jobTime);
+  //       if (jobTime < jTime) {
+
+  //       }
+  //     }
+  //   }
+  // }
+  const suspendToOperation = async function (resultJob, job_Id) {
+
     const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
     const options = {
       baseURL: baseURL,
       token: token
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
-
     for (var k = 0; k < resultJob.length; k++) {
-      if (resultJob[k].description === constants.daily) {
+      if (resultJob[k].description === constants.daily || resultJob[k].description === constants.onDemand) {
         sSId = resultJob[k].scheduleId;
-        let iTime = resultJob[k].time;
-        let nDesc = resultJob[k].description;
-        var req = {
+        var scJob = {
           jobId: job_Id,
-          scheduleId: sSId
+          scheduleId: sSId,
+          // schedule: {
+          //   "active": false
+          // }
+          schedule: {
+            "data": {
+              "headers": { "Content-Type": "application/json" },
+              "suspendStatus": "INACTIVE"
+            }
+          }
         };
-        scheduler.deleteJobSchedule(req, function (err, result) {
+        scheduler.updateJobSchedule(scJob, function (err, result) {
           if (err) {
             return logger.log('Error deleting schedule: %s', err);
           }
           //Schedule deleted successfully
-          log.info(constants.LOG_JS_DEL);
+          log.info(constants.LOG_SCH_DEL);
         });
-        var scJobN = {
-          jobId: job_Id,
-          schedule: {
-            "repeatAt": iTime,
-            "type": "recurring",
-            "description": nDesc,
-            "data": {
-              "headers": { "Content-Type": "application/json" },
-              "sDesc": nDesc
-            },
-            "active": true
-          }
-        };
-        log.info("Daily Schedule Created" + scJobN);
-        scheduler.createJobSchedule(scJobN, function (error, body) {
-          if (error) {
-            // return logger.log('Error creating schedule: %s', error);
-            reject(error.message);
-
-          }
-          // Job successfully created.
-          resolve('Job successfully created')
-        });
-
-        // var scJob = {
-        //   jobId: job_Id,
-        //   scheduleId: sSId,
-        //   schedule: {
-        //     "active": true
-        //   }
-        // };
-        // scheduler.updateJobSchedule(scJob, function (err, result) {
-        //   if (err) {
-        //     return logger.log('Error deleting schedule: %s', err);
-        //   }
-        //   //Schedule deleted successfully
-        //   log.info(constants.LOG_SCH_DEL);
-        // });
-      } else if (resultJob[k].description === constants.onDemand) {
-         let jobTime = new Date(resultJob[k].time);
-         let jTime = new Date(nTime);
-         console.log("NEHA JOB TIME "+jobTime);
-         if(jobTime < jTime){
-
-         }
       }
     }
+
   }
+
   /********************Get Dynamic token for Jobscheduler***********************/
   const fetchJwtToken = function (clientId, clientSecret) {
     return new Promise((resolve, reject) => {

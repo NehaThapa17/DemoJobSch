@@ -81,7 +81,7 @@
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
-                            <!-- <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="" enabled="false" /> -->
+                            <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="" enabled="false" />
                             <!-- onPressSuspendEdit -->
                             <!-- <Button id="idButtonSuspendSave" text="{i18n>save}" type="Emphasized" visible="false" press="" enabled="false" /> -->
                             <!-- //onPressSuspendSave -->
