@@ -95,8 +95,10 @@ sap.ui.define([
                                 minute: 'numeric',
                                 hour12: true
                             });
+                            debugger;
+                            that.getView().byId("idTimePickerInput").setDateValue(date);
                             that.getView().byId("idTextDailyST").setText(sTime);
-                            that.getView().byId("idTimePickerInput").setValue(sTime);
+                            // that.getView().byId("idTimePickerInput").setValue(sTime);
                             that.getView().byId("idSwitchInput").setState(true);
                             that.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
                             that.getView().byId("idInfoLabel").setText("Active");
@@ -228,6 +230,7 @@ sap.ui.define([
                * @public
                */
             onRouteControl: function () {
+                // this.getView().byId("idTimePickerInput").setValue("5:30 AM");
                 this.getCustomerDetails();
                 this.getTerminalDetails();
                 this.getProductDetails();

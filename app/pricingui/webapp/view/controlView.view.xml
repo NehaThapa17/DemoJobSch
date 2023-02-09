@@ -67,6 +67,22 @@
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
             </uxap:ObjectPageSection>
+            <uxap:ObjectPageSection titleUppercase="true" showTitle="true" title="{i18n>dataInc}">
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection title="{i18n>dataInc}" titleUppercase="true">
+                        <uxap:blocks>
+                            <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
+                                <Label text="{i18n>dataIncInput}" required="true" />
+                                <DateTimePicker id="" change="onhandleDateCheck" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
+                                <Switch id="idSwitchInputDataInc" change="" />
+                            </forms:SimpleForm>
+                        </uxap:blocks>
+                        <uxap:actions>
+                            <Button id="idButtonRefresh" text="{i18n>ccButton}" type="Emphasized" press="" /> 
+                        </uxap:actions>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>            
             <uxap:ObjectPageSection titleUppercase="true" showTitle="true" title="{i18n>suspend}">
                 <uxap:subSections>
                     <uxap:ObjectPageSubSection title="{i18n>suspend}" titleUppercase="true">
