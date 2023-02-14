@@ -154,4 +154,61 @@ let deleteonPremCall = async (req,sUrl) => {
     }
 }
 
-module.exports = {updateonPremCall,createonPremCall,deleteonPremCall};
+/**
+ * 
+ */
+async function getTokenJS(url) {
+    try {
+        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAMEBASIC }, {
+            method: 'GET',
+            url: url + "/$metadata",
+            headers: {
+                "content-type": "application/json",
+                'x-csrf-token': 'fetch'
+            }
+        });
+        let xcsrfToken = response.headers['x-csrf-token'];
+        let cookies = response.headers['set-cookie'];
+        let cookie = '';
+        if (cookies.length > 0) {
+            cookies.map(item => {
+                cookie = cookie.concat(item + "; ");
+            });
+        }
+        return { xcsrfToken, cookie }
+    }
+    catch (error) {
+        return req.error({
+            message: error
+        })
+    }
+}
+let clearOnDemandFlag = async (req) => {
+    try {
+        let sUrl = constants.DEFAULTURL;
+        let { xcsrfToken, cookie } = await getTokenJS(sUrl);
+        // let payload = JSON.parse(req.data.createData);
+        let payload = {"ClearFlag" : true} 
+        console.log("NEHA1" + JSON.stringify(payload));
+        let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAMEBASIC }, {
+            method: 'POST',
+            url: sUrl + "/OnDemandDetailSet",
+            headers: {
+                "content-type": "application/json",
+                'x-csrf-token': xcsrfToken,
+                'Cookie': cookie,
+            },
+            data: payload
+        });
+        let result = [{
+            "status": response.status,
+            "statusText": response.statusText,
+            "data": response.data.d
+        }];
+        return result;
+    }
+    catch (error) {
+        return error;
+    }
+}
+module.exports = {updateonPremCall,createonPremCall,deleteonPremCall,clearOnDemandFlag};

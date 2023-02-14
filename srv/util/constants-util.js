@@ -13,6 +13,7 @@ module.exports=Object.freeze({
     NONE: "None",
     onDemand:'ONDEMAND',
     daily:'DAILY',
+    checkData:'CHECKDATA',
     suspendTo:'SUSPENDTO',
     suspendFrom:'SUSPENDFROM',
     URL_metadata:"/$metadata",

@@ -213,7 +213,42 @@ sap.ui.define([
                             that.getView().byId("idDatePicker2Suspend").setEnabled(true);
                             that.getView().byId("idSwitchInputSuspend").setState(false);
                         }
-
+                        if (oDataArr2.CHECKDATA !== undefined) {
+                            var date = new Date(),
+                                index = oDataArr2.DISPLAY.indexOf(constants.DIV),
+                                hours = oDataArr2.DISPLAY.substring(constants.INTZERO, index),
+                                minutes = oDataArr2.DISPLAY.substring(index + constants.INTONE);
+                            date.setHours(hours);
+                            date.setMinutes(minutes);
+                            // Get dates for January and July
+                            var dateJan = new Date(date.getFullYear(), constants.INTZERO, constants.INTONE);
+                            var dateJul = new Date(date.getFullYear(), constants.INTSIX, constants.INTONE);
+                            // Get timezone offset
+                            var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                            // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
+                            if (date.getTimezoneOffset() < timezoneOffset) {
+                                // Adjust date by 5 hours
+                                date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                            }
+                            else {
+                                // Adjust date by 6 hours
+                                date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                            }
+                            // var timzone = new Date().toLocaleDateString(undefined, { day: '2-digit', timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
+                            var sTime = date.toLocaleString('en-US', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true
+                            });
+                            debugger;
+                            that.getView().byId("idTimePickerInputDI").setDateValue(date);
+                            that.getView().byId("idSwitchInputDataInc").setState(true);
+                            that.getView().byId("idTimePickerInputDI").setEnabled(false);
+                        } else {
+                            that.getView().byId("idTimePickerInputDI").setValue(constants.SPACE);
+                            that.getView().byId("idSwitchInputDataInc").setState(false);
+                            that.getView().byId("idTimePickerInputDI").setEnabled(true);
+                        }
                     },
                     error: function (err) {
                         BusyIndicator.hide();
@@ -230,7 +265,6 @@ sap.ui.define([
                * @public
                */
             onRouteControl: function () {
-                // this.getView().byId("idTimePickerInput").setValue("5:30 AM");
                 this.getCustomerDetails();
                 this.getTerminalDetails();
                 this.getProductDetails();
@@ -1554,6 +1588,55 @@ sap.ui.define([
                 }
             },
             /**
+              * Method called to open CCEmail dialog for Data Inconsistency
+              * @public
+              */
+            onEmailCCSelectDialogPressD: function () {
+                var oView = this.getView(), aTokens = [],
+                    oDataCC = oView.getModel("oModel").getProperty("/emailsCCInc");
+                if (oDataCC) {
+                    if (oDataCC[0] != '') {
+                        for (var e = constants.INTZERO; e < oDataCC.length; e++) {
+                            var otoken1 = new sap.m.Token({ key: oDataCC[e], text: oDataCC[e] });
+                            aTokens.push(otoken1);
+                        }
+                    }
+                }
+                // create dialog lazily
+                if (!this.byId("addEmailCC")) {
+                    // load asynchronous XML fragment
+                    Fragment.load({
+                        id: oView.getId(),
+                        name: constants.fragmentAddDataIncCCEmail,
+                        controller: this
+                    }).then(function (oDialog) {
+                        // connect dialog to the root view
+                        //of this component (models, lifecycle)
+                        oView.addDependent(oDialog);
+                        // oDialog.open();
+                        var oMultiInput1 = sap.ui.core.Fragment.byId(oView.getId(), "multiInputemailD");
+                        oMultiInput1.setTokens(aTokens);
+                        var fnValidator = function (args) {
+                            var email = args.text;
+                            var eArr = email.split('@');
+                            var mailregex = /^\w+[\w-+\.]*\@\w+([-\.]\w+)*\.[a-zA-Z]{2,}$/;
+                            if (!mailregex.test(email) || eArr[constants.INTONE] !== "marathonpetroleum.com") {
+                                oMultiInput1.setValueState(sap.ui.core.ValueState.Error);
+                            } else {
+                                oMultiInput1.setValueState(sap.ui.core.ValueState.None);
+                                return new Token({ key: email, text: email });
+                            }
+                        };
+
+                        oMultiInput1.addValidator(fnValidator);
+                        oDialog.open();
+
+                    });
+                } else {
+                    this.byId("addEmailCC").open();
+                }
+            },            
+            /**
               * Method called for validation of emailCC MultiInput
               * @public
               * @param {sap.ui.base.Event} oEvt An Event object consisting of an ID, a source and a map of parameters
@@ -1583,6 +1666,10 @@ sap.ui.define([
             onCCEmailClose: function () {
                 this.byId("addEmail").close();
                 this.byId("addEmail").destroy();
+            },
+            onCCEmailCloseD: function () {
+                this.byId("addEmailCC").close();
+                this.byId("addEmailCC").destroy();
             },
             /**
               * Method called to save CCEmails in S/4
@@ -1632,6 +1719,50 @@ sap.ui.define([
                     }
                 });
 
+            },
+            onCCEmailSaveD:function(){
+                BusyIndicator.show();
+                var oCCEmail = this.getView().byId("multiInputemailD").getTokens(), oCCEmailString = "", that = this;
+                if (oCCEmail.length !== constants.INTZERO) {
+                    for (var j = constants.INTZERO; j < oCCEmail.length; j++) {
+                        var objEmail = oCCEmail[j].getKey();
+                        if (j === constants.INTZERO) {
+                            oCCEmailString = objEmail;
+                        } else {
+                            oCCEmailString = oCCEmailString + constants.spliter + objEmail;
+                        }
+                    }
+                }
+                var jsonCC = {
+                    "Key": constants.emailCC,
+                    "Value": oCCEmailString
+                }
+                var oPayloadCC = JSON.stringify(jsonCC);
+                this.oDataModelT.callFunction("/createCCEmail", {
+                    method: constants.httpPost,
+                    urlParameters: {
+                        createData: oPayloadCC
+                    },
+                    success: function (oData) {
+
+                        BusyIndicator.hide();
+                        MessageBox.success(that.oBundle.getText("savedSucc"), {
+                            onClose: function (sAction) {
+                                if (sAction === MessageBox.Action.OK) {
+                                    that.onCCEmailCloseD();
+                                    that.getCCEmails();
+                                }
+                            }
+                        });
+                    },
+                    error: function (err) {
+                        BusyIndicator.hide();
+                        MessageBox.error(that.oBundle.getText("techError"), {
+                            details: err
+                        });
+
+                    }
+                });
             },
             /**
               * Method called to handle Edit button for OnDemand Processing
@@ -2652,6 +2783,85 @@ sap.ui.define([
                 else {
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }   
+            },
+     /**
+              * Method called on change Event of idSwitchInputDataInc to handle creation of Data Inconsistency Schedule. 
+              * @public
+              * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameters
+              */
+     onSwtichChangeDataInc: function (oEvent) {
+        BusyIndicator.show();
+        var oState = oEvent.getSource().getState(),
+            oDateD = this.getView().byId("idTimePickerInputDI").getValue(),that=this;
+            if (oState === false) {
+                this.getView().byId("idTimePickerInputDI").setEnabled(true);
+                //Delete Schedule
+                this.oDataModelT.callFunction("/deleteSchedule", {
+                    // this.oDataModelT.callFunction("/updateSchedule", { 
+                    method: constants.httpGet,
+                    urlParameters: {
+                        desc: constants.checkData
+                    },
+                    success: function (oData) {
+                        BusyIndicator.hide();
+                    },
+                    error: function (err) {
+                        BusyIndicator.hide();
+                        MessageBox.error(that.oBundle.getText("techError"), {
+                            details: err
+                        });
+                    }
+                });
+            } else {
+                if (oDateD !== "" && oDateD !== constants.SPACE && oDateD !== undefined) {
+                    BusyIndicator.show();
+                    var oDate = new Date(this.getView().byId("idTimePickerInputDI").getDateValue()),
+                        dateH = oDate.getHours(),
+                        dateM = (oDate.getMinutes() < constants.INTTEN ? constants.ZERO : '') + oDate.getMinutes(),
+                        dateValue = new Date();
+                    dateValue.setHours(dateH);
+                    dateValue.setMinutes(dateM);
+                    // Get dates for January and July
+                    var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
+                    var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
+                    // Get timezone offset
+                    var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                    if (dateValue.getTimezoneOffset() < timezoneOffset) {
+                        // Adjust date by 5 hours
+                        dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                    }
+                    else {
+                        // Adjust date by 6 hours
+                        dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                    }
+                    var oMin = (dateValue.getMinutes() < constants.INTTEN ? constants.ZERO : '') + dateValue.getMinutes();
+                    var oTime = dateValue.getHours() + constants.DIV + oMin;
+                    this.getView().byId("idTimePickerInputDI").setEnabled(false);
+                    //Create Daily Schedule
+                    this.oDataModelT.callFunction("/createSchedule", {
+                        method: constants.httpGet,
+                        urlParameters: {
+                            time: oTime,
+                            desc: constants.checkData
+                        },
+                        success: function (oData) {
+                            BusyIndicator.hide();
+                            MessageBox.success(that.oBundle.getText("succJSInconsis"));
+                        },
+                        error: function (err) {
+                            BusyIndicator.hide();
+                            MessageBox.error(that.oBundle.getText("techError"), {
+                                details: err
+                            });
+
+                        }
+                    });
+                } else {
+                    that.getView().byId("idSwitchInputDataInc").setState(false);
+                    BusyIndicator.hide();
+                    MessageBox.error(that.oBundle.getText("manTime"));
+                }
             }
+    },        
         });
     });

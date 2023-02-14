@@ -34,9 +34,9 @@
                 <uxap:subSections>
                     <uxap:ObjectPageSubSection title="{i18n>dailyProcessing}" titleUppercase="true">
                         <uxap:blocks>
-                            <forms:SimpleForm layout="ResponsiveGridLayout" class="sapUiSizeCompact">
+                            <forms:SimpleForm  layout="ResponsiveGridLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>dailyProcessingStartTime}" />
-                                <TimePicker id="idTimePickerInput" displayFormat="hh:mm a" valueFormat="hh:mm a" width="60%" />
+                                <TimePicker id="idTimePickerInput" displayFormat="hh:mm a" valueFormat="hh:mm a" width="80%" />
                                 <Switch id="idSwitchInput" change="onSwtichChange" />
                             </forms:SimpleForm>
                         </uxap:blocks>
@@ -71,14 +71,18 @@
                 <uxap:subSections>
                     <uxap:ObjectPageSubSection title="{i18n>dataInc}" titleUppercase="true">
                         <uxap:blocks>
-                            <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
+                            <forms:SimpleForm labelSpanXL="4"
+			labelSpanL="3"
+			labelSpanM="4"
+			labelSpanS="12" editable="true" layout="ResponsiveGridLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>dataIncInput}" required="true" />
-                                <DateTimePicker id="" change="onhandleDateCheck" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
-                                <Switch id="idSwitchInputDataInc" change="" />
+                                <TimePicker id="idTimePickerInputDI" displayFormat="hh:mm a" valueFormat="hh:mm a" width="80%" />
+                                <Switch id="idSwitchInputDataInc" change="onSwtichChangeDataInc" />
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
-                            <Button id="idButtonRefresh" text="{i18n>ccButton}" type="Emphasized" press="" /> 
+                            <Button id="idButtonCCdataInc" text="{i18n>ccButton}" type="Emphasized" press="onEmailCCSelectDialogPressD" /> 
+                            <Button id="idButtonCheck" text="{i18n>checkInconsis}" type="Emphasized" press="" /> 
                         </uxap:actions>
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
