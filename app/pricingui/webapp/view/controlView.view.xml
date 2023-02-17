@@ -34,7 +34,7 @@
                 <uxap:subSections>
                     <uxap:ObjectPageSubSection title="{i18n>dailyProcessing}" titleUppercase="true">
                         <uxap:blocks>
-                            <forms:SimpleForm  layout="ResponsiveGridLayout" class="sapUiSizeCompact">
+                            <forms:SimpleForm labelSpanXL="3" columnsXL="2" columnsL="1" columnsM="1" labelSpanL="2" labelSpanM="3" labelSpanS="12" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>dailyProcessingStartTime}" />
                                 <TimePicker id="idTimePickerInput" displayFormat="hh:mm a" valueFormat="hh:mm a" width="80%" />
                                 <Switch id="idSwitchInput" change="onSwtichChange" />
@@ -48,15 +48,12 @@
                     <uxap:ObjectPageSubSection title="{i18n>onDemandProcessignlbl}" titleUppercase="true">
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
-                                <Label text="{i18n>onDemandStartTime}" required="true" />
-                                <DateTimePicker id="idDatePickerOnDemand" change="onhandleDateCheck" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
-
                                 <Label text="{i18n>customerSH}" required="true" />
                                 <MultiInput id="idMultiInputCustomer" enabled="false" valueHelpRequest=".onValueHelpRequested" change="handleChangeOnDemand" />
-                                <Label text="{i18n>terminal}" required="true" />
-                                <MultiComboBox id="idMultiInputTerminal" enabled="false" showSecondaryValues="true" showSelectAll="true" width="350px" items="{oModel>/TerminalData}">
-                                    <core:ListItem key="{oModel>Terminal}" text="{oModel>TerminalName}" additionalText="{oModel>Terminal}" />
-                                </MultiComboBox>
+                                <Label text="{i18n>pricingDate}" required="true" />
+                                <DatePicker id="idDatePickerPricingDate" placeholder="Enter Pricing Date" enabled="false" class="sapUiSmallMarginBottom" />
+                                <Label text="{i18n>onDemandStartTime}" required="true" />
+                                <DateTimePicker id="idDatePickerOnDemand" displayFormat="MMM dd YYYY hh:mm a" change="onhandleDateCheck" timezone="America/Mexico_City" enabled="false" placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
@@ -71,33 +68,39 @@
                 <uxap:subSections>
                     <uxap:ObjectPageSubSection title="{i18n>dataInc}" titleUppercase="true">
                         <uxap:blocks>
-                            <forms:SimpleForm labelSpanXL="4"
-			labelSpanL="3"
-			labelSpanM="4"
-			labelSpanS="12" editable="true" layout="ResponsiveGridLayout" class="sapUiSizeCompact">
+                            <forms:SimpleForm labelSpanXL="3" columnsXL="2" columnsL="1" columnsM="1" labelSpanL="2" labelSpanM="3" labelSpanS="12" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>dataIncInput}" required="true" />
                                 <TimePicker id="idTimePickerInputDI" displayFormat="hh:mm a" valueFormat="hh:mm a" width="80%" />
                                 <Switch id="idSwitchInputDataInc" change="onSwtichChangeDataInc" />
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
-                            <Button id="idButtonCCdataInc" text="{i18n>ccButton}" type="Emphasized" press="onEmailCCSelectDialogPressD" /> 
-                            <Button id="idButtonCheck" text="{i18n>checkInconsis}" type="Emphasized" press="" /> 
+                            <Button id="idButtonCCdataInc" text="To" type="Emphasized" press="onEmailCCSelectDialogPressD" />
+                            <Button id="idButtonCheck" tooltip="Instant Check" icon="sap-icon://validate" type="Emphasized" press="" />
+                            <!-- text="{i18n>checkInconsis}" -->
                         </uxap:actions>
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
-            </uxap:ObjectPageSection>            
+            </uxap:ObjectPageSection>
             <uxap:ObjectPageSection titleUppercase="true" showTitle="true" title="{i18n>suspend}">
                 <uxap:subSections>
                     <uxap:ObjectPageSubSection title="{i18n>suspend}" titleUppercase="true">
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
-                                 
                                 <Label text="{i18n>suspendFrom}" required="true" />
-                                <DateTimePicker id="idDatePickerSuspend" timezone="America/Mexico_City"  placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
+                                <DateTimePicker id="idDatePickerSuspend" timezone="America/Mexico_City" displayFormat="MMM dd YYYY hh:mm a" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
                                 <Label text="{i18n>suspendTo}" required="true" />
-                                <DateTimePicker id="idDatePicker2Suspend"  timezone="America/Mexico_City"  placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP2Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" valueStateText="{i18n>plcErrorDate}" />                           
-                                <!-- <Switch id="idSwitchInputSuspend" change="onSwtichChangeSuspend" /> -->
+                                <DateTimePicker
+                                    id="idDatePicker2Suspend"
+                                    timezone="America/Mexico_City"
+                                    displayFormat="MMM dd YYYY hh:mm a"
+                                    placeholder="Enter Date and Time"
+                                    afterValueHelpClose="onhandleChangeDP2Suspend"
+                                    class="sapUiSmallMarginBottom"
+                                    change="onhandleDateCheck"
+                                    valueStateText="{i18n>plcErrorDate}"
+                                />
+                                <!-- <Switch id="idSwitchInputSuspend" change="onSwtichChangeSuspend"/> -->
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
@@ -243,7 +246,7 @@
                                     <ColumnListItem>
                                         <Text text="{oModel>Terminal}" />
                                         <Text text="{oModel>TerminalName}" />
-                                        <ObjectStatus text="{oModel>ShiptoCount}"  />
+                                        <ObjectStatus text="{oModel>ShiptoCount}" />
                                         <!-- <core:Icon src="sap-icon://broken-link" press="onPressUnbind"></core:Icon> -->
                                         <!-- <ObjectStatus icon="{path:'oModel>DailyJob', formatter: '.formatter.getIconOrder'}" />
                                         <ObjectStatus icon="{path:'oModel>OnDemandJob', formatter: '.formatter.getIconOrder'}" /> -->

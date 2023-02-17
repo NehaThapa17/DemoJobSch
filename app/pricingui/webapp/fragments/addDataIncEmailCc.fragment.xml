@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:f="sap.ui.layout.form" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core">
-    <Dialog id="addEmailCC" title="{i18n>addCCEmail}" afterClose="onValueEmailAfterClose" contentWidth="100%">
+    <Dialog id="addEmailCC" title="{i18n>editToEmail}" afterClose="onValueEmailAfterClose" contentWidth="100%">
         <content>
         <!-- <VBox>
             <Label text="{i18n>ccEmail}:" /> -->

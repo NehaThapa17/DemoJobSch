@@ -490,7 +490,7 @@ module.exports = cds.service.impl(async function () {
     return new Promise((resolve, reject) => {
       scheduler.fetchJob(req, function (err, result) {
         if (err) {
-          console.log(err);
+          
           reject(err.message);
         }
         resolve(result);
@@ -560,7 +560,7 @@ module.exports = cds.service.impl(async function () {
         if (resultJob[q].description === constants.daily || resultJob[q].description === constants.onDemand) {
           let test = JSON.parse(resultJob[q].data);
           suspendStatus = test.suspendStatus;
-          // console.log("NEHA1" +resultJob[q].data);
+          
           
 
         }
@@ -603,9 +603,9 @@ module.exports = cds.service.impl(async function () {
           }
         }
         if( oDesc === constants.onDemand && response === "Mail sent Successfully"){
-          console.log("NEHA");
-          // let oStatus = await clearOnDemandFlag(req);
-          // console.log("NEHA3" + JSON.stringify(oStatus));
+          let oUrl = constants.URL_CLRPOST;
+          let oStatus = await clearOnDemandFlag(oUrl);
+          console.log("NEHA3" + JSON.stringify(oStatus));
         }
         
         return response;

@@ -38,6 +38,7 @@ module.exports=Object.freeze({
     URL_F4Ter:"/sap/opu/odata/sap/zhsc_pricing_notification_srv/Terminal_VHSet",
     URL_F4Prod:"/sap/opu/odata/sap/zhsc_pricing_notification_srv/Product_VHSet",
     URL_CC:"/sap/opu/odata/sap/zhsc_pricing_notification_srv/KeyValueSet",
+    URL_CLRPOST:"/sap/opu/odata/sap/zhsc_pricing_notification_srv/OnDemandDetailSet",
     URL_ProdCreate:"/ProductDetailSet",
     URL_TerCreate:"/TerminalDetailSet",
     URL_CusCreate:"/CustomerShipToDetailSet",

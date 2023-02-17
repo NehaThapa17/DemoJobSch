@@ -7,6 +7,7 @@ const destService = constants.destService;
 const destination = constants.dest;
 const SapCfAxios = require('sap-cf-axios').default;
 const sapcfaxios= SapCfAxios(destination);
+const core = require('@sap-cloud-sdk/core');
 /**
 * Function to get token details 
 * Function invoked in Create,delete n Update function calls
@@ -157,11 +158,12 @@ let deleteonPremCall = async (req,sUrl) => {
 /**
  * 
  */
-async function getTokenJS(url) {
+async function getTokenJS(sUrl) {
     try {
+        
         let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAMEBASIC }, {
             method: 'GET',
-            url: url + "/$metadata",
+            url: sUrl,
             headers: {
                 "content-type": "application/json",
                 'x-csrf-token': 'fetch'
@@ -175,24 +177,24 @@ async function getTokenJS(url) {
                 cookie = cookie.concat(item + "; ");
             });
         }
+        
         return { xcsrfToken, cookie }
     }
     catch (error) {
+        log.info("ERROR getTokenJS()" + error);
         return req.error({
             message: error
         })
     }
 }
-let clearOnDemandFlag = async (req) => {
+let clearOnDemandFlag = async (oUrl) => {
     try {
-        let sUrl = constants.DEFAULTURL;
+        let sUrl = constants.PPSERVICEURL;
         let { xcsrfToken, cookie } = await getTokenJS(sUrl);
-        // let payload = JSON.parse(req.data.createData);
-        let payload = {"ClearFlag" : true} 
-        console.log("NEHA1" + JSON.stringify(payload));
+        let payload = {"ClearFlag" : true, "Customer" : [ ]}; 
         let response = await core.executeHttpRequest({ destinationName: constants.DESTINATIONNAMEBASIC }, {
             method: 'POST',
-            url: sUrl + "/OnDemandDetailSet",
+            url: oUrl,
             headers: {
                 "content-type": "application/json",
                 'x-csrf-token': xcsrfToken,
@@ -205,9 +207,11 @@ let clearOnDemandFlag = async (req) => {
             "statusText": response.statusText,
             "data": response.data.d
         }];
+        log.info("SUCCESS clearOnDemandFlag()" + JSON.stringify(result));
         return result;
     }
     catch (error) {
+        log.info("ERROR clearOnDemandFlag()" +error); 
         return error;
     }
 }
