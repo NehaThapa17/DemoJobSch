@@ -567,12 +567,12 @@ module.exports = cds.service.impl(async function () {
           suspendStatus = test.suspendStatus;
         }
       }
-      log.info("Call for Data inconsistency check for" + oDesc);
-      let resultR= await triggerCPI();
-      log.info("Result for Data inconsistency check" + resultR);
       log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
       if (suspendStatus === constants.inactive && (oDesc === constants.daily || oDesc === constants.onDemand)) {
         log.info("suspendStatus " + suspendStatus +"for "+oDesc);
+        log.info("Call for Data inconsistency check for" + oDesc);
+        let resultR= await triggerCPI();
+        log.info("Result for Data inconsistency check" + resultR);
         let top = constants.TOP;
         let response;
         let sUrl = constants.CPI_DATA_URL + oDesc + "'&$skip=0&$top=0&$format=json";
