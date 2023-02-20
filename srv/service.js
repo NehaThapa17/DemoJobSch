@@ -268,6 +268,10 @@ module.exports = cds.service.impl(async function () {
       // })
     }
   });
+  this.on('sendInconEmail', async (req) => {
+    let resultR= await triggerCPI(); 
+    return resultR;
+  });
   /**
 * Function to deactivate Daily Schedule
 */
@@ -555,20 +559,20 @@ module.exports = cds.service.impl(async function () {
   */
   const operationTriggerEndpoint = async function (req, oDesc, resultJob, job_Id) {
     try {
+      log.info("Schedule Description" + oDesc);
       let suspendStatus;
       for (var q = 0; q < resultJob.length; q++) {
         if (resultJob[q].description === constants.daily || resultJob[q].description === constants.onDemand) {
           let test = JSON.parse(resultJob[q].data);
           suspendStatus = test.suspendStatus;
-          
-          
-
         }
       }
-      log.info("Schedule Description" + oDesc);
+      log.info("Call for Data inconsistency check for" + oDesc);
+      let resultR= await triggerCPI();
+      log.info("Result for Data inconsistency check" + resultR);
       log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
       if (suspendStatus === constants.inactive && (oDesc === constants.daily || oDesc === constants.onDemand)) {
-        // if (oDesc === constants.daily || oDesc === constants.onDemand) {
+        log.info("suspendStatus " + suspendStatus +"for "+oDesc);
         let top = constants.TOP;
         let response;
         let sUrl = constants.CPI_DATA_URL + oDesc + "'&$skip=0&$top=0&$format=json";
@@ -611,6 +615,7 @@ module.exports = cds.service.impl(async function () {
         return response;
 
       } else if (oDesc === constants.suspendFrom) {
+        log.info(oDesc + " Triggered");
         if (resultJob) {
           const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
           const options = {
@@ -645,11 +650,16 @@ module.exports = cds.service.impl(async function () {
           }
         }
       } else if (oDesc === constants.suspendTo) {
+        log.info(oDesc + " Triggered");
         if (resultJob) {
           let iRes = await suspendToOperation(resultJob, job_Id);
           return iRes;
         }
-      } else if (oDesc === constants.checkData) {}
+      } else if (oDesc === constants.checkData) {
+        log.info(oDesc + " Triggered");
+        let resultR= await triggerCPI();
+      }
+      log.info("operationTriggerEndpoint - Out of IF condition" );
     }
     catch (error) {
       req.error({ code: constants.ERR, message: error.message });
@@ -690,6 +700,27 @@ module.exports = cds.service.impl(async function () {
       }
     }
 
+  }
+  const triggerCPI = async function () {
+    let sUrl = constants.URL_Check;
+    let responseData = await getOnPremDetails(sUrl);
+    log.info(" CPI Data Inconsistency Mail Body" + responseData.data.d);
+    if (responseData.data.d.results[0].DataCheck.results.length !== constants.INTZERO) {
+      response = await SapCfAxiosObj({
+        method: constants.httpPost,
+        url: constants.CPI_DATA_ENDPOINT,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: responseData.data
+      }).then(res => {
+        log.info("CPI execution was Successful " + res);
+        return constants.SUCCESS;
+      }).catch(async (error) => {
+        log.error("Error in CPI call" + error);
+        return error;
+      })          
+    }
   }
 
   /********************Get Dynamic token for Jobscheduler***********************/
@@ -828,6 +859,24 @@ module.exports = cds.service.impl(async function () {
       return error
     }
   });
+    /**
+* Function to get data Inconsistency data
+*/
+this.on('dataInconCheck', async (req) => {
+  try {
+    let sUrl = constants.URL_Check;
+    let response = await getOnPremCall(req, sUrl);
+    let resultData = {
+      data: response.data.d.results
+    }
+    log.info("dataInconCheck success");
+    return resultData;
+  }
+  catch (error) {
+    log.error("dataInconCheck error" + error);
+    return error
+  }
+});
   /**
 * Function to get Customer F4 help data
 */

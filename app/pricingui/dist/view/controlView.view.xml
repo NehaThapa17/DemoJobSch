@@ -76,7 +76,7 @@
                         </uxap:blocks>
                         <uxap:actions>
                             <Button id="idButtonCCdataInc" text="To" type="Emphasized" press="onEmailCCSelectDialogPressD" />
-                            <Button id="idButtonCheck" tooltip="Instant Check" icon="sap-icon://validate" type="Emphasized" press="" />
+                            <Button id="idButtonCheck" tooltip="Instant Check" icon="sap-icon://validate" type="Emphasized" press="onInstantCheck" />
                             <!-- text="{i18n>checkInconsis}" -->
                         </uxap:actions>
                     </uxap:ObjectPageSubSection>

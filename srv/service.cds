@@ -19,6 +19,8 @@ service CatalogService @(requires : 'authenticated-user')
     function getOnPremTerminalF4() returns response; 
     function getOnPremProductF4() returns response;
     function getOnCCEmail() returns response; 
+    function dataInconCheck() returns response; 
+    function sendInconEmail() returns response;
     action updateOnDemand(createData: String) returns response;
     action createCCEmail(createData: String) returns response;
     action createProduct(createData: String) returns response;
