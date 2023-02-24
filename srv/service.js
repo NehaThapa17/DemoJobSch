@@ -117,33 +117,7 @@ module.exports = cds.service.impl(async function () {
           });
           break;
         }
-        // if(resultJob[i].description === sDesc){
-        //   for (var k = 0; k < resultJob.length; k++) {
-        //     if (resultJob[k].description === constants.daily || resultJob[k].description === constants.onDemand) {
-        //       sSId = resultJob[k].scheduleId;
-        //       var scJob = {
-        //         jobId: job_Id,
-        //         scheduleId: sSId,
-        //         // schedule: {
-        //         //   "active": false
-        //         // }
-        //         schedule: {
-        //           "data": {
-        //             "headers": { "Content-Type": "application/json" },
-        //             "suspendStatus": "INACTIVE"
-        //           }
-        //         }
-        //       };
-        //       scheduler.updateJobSchedule(scJob, function (err, result) {
-        //         if (err) {
-        //           return logger.log('Error deleting schedule: %s', err);
-        //         }
-        //         //Schedule deleted successfully
-        //         log.info(constants.LOG_SCH_DEL);
-        //       });
-        //     }
-        //   }
-        // }
+
       };
     }
   });
@@ -538,9 +512,6 @@ module.exports = cds.service.impl(async function () {
         await doUpdateStatus(headers, true, result)
         return result;
       }
-      // else {
-      //     await operationTriggerEndpoint(req,oDesc,resultJob,job_Id)
-      // }
     } catch (error) {
       log.error("handleAsyncJob Catch" + error);
 
@@ -568,8 +539,9 @@ module.exports = cds.service.impl(async function () {
         }
       }
       log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
+      log.info("suspendStatus " + suspendStatus +"for "+oDesc);
       if (suspendStatus === constants.inactive && (oDesc === constants.daily || oDesc === constants.onDemand)) {
-        log.info("suspendStatus " + suspendStatus +"for "+oDesc);
+
         log.info("Call for Data inconsistency check for" + oDesc);
         let resultR= await triggerCPI();
         log.info("Result for Data inconsistency check" + resultR);
@@ -624,14 +596,11 @@ module.exports = cds.service.impl(async function () {
           };
           const scheduler = new JobSchedulerClient.Scheduler(options);
           for (var k = 0; k < resultJob.length; k++) {
-            if (resultJob[k].description === constants.daily || resultJob[k].description === constants.onDemand) {
+            if (resultJob[k].description === constants.daily ) { //|| resultJob[k].description === constants.onDemand
               sSId = resultJob[k].scheduleId;
               var scJob = {
                 jobId: job_Id,
                 scheduleId: sSId,
-                // schedule: {
-                //   "active": false
-                // }
                 schedule: {
                   "data": {
                     "headers": { "Content-Type": "application/json" },
@@ -675,14 +644,11 @@ module.exports = cds.service.impl(async function () {
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
     for (var k = 0; k < resultJob.length; k++) {
-      if (resultJob[k].description === constants.daily || resultJob[k].description === constants.onDemand) {
+      if (resultJob[k].description === constants.daily ) { //|| resultJob[k].description === constants.onDemand
         sSId = resultJob[k].scheduleId;
         var scJob = {
           jobId: job_Id,
           scheduleId: sSId,
-          // schedule: {
-          //   "active": false
-          // }
           schedule: {
             "data": {
               "headers": { "Content-Type": "application/json" },
