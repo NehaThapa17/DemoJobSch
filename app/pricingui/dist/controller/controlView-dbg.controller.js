@@ -1085,11 +1085,12 @@ sap.ui.define([
                         //of this component (models, lifecycle)
                         oView.addDependent(oDialog);
                         oDialog.open();
-                        oDialog.setTitle(that.oBundle.getText("addProduct"));
+                        oDialog.setTitle("addProduct");
+                        sap.ui.core.Fragment.byId(oView.getId(), "idProdShCount").setText(constants.INTZERO);
                     });
                 } else {
                     this.byId("addProduct").open();
-                    oDialog.setTitle(that.oBundle.getText("addProduct"));
+                    oDialog.setTitle("addProduct");
                 }
             },
             /**
@@ -1117,15 +1118,20 @@ sap.ui.define([
                             oDialog.open();
                             oDialog.setTitle(that.oBundle.getText("editProduct"));
                             var oProdID = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductID");
-                            var oProdName = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductName");
-                            oProdID.setValue(lineData.Product);
                             oProdID.setEnabled(false);
-                            oProdName.setValue(lineData.ProductName);
+                            sap.ui.core.Fragment.byId(oView.getId(), "idInputProductID").setValue(lineData.Product);
+                            sap.ui.core.Fragment.byId(oView.getId(), "idInputProductName").setValue(lineData.ProductName);
+                            sap.ui.core.Fragment.byId(oView.getId(), "idProdShCount").setText(lineData.ShiptoCount);
+                            // var oProdName = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductName");
+                            // oProdID.setValue(lineData.Product);
+                          
+                            // oProdName.setValue(lineData.ProductName);
                         });
-                    } else {
-                        this.byId("addProduct").open();
-                        oDialog.setTitle(that.oBundle.getText("editProduct"));
                     }
+                    //  else {
+                    //     this.byId("addProduct").open();
+                    //     oDialog.setTitle(that.oBundle.getText("editProduct"));
+                    // }
                 }
                 else {
                     MessageBox.error(this.oBundle.getText("selectProduct"));
@@ -1157,11 +1163,14 @@ sap.ui.define([
                             oDialog.setTitle(that.oBundle.getText("editProduct"));
                             var oProdID = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductID");
                             var oProdName = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductName");
+                            sap.ui.core.Fragment.byId(oView.getId(), "idProdShCount").setText(lineData.ShiptoCount);
                             oProdID.setValue(lineData.Product);
                             oProdID.setEnabled(false);
                             oProdName.setValue(lineData.ProductName);
+                           
                         });
-                    } else {
+                    }
+                     else {
                         this.byId("addProduct").open();
                         oDialog.setTitle(that.oBundle.getText("editProduct"));
                     }
@@ -2877,7 +2886,7 @@ sap.ui.define([
                     var oData = this.getView().getModel("oModel").getProperty("/ProductData")[itemIndex];
                     // oData = oPath[itemIndex];
                     if (oData.ShiptoCount !== constants.INTZERO) {
-                        MessageBox.confirm(that.oBundle.getText("unBindconfirm", [oData.Product, oData.ProductName]), {
+                        MessageBox.confirm(that.oBundle.getText("unBindProdconfirm", [oData.Product, oData.ProductName]), {
                             onClose: function (oAction) {
                                 if (oAction === constants.actionOK) {
                                     BusyIndicator.show();
@@ -2886,7 +2895,7 @@ sap.ui.define([
                                         "RemoveShipto" : true
                                     };    
                                     var oPayload = JSON.stringify(jsonData);
-                                    that.oDataModelT.callFunction("/unbindShipTo", {
+                                    that.oDataModelT.callFunction("/unbindProdShipTo", {
                                         method: constants.httpPost,
                                         urlParameters: {
                                             createData: oPayload,
@@ -2895,11 +2904,11 @@ sap.ui.define([
                                         },
                                         success: function (oData) {
                                             BusyIndicator.hide();
-                                            if (oData.unbindShipTo.data.message !== undefined) {
-                                                MessageBox.error(oData.unbindShipTo.data.message);
+                                            if (oData.unbindProdShipTo.data.message !== undefined) {
+                                                MessageBox.error(oData.unbindProdShipTo.data.message);
                                             }
                                             else {
-                                                MessageToast.show(that.oBundle.getText("productunBind"), [oData.unbindShipTo.data.Product]);
+                                                MessageToast.show(that.oBundle.getText("productunBind"), [oData.unbindProdShipTo.data.Product]);
                                                 that.getProductDetails();
                                                 that.getCustomerDetails();
                                             }
@@ -2918,7 +2927,7 @@ sap.ui.define([
                             }
                         });
                     } else {
-                        MessageBox.error(that.oBundle.getText("checkSH", [oData.Product, oData.ProductName]));
+                        MessageBox.error(that.oBundle.getText("checkProdSH", [oData.Product, oData.ProductName]));
                     }
                 }
                 else {
@@ -2932,7 +2941,7 @@ sap.ui.define([
                     var oData = this.getView().getModel("oModel").getProperty("/ProductData")[itemIndex];
                     // oData = oPath[itemIndex];
                     if (oData.ShiptoCount !== constants.INTZERO) {
-                        MessageBox.confirm(that.oBundle.getText("unBindconfirm", [oData.Product, oData.ProductName]), {
+                        MessageBox.confirm(that.oBundle.getText("unBindProdconfirm", [oData.Product, oData.ProductName]), {
                             onClose: function (oAction) {
                                 if (oAction === constants.actionOK) {
                                     BusyIndicator.show();
@@ -2942,7 +2951,7 @@ sap.ui.define([
                                         
                                     };
                                     var oPayload = JSON.stringify(jsonData);
-                                    that.oDataModelT.callFunction("/unbindShipTo", {
+                                    that.oDataModelT.callFunction("/unbindProdShipTo", {
                                         method: constants.httpPost,
                                         urlParameters: {
                                             createData: oPayload,
@@ -2951,8 +2960,8 @@ sap.ui.define([
                                         },
                                         success: function (oData) {
                                             BusyIndicator.hide();
-                                            if (oData.unbindShipTo.data.message !== undefined) {
-                                                MessageBox.error(oData.unbindShipTo.data.message);
+                                            if (oData.unbindProdShipTo.data.message !== undefined) {
+                                                MessageBox.error(oData.unbindProdShipTo.data.message);
                                             }
                                             else {
                                                 MessageToast.show(that.oBundle.getText("productunBind"));
@@ -2974,7 +2983,7 @@ sap.ui.define([
                             }
                         });
                     } else {
-                        MessageBox.error(that.oBundle.getText("checkSH", [oData.Product, oData.ProductName]));
+                        MessageBox.error(that.oBundle.getText("checkProdSH", [oData.Product, oData.ProductName]));
                     }
                 }
                 else {

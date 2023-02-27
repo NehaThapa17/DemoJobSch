@@ -268,7 +268,7 @@ sap.ui.define([
                 this.getCustomerDetails();
                 this.getTerminalDetails();
                 this.getProductDetails();
-                // this.getJSTime();
+                this.getJSTime();
             },
             /**
               * Method called on init() to get CC Emails.
@@ -1085,12 +1085,12 @@ sap.ui.define([
                         //of this component (models, lifecycle)
                         oView.addDependent(oDialog);
                         oDialog.open();
-                        oDialog.setTitle(that.oBundle.getText("addProduct"));
+                        oDialog.setTitle("addProduct");
                         sap.ui.core.Fragment.byId(oView.getId(), "idProdShCount").setText(constants.INTZERO);
                     });
                 } else {
                     this.byId("addProduct").open();
-                    oDialog.setTitle(that.oBundle.getText("addProduct"));
+                    oDialog.setTitle("addProduct");
                 }
             },
             /**
@@ -1118,15 +1118,20 @@ sap.ui.define([
                             oDialog.open();
                             oDialog.setTitle(that.oBundle.getText("editProduct"));
                             var oProdID = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductID");
-                            var oProdName = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductName");
-                            oProdID.setValue(lineData.Product);
                             oProdID.setEnabled(false);
-                            oProdName.setValue(lineData.ProductName);
+                            sap.ui.core.Fragment.byId(oView.getId(), "idInputProductID").setValue(lineData.Product);
+                            sap.ui.core.Fragment.byId(oView.getId(), "idInputProductName").setValue(lineData.ProductName);
+                            sap.ui.core.Fragment.byId(oView.getId(), "idProdShCount").setText(lineData.ShiptoCount);
+                            // var oProdName = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductName");
+                            // oProdID.setValue(lineData.Product);
+                          
+                            // oProdName.setValue(lineData.ProductName);
                         });
-                    } else {
-                        this.byId("addProduct").open();
-                        oDialog.setTitle(that.oBundle.getText("editProduct"));
                     }
+                    //  else {
+                    //     this.byId("addProduct").open();
+                    //     oDialog.setTitle(that.oBundle.getText("editProduct"));
+                    // }
                 }
                 else {
                     MessageBox.error(this.oBundle.getText("selectProduct"));
@@ -1158,9 +1163,11 @@ sap.ui.define([
                             oDialog.setTitle(that.oBundle.getText("editProduct"));
                             var oProdID = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductID");
                             var oProdName = sap.ui.core.Fragment.byId(oView.getId(), "idInputProductName");
+                            sap.ui.core.Fragment.byId(oView.getId(), "idProdShCount").setText(lineData.ShiptoCount);
                             oProdID.setValue(lineData.Product);
                             oProdID.setEnabled(false);
                             oProdName.setValue(lineData.ProductName);
+                           
                         });
                     }
                      else {

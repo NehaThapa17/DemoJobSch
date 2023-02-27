@@ -12,12 +12,12 @@
                 </Toolbar>
             </headerToolbar>
             <columns>
-                <Column mergeDuplicates="true" hAlign="Begin" width="15rem">
+                <Column mergeDuplicates="true" hAlign="Begin" >
                     <header>
                         <Text text="{i18n>productID}" />
                     </header>
                 </Column>
-                <Column demandPopin="true" hAlign="Begin" width="15rem">
+                <Column demandPopin="true" hAlign="Begin">
                     <header>
                         <Text text="{i18n>productName}" />
                     </header>

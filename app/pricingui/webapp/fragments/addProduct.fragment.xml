@@ -10,7 +10,7 @@
             <Label text="{i18n>productName}" />
             <Input id="idInputProductName"  maxLength="40" width="360px" />
             <Label text="{i18n>shipTo}" />
-            <Text id="idProdShCount" text="" />
+            <Text id="idProdShCount"  />
             
         </f:content>  
     </f:SimpleForm>  

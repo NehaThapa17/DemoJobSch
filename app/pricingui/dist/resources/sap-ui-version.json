@@ -1,11 +1,7 @@
 {
 	"name": "marathonpetroleum.hsc.pricingui.pricingui",
 	"version": "0.0.2",
-<<<<<<< HEAD
-	"buildTimestamp": "202302240538",
-=======
-	"buildTimestamp": "202302240835",
->>>>>>> 3af8dc45bbcd6b5c5e932e5184805349589e42fe
+	"buildTimestamp": "202302270753",
 	"scmRevision": "",
 	"libraries": []
 }

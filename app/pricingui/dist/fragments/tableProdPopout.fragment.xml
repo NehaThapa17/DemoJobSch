@@ -8,23 +8,30 @@
                     <ToolbarSpacer />
                     <Button icon="sap-icon://edit" tooltip="{i18n>editProduct}" press="handleEditProductPopout" />
                     <Button icon="sap-icon://delete" tooltip="{i18n>delP}"  press="onDeleteProductPopout" />
+                    <Button icon="sap-icon://broken-link" tooltip="{i18n>unBind}"  press="onUnbindProductPopout" />
                 </Toolbar>
             </headerToolbar>
             <columns>
-                <Column mergeDuplicates="true" hAlign="Begin" width="15rem">
+                <Column mergeDuplicates="true" hAlign="Begin" >
                     <header>
                         <Text text="{i18n>productID}" />
                     </header>
                 </Column>
-                <Column demandPopin="true" hAlign="Begin" width="15rem">
+                <Column demandPopin="true" hAlign="Begin">
                     <header>
                         <Text text="{i18n>productName}" />
+                    </header>
+                </Column>
+                 <Column hAlign="Center">
+                    <header>
+                        <Text text="{i18n>shipTo}" />
                     </header>
                 </Column>
             </columns>
             <ColumnListItem>
                 <Text text="{oModel>Product}" />
                 <Text text="{oModel>ProductName}" />
+                <ObjectStatus text="{oModel>ShiptoCount}" />
             </ColumnListItem>
         </Table>
         <beginButton>
