@@ -7,7 +7,7 @@
                 <Label text="{i18n>terminalName}" required="true" />
                 <Input id="idInputTerminalName" maxLength="40" width="360px" />
                 <Label text="{i18n>shipTo}" />
-                <Text id="idTxtShCount" text="3" />
+                <Text id="idTxtShCount"  />
                 <!-- <CheckBox id="idCheckBoxDaily" enabled="true" /> -->
                 <!-- <Label text="{i18n>onDemandlbl}" />
                 <CheckBox id="idCheckBoxOnDemand" enabled="true" /> -->

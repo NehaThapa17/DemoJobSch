@@ -31,6 +31,7 @@ service CatalogService @(requires : 'authenticated-user')
     action deleteTerminal(terminal:String) returns response;
     action deleteProduct(product:String) returns response;
     action unbindShipTo(createData:String,terminal:String) returns response;
+     action unbindProdShipTo(createData:String,terminal:String) returns response;
     
   
 }

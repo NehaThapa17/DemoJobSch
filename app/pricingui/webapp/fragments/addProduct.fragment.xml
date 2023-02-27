@@ -9,6 +9,8 @@
              <Input id="idInputProductID" maxLength="10" valueHelpRequest="onHandleValueHelpProduct" width="360px" showValueHelp="true" valueHelpOnly="true" />
             <Label text="{i18n>productName}" />
             <Input id="idInputProductName"  maxLength="40" width="360px" />
+            <Label text="{i18n>shipTo}" />
+            <Text id="idProdShCount" text="" />
             
         </f:content>  
     </f:SimpleForm>  

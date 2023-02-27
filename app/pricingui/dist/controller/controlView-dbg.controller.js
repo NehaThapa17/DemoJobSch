@@ -2843,6 +2843,118 @@ sap.ui.define([
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }
             },
+            onUnbindProduct: function (oEvt) {
+                var oTable = this.getView().byId("producttbl"), that = this;
+                var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
+                // var oPath = oEvt.oSource.getParent().getBindingContextPath(),
+                if (itemIndex !== constants.INTNEGONE) {
+                    var oData = this.getView().getModel("oModel").getProperty("/ProductData")[itemIndex];
+                    // oData = oPath[itemIndex];
+                    if (oData.ShiptoCount !== constants.INTZERO) {
+                        MessageBox.confirm(that.oBundle.getText("unBindconfirm", [oData.Product, oData.ProductName]), {
+                            onClose: function (oAction) {
+                                if (oAction === constants.actionOK) {
+                                    BusyIndicator.show();
+                                    var jsonData = {
+                                        "Product" : oData.Product,
+                                        "RemoveShipto" : true
+                                    };    
+                                    var oPayload = JSON.stringify(jsonData);
+                                    that.oDataModelT.callFunction("/unbindShipTo", {
+                                        method: constants.httpPost,
+                                        urlParameters: {
+                                            createData: oPayload,
+                                            product: oData.Product
+
+                                        },
+                                        success: function (oData) {
+                                            BusyIndicator.hide();
+                                            if (oData.unbindShipTo.data.message !== undefined) {
+                                                MessageBox.error(oData.unbindShipTo.data.message);
+                                            }
+                                            else {
+                                                MessageToast.show(that.oBundle.getText("productunBind"), [oData.unbindShipTo.data.Product]);
+                                                that.getProductDetails();
+                                                that.getCustomerDetails();
+                                            }
+                                        },
+                                        error: function (err) {
+                                            BusyIndicator.hide();
+                                            var msg = err.message;
+                                            MessageBox.error(msg, {
+                                                details: err
+                                            });
+
+                                        }
+
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        MessageBox.error(that.oBundle.getText("checkSH", [oData.Product, oData.ProductName]));
+                    }
+                }
+                else {
+                    MessageBox.error(that.oBundle.getText("delCheck"));
+                }
+            },
+            onUnbindProductPopout: function (oEvent) {
+                var oTable = this.getView().byId("idProdTablePopout"), that = this;
+                var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
+                if (itemIndex !== constants.INTNEGONE) {
+                    var oData = this.getView().getModel("oModel").getProperty("/ProductData")[itemIndex];
+                    // oData = oPath[itemIndex];
+                    if (oData.ShiptoCount !== constants.INTZERO) {
+                        MessageBox.confirm(that.oBundle.getText("unBindconfirm", [oData.Product, oData.ProductName]), {
+                            onClose: function (oAction) {
+                                if (oAction === constants.actionOK) {
+                                    BusyIndicator.show();
+                                    var jsonData = {
+                                        "Product" : oData.Product,
+                                        "RemoveShipto" : true
+                                        
+                                    };
+                                    var oPayload = JSON.stringify(jsonData);
+                                    that.oDataModelT.callFunction("/unbindShipTo", {
+                                        method: constants.httpPost,
+                                        urlParameters: {
+                                            createData: oPayload,
+                                            product: oData.Product
+
+                                        },
+                                        success: function (oData) {
+                                            BusyIndicator.hide();
+                                            if (oData.unbindShipTo.data.message !== undefined) {
+                                                MessageBox.error(oData.unbindShipTo.data.message);
+                                            }
+                                            else {
+                                                MessageToast.show(that.oBundle.getText("productunBind"));
+                                                that.getProductDetails();
+                                                that.getCustomerDetails();
+                                            }
+                                        },
+                                        error: function (err) {
+                                            BusyIndicator.hide();
+                                            var msg = err.message;
+                                            MessageBox.error(msg, {
+                                                details: err
+                                            });
+
+                                        }
+
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        MessageBox.error(that.oBundle.getText("checkSH", [oData.Product, oData.ProductName]));
+                    }
+                }
+                else {
+                    MessageBox.error(that.oBundle.getText("delCheck"));
+                }
+            },
             /**
                      * Method called on change Event of idSwitchInputDataInc to handle creation of Data Inconsistency Schedule. 
                      * @public

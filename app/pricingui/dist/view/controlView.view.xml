@@ -266,6 +266,7 @@
                                             <Button id="btnaddproduct" tooltip="{i18n>addProduct}" press="handleProductSelectDialogPress" icon="sap-icon://add" />
                                             <Button id="btneditproduct" tooltip="{i18n>editProduct}" icon="sap-icon://edit" press="handleEditProductSelectDialogPress" />
                                             <Button id="btndeleteproduct" tooltip="{i18n>delP}" icon="sap-icon://delete" press="onDeleteProduct" />
+                                            <Button id="btnunbindproduct" tooltip="{i18n>unBind}" icon="sap-icon://broken-link" press="onUnbindProduct" />
                                             <Button press="handleProductTableSelectDialogPress" tooltip="{i18n>expand}" type="Emphasized" icon="sap-icon://full-screen" />
                                         </OverflowToolbar>
                                     </headerToolbar>
@@ -280,10 +281,16 @@
                                                 <Text text="{i18n>productName}" />
                                             </header>
                                         </Column>
+                                         <Column demandPopin="true" hAlign="Center">
+                                            <header>
+                                                <Text text="{i18n>shipTo}" />
+                                            </header>
+                                        </Column>
                                     </columns>
                                     <ColumnListItem>
                                         <Text text="{oModel>Product}" />
                                         <Text text="{oModel>ProductName}" />
+                                         <ObjectStatus text="{oModel>ShiptoCount}" />
                                     </ColumnListItem>
                                 </Table>
                             </VBox>

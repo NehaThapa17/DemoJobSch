@@ -14,17 +14,17 @@ passport.use(jwtStrategy);
 const app = express();
 app.use(passport.initialize());
 app.use(passport.authenticate('JWT', { session: false }));
-const https = require('https');
-const LG_SERVICE = 'Service: ';
-// access credentials from environment variable (alternatively use xsenv)
-const VCAP_SERVICES = JSON.parse(process.env.VCAP_SERVICES)
-const CREDENTIALS = VCAP_SERVICES.jobscheduler[0].credentials
-// oauth
-const UAA = CREDENTIALS.uaa;
-const baseURL = CREDENTIALS.url;
-const OA_CLIENTID = UAA.clientid;
-const OA_SECRET = UAA.clientsecret;
-const OA_ENDPOINT = UAA.url;
+// const https = require('https');
+// const LG_SERVICE = 'Service: ';
+// // access credentials from environment variable (alternatively use xsenv)
+// const VCAP_SERVICES = JSON.parse(process.env.VCAP_SERVICES)
+// const CREDENTIALS = VCAP_SERVICES.jobscheduler[0].credentials
+// // oauth
+// const UAA = CREDENTIALS.uaa;
+// const baseURL = CREDENTIALS.url;
+// const OA_CLIENTID = UAA.clientid;
+// const OA_SECRET = UAA.clientsecret;
+// const OA_ENDPOINT = UAA.url;
 const SapCfAxios = require('sap-cf-axios').default;
 const SapCfAxiosObj = SapCfAxios('CPI');
 const JobSchedulerClient = require('@sap/jobs-client');
@@ -1106,6 +1106,23 @@ module.exports = cds.service.impl(async function () {
     }
     catch (error) {
       log.error("unbindShipTo error" + error);
+      return error;
+    }
+  });
+  /**
+  * Function to unbind Product Ship-to
+  */
+  this.on("unbindProdShipTo", async (req) => {
+    try {
+      let m = req.data.terminal;
+      let sUrl = "/ProductDetailSet('" + m + "')";
+      let response = await updateonPremCall(req, sUrl);
+      let resultData = { data: response };
+      log.info("unbindProdShipTo success");
+      return resultData;
+    }
+    catch (error) {
+      log.error("unbindProdShipTo error" + error);
       return error;
     }
   });
