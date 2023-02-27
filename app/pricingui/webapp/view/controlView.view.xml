@@ -76,7 +76,7 @@
                         </uxap:blocks>
                         <uxap:actions>
                             <Button id="idButtonCCdataInc" text="To" type="Emphasized" press="onEmailCCSelectDialogPressD" />
-                            <Button id="idButtonCheck" tooltip="Instant Check" icon="sap-icon://validate" type="Emphasized" press="" />
+                            <Button id="idButtonCheck" tooltip="Instant Check" icon="sap-icon://validate" type="Emphasized" press="onInstantCheck" />
                             <!-- text="{i18n>checkInconsis}" -->
                         </uxap:actions>
                     </uxap:ObjectPageSubSection>
@@ -86,10 +86,11 @@
                 <uxap:subSections>
                     <uxap:ObjectPageSubSection title="{i18n>suspend}" titleUppercase="true">
                         <uxap:blocks>
-                            <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
+                            <forms:SimpleForm columnsXL="3" columnsL="3" columnsM="1" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>suspendFrom}" required="true" />
-                                <DateTimePicker id="idDatePickerSuspend" timezone="America/Mexico_City" displayFormat="MMM dd YYYY hh:mm a" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
+                                <DateTimePicker id="idDatePickerSuspend"  timezone="America/Mexico_City" displayFormat="MMM dd YYYY hh:mm a" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
                                 <Label text="{i18n>suspendTo}" required="true" />
+                                
                                 <DateTimePicker
                                     id="idDatePicker2Suspend"
                                     timezone="America/Mexico_City"
@@ -98,13 +99,18 @@
                                     afterValueHelpClose="onhandleChangeDP2Suspend"
                                     class="sapUiSmallMarginBottom"
                                     change="onhandleDateCheck"
-                                    valueStateText="{i18n>plcErrorDate}"
+                                    valueStateText="{i18n>plcErrorDate}" 
                                 />
-                                <!-- <Switch id="idSwitchInputSuspend" change="onSwtichChangeSuspend"/> -->
+                            
+                              <Label ></Label>
+                                <Switch id="idSwitchInputSuspend" change="onSwtichChangeSuspend" enabled="false"/>
+                               
+                               
+                    
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions>
-                            <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="" enabled="false" />
+                            <!-- <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="" enabled="false" /> -->
                             <!-- onPressSuspendEdit -->
                             <!-- <Button id="idButtonSuspendSave" text="{i18n>save}" type="Emphasized" visible="false" press="" enabled="false" /> -->
                             <!-- //onPressSuspendSave -->
@@ -279,6 +285,11 @@
                                         <Column demandPopin="true" hAlign="Begin">
                                             <header>
                                                 <Text text="{i18n>productName}" />
+                                            </header>
+                                        </Column> 
+                                        <Column demandPopin="true" hAlign="Begin">
+                                            <header>
+                                                <Text text="{i18n>shipTo}" />
                                             </header>
                                         </Column>
                                          <Column demandPopin="true" hAlign="Center">

@@ -33,7 +33,7 @@ async function getOnPremCall(req,sUrl) {
     }
     catch (error) {
         log.error("getOnPremCall error" +error);
-        error.message = error.response.data.error.message.value;     
+        // error.message = error.response.data.error.message.value;     
         return error;
     }
 }

@@ -74,27 +74,27 @@ sap.ui.define([
                                 minutes = oDataArr2.DISPLAY.substring(index + constants.INTONE);
                             date.setHours(hours);
                             date.setMinutes(minutes);
-                            // Get dates for January and July
-                            var dateJan = new Date(date.getFullYear(), constants.INTZERO, constants.INTONE);
-                            var dateJul = new Date(date.getFullYear(), constants.INTSIX, constants.INTONE);
-                            // Get timezone offset
-                            var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                            // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
-                            if (date.getTimezoneOffset() < timezoneOffset) {
-                                // Adjust date by 5 hours
-                                date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                            }
-                            else {
+                            // // Get dates for January and July
+                            // var dateJan = new Date(date.getFullYear(), constants.INTZERO, constants.INTONE);
+                            // var dateJul = new Date(date.getFullYear(), constants.INTSIX, constants.INTONE);
+                            // // Get timezone offset
+                            // var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                            // // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
+                            // if (date.getTimezoneOffset() < timezoneOffset) {
+                            //     // Adjust date by 5 hours
+                            //     date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                            // }
+                            // else {
                                 // Adjust date by 6 hours
                                 date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                            }
+                            // }
                             // var timzone = new Date().toLocaleDateString(undefined, { day: '2-digit', timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
                             var sTime = date.toLocaleString('en-US', {
                                 hour: 'numeric',
                                 minute: 'numeric',
                                 hour12: true
                             });
-                            debugger;
+
                             that.getView().byId("idTimePickerInput").setDateValue(date);
                             that.getView().byId("idTextDailyST").setText(sTime);
                             // that.getView().byId("idTimePickerInput").setValue(sTime);
@@ -112,27 +112,28 @@ sap.ui.define([
                         }
                         if (oDataArr2.ONDEMAND !== undefined) {
                             var date = new Date(oDataArr2.ONDEMAND);
-                            // // Get dates for January and July
-                            var dateJan = new Date(date.getFullYear(), constants.INTZERO, constants.INTONE);
-                            var dateJul = new Date(date.getFullYear(), constants.INTSIX, constants.INTONE);
-                            // Get timezone offset
-                            var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                            // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
-                            if (date.getTimezoneOffset() < timezoneOffset) {
-                                // Adjust date by 5 hours
-                                date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                            }
-                            else {
+                            // // // Get dates for January and July
+                            // var dateJan = new Date(date.getFullYear(), constants.INTZERO, constants.INTONE);
+                            // var dateJul = new Date(date.getFullYear(), constants.INTSIX, constants.INTONE);
+                            // // Get timezone offset
+                            // var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                            // // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
+                            // if (date.getTimezoneOffset() < timezoneOffset) {
+                            //     // Adjust date by 5 hours
+                            //     date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                            // }
+                            // else {
                                 // Adjust date by 6 hours
                                 date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                            }
+                            // }
                             var sTime = date.toLocaleString('en-US', {
                                 hour: 'numeric',
                                 minute: 'numeric',
                                 hour12: true
                             });
-                            var dDate = date.toDateString(),
-                                finalDate = dDate.slice(4) + constants.SPACE + sTime;
+                            // replace first nonspace combination along with whitespace
+                            var dDate = date.toDateString().replace(/^\S+\s/,''),
+                                finalDate = dDate + constants.SPACE + sTime;
                             that.getView().byId("idTextOnDemandST").setText(finalDate);
                             that.getView().byId("idDatePickerOnDemand").setValue(finalDate);
                             that.getView().getModel("oModel").setProperty("/dateValue", finalDate);
@@ -144,51 +145,51 @@ sap.ui.define([
                         if (oDataArr2.sActive !== "Completed" && oDataArr2.SUSPENDTo !== undefined && oDataArr2.SUSPENDFrom !== undefined) {
                             var dateTo = new Date(oDataArr2.SUSPENDTo);
                             var dateFrom = new Date(oDataArr2.SUSPENDFrom);
-                            // Get dates for January and July
-                            var dateJanF = new Date(dateFrom.getFullYear(), constants.INTZERO, constants.INTONE);
-                            var dateJulF = new Date(dateFrom.getFullYear(), constants.INTSIX, constants.INTONE);
-                            // Get timezone offset
-                            var timezoneOffsetF = Math.max(dateJanF.getTimezoneOffset(), dateJulF.getTimezoneOffset());
-                            // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
-                            if (dateFrom.getTimezoneOffset() < timezoneOffsetF) {
-                                // Adjust date by 5 hours
-                                dateFrom = new Date(dateFrom.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                            }
-                            else {
+                            // // Get dates for January and July
+                            // var dateJanF = new Date(dateFrom.getFullYear(), constants.INTZERO, constants.INTONE);
+                            // var dateJulF = new Date(dateFrom.getFullYear(), constants.INTSIX, constants.INTONE);
+                            // // Get timezone offset
+                            // var timezoneOffsetF = Math.max(dateJanF.getTimezoneOffset(), dateJulF.getTimezoneOffset());
+                            // // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
+                            // if (dateFrom.getTimezoneOffset() < timezoneOffsetF) {
+                            //     // Adjust date by 5 hours
+                            //     dateFrom = new Date(dateFrom.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                            // }
+                            // else {
                                 // Adjust date by 6 hours
                                 dateFrom = new Date(dateFrom.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                            }
+                            // }
 
                             var sTime = dateFrom.toLocaleString('en-US', {
                                 hour: 'numeric',
                                 minute: 'numeric',
                                 hour12: true
                             });
-                            var dDate = dateFrom.toDateString(),
-                                finalText = dDate.slice(4) + constants.SPACE + sTime;
+                            var dDate = dateFrom.toDateString().replace(/^\S+\s/,''),
+                                finalText = dDate + constants.SPACE + sTime;
                             /*************************** Suspend To Date ***************************/
-                            // Get dates for January and July
-                            var dateJanT = new Date(dateTo.getFullYear(), constants.INTZERO, constants.INTONE);
-                            var dateJulT = new Date(dateTo.getFullYear(), constants.INTSIX, constants.INTONE);
-                            // Get timezone offset
-                            var timezoneOffsetT = Math.max(dateJanT.getTimezoneOffset(), dateJulT.getTimezoneOffset());
-                            // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
-                            if (dateTo.getTimezoneOffset() < timezoneOffsetT) {
-                                // Adjust date by 5 hours
-                                dateTo = new Date(dateTo.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                            }
-                            else {
+                            // // Get dates for January and July
+                            // var dateJanT = new Date(dateTo.getFullYear(), constants.INTZERO, constants.INTONE);
+                            // var dateJulT = new Date(dateTo.getFullYear(), constants.INTSIX, constants.INTONE);
+                            // // Get timezone offset
+                            // var timezoneOffsetT = Math.max(dateJanT.getTimezoneOffset(), dateJulT.getTimezoneOffset());
+                            // // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
+                            // if (dateTo.getTimezoneOffset() < timezoneOffsetT) {
+                            //     // Adjust date by 5 hours
+                            //     dateTo = new Date(dateTo.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                            // }
+                            // else {
                                 // Adjust date by 6 hours
                                 dateTo = new Date(dateTo.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                            }
+                            // }
                             // var timzone = new Date().toLocaleDateString(undefined, { day: '2-digit', timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
                             var sTimeT = dateTo.toLocaleString('en-US', {
                                 hour: 'numeric',
                                 minute: 'numeric',
                                 hour12: true
                             });
-                            var dDateT = dateTo.toDateString(),
-                                finalTextTo = dDateT.slice(4) + constants.SPACE + sTimeT;
+                            var dDateT = dateTo.toDateString().replace(/^\S+\s/,''),
+                                finalTextTo = dDateT + constants.SPACE + sTimeT;
                             if (oDataArr2.sActive === true) {
                                 that.getView().byId("idInfoLabel").setText("Suspended");
                                 that.getView().byId("idInfoLabel").setColorScheme(2);
@@ -201,7 +202,7 @@ sap.ui.define([
                             that.getView().byId("idDatePicker2Suspend").setValue(finalTextTo);
                             that.getView().byId("idDatePickerSuspend").setEnabled(false);
                             that.getView().byId("idDatePicker2Suspend").setEnabled(false);
-                            // that.getView().byId("idSwitchInputSuspend").setState(true);
+                            that.getView().byId("idSwitchInputSuspend").setState(true);
 
                         } else {
                             that.getView().byId("idObjStatusS2").setText(constants.SPACE);
@@ -210,36 +211,36 @@ sap.ui.define([
                             that.getView().getModel("oModel").setProperty("/dateValueT", constants.SPACE);
                             that.getView().byId("idDatePickerSuspend").setEnabled(true);
                             that.getView().byId("idDatePicker2Suspend").setEnabled(true);
-                            // that.getView().byId("idSwitchInputSuspend").setState(false);
+                            that.getView().byId("idSwitchInputSuspend").setState(false);
                         }
                         if (oDataArr2.CHECKDATA !== undefined) {
                             var date = new Date(),
-                                index = oDataArr2.DISPLAY.indexOf(constants.DIV),
-                                hours = oDataArr2.DISPLAY.substring(constants.INTZERO, index),
-                                minutes = oDataArr2.DISPLAY.substring(index + constants.INTONE);
+                                index = oDataArr2.CHECKDATA.indexOf(constants.DIV),
+                                hours = oDataArr2.CHECKDATA.substring(constants.INTZERO, index),
+                                minutes = oDataArr2.CHECKDATA.substring(index + constants.INTONE);
                             date.setHours(hours);
                             date.setMinutes(minutes);
                             // Get dates for January and July
-                            var dateJan = new Date(date.getFullYear(), constants.INTZERO, constants.INTONE);
-                            var dateJul = new Date(date.getFullYear(), constants.INTSIX, constants.INTONE);
-                            // Get timezone offset
-                            var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                            // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
-                            if (date.getTimezoneOffset() < timezoneOffset) {
-                                // Adjust date by 5 hours
-                                date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                            }
-                            else {
+                            // var dateJan = new Date(date.getFullYear(), constants.INTZERO, constants.INTONE);
+                            // var dateJul = new Date(date.getFullYear(), constants.INTSIX, constants.INTONE);
+                            // // Get timezone offset
+                            // var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                            // // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
+                            // if (date.getTimezoneOffset() < timezoneOffset) {
+                            //     // Adjust date by 5 hours
+                            //     date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                            // }
+                            // else {
                                 // Adjust date by 6 hours
                                 date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                            }
+                            // }
                             // var timzone = new Date().toLocaleDateString(undefined, { day: '2-digit', timeZoneName: 'long' }).substring(4).match(/\b(\w)/g).join('');
                             var sTime = date.toLocaleString('en-US', {
                                 hour: 'numeric',
                                 minute: 'numeric',
                                 hour12: true
                             });
-                            
+
                             that.getView().byId("idTimePickerInputDI").setDateValue(date);
                             that.getView().byId("idSwitchInputDataInc").setState(true);
                             that.getView().byId("idTimePickerInputDI").setEnabled(false);
@@ -278,7 +279,7 @@ sap.ui.define([
                 this.oDataModelT.callFunction("/getOnCCEmail", {
                     method: constants.httpGet,
                     success: function (oData) {
-                        var dataTmp = oData.getOnCCEmail.data, oEmailArray, oDateVal;
+                        var dataTmp = oData.getOnCCEmail.data, oEmailArray, oDateVal, oEmailToArray;
                         if (dataTmp != undefined) {
                             if (dataTmp.length != constants.INTZERO) {
                                 for (var u = constants.INTZERO; u < dataTmp.length; u++) {
@@ -286,30 +287,33 @@ sap.ui.define([
                                         case constants.emailCC:
                                             oEmailArray = dataTmp[u].Value.split(constants.spliter);
                                             break;
+                                        case constants.emailTo:
+                                            oEmailToArray = dataTmp[u].Value.split(constants.spliter);
+                                            break;
                                         case constants.pricingDate:
                                             oDateVal = dataTmp[u].Value;
-                                            debugger;
-                                            if(oDateVal){
-                                            var date = new Date(oDateVal);
-                                            // Get dates for January and July
-                                            var dateJan = new Date(date.getFullYear(), constants.INTZERO, constants.INTONE);
-                                            var dateJul = new Date(date.getFullYear(), constants.INTSIX, constants.INTONE);
-                                            // Get timezone offset
-                                            var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                                            // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
-                                            if (date.getTimezoneOffset() < timezoneOffset) {
-                                                // Adjust date by 5 hours
-                                                date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+
+                                            if (oDateVal) {
+                                                var date = new Date(oDateVal);
+                                                // Get dates for January and July
+                                                // var dateJan = new Date(date.getFullYear(), constants.INTZERO, constants.INTONE);
+                                                // var dateJul = new Date(date.getFullYear(), constants.INTSIX, constants.INTONE);
+                                                // // Get timezone offset
+                                                // var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                                                // // var oTempDate = new Date(date.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * 6));
+                                                // if (date.getTimezoneOffset() < timezoneOffset) {
+                                                //     // Adjust date by 5 hours
+                                                //     date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                                                // }
+                                                // else {
+                                                    // Adjust date by 6 hours
+                                                    date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                                                // }
+                                                that.getView().byId('idDatePickerPricingDate').setDateValue(date);
                                             }
                                             else {
-                                                // Adjust date by 6 hours
-                                                date = new Date(date.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                                                that.getView().byId('idDatePickerPricingDate').setValue(constants.SPACE);
                                             }
-                                            that.getView().byId('idDatePickerPricingDate').setDateValue(date);
-                                        }
-                                        else {
-                                            that.getView().byId('idDatePickerPricingDate').setValue(constants.SPACE);
-                                        }
                                             break;
 
                                     }
@@ -317,6 +321,7 @@ sap.ui.define([
                             }
                         }
                         that.getView().getModel("oModel").setProperty("/emailsCC", oEmailArray);
+                        that.getView().getModel("oModel").setProperty("/emailsCCInc", oEmailToArray);
                         BusyIndicator.hide();
                     },
                     error: function (err) {
@@ -697,19 +702,19 @@ sap.ui.define([
                             dateValue = new Date();
                         dateValue.setHours(dateH);
                         dateValue.setMinutes(dateM);
-                        // Get dates for January and July
-                        var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
-                        var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
-                        // Get timezone offset
-                        var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                        if (dateValue.getTimezoneOffset() < timezoneOffset) {
-                            // Adjust date by 5 hours
-                            dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                        }
-                        else {
+                        // // Get dates for January and July
+                        // var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
+                        // var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
+                        // // Get timezone offset
+                        // var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                        // if (dateValue.getTimezoneOffset() < timezoneOffset) {
+                        //     // Adjust date by 5 hours
+                        //     dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                        // }
+                        // else {
                             // Adjust date by 6 hours
                             dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                        }
+                        // }
                         var oMin = (dateValue.getMinutes() < constants.INTTEN ? constants.ZERO : '') + dateValue.getMinutes();
                         var oTime = dateValue.getHours() + constants.DIV + oMin;
                         this.getView().byId("idTimePickerInput").setEnabled(false);
@@ -1744,7 +1749,7 @@ sap.ui.define([
 
             },
             onCCEmailSaveD: function () {
-                BusyIndicator.show();
+
                 var oCCEmail = this.getView().byId("multiInputemailD").getTokens(), oCCEmailString = "", that = this;
                 if (oCCEmail.length !== constants.INTZERO) {
                     for (var j = constants.INTZERO; j < oCCEmail.length; j++) {
@@ -1755,9 +1760,13 @@ sap.ui.define([
                             oCCEmailString = oCCEmailString + constants.spliter + objEmail;
                         }
                     }
+                } else {
+                    MessageBox.error(this.oBundle.getText("errorDate"));
+                    return;
                 }
+                BusyIndicator.show();
                 var jsonCC = {
-                    "Key": constants.emailCC,
+                    "Key": constants.emailTo,
                     "Value": oCCEmailString
                 }
                 var oPayloadCC = JSON.stringify(jsonCC);
@@ -1767,7 +1776,6 @@ sap.ui.define([
                         createData: oPayloadCC
                     },
                     success: function (oData) {
-
                         BusyIndicator.hide();
                         MessageBox.success(that.oBundle.getText("savedSucc"), {
                             onClose: function (sAction) {
@@ -1789,18 +1797,18 @@ sap.ui.define([
             },
             onCreatePricingDate: function (oPricingDateString) {
                 // Get dates for January and July
-                var dateJan = new Date(oPricingDateString.getFullYear(), constants.INTZERO, constants.INTONE);
-                var dateJul = new Date(oPricingDateString.getFullYear(), constants.INTSIX, constants.INTONE);
-                // Get timezone offset
-                var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                if (oPricingDateString.getTimezoneOffset() < timezoneOffset) {
-                    // Adjust date by 5 hours
-                    oPricingDateString = new Date(oPricingDateString.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                }
-                else {
+                // var dateJan = new Date(oPricingDateString.getFullYear(), constants.INTZERO, constants.INTONE);
+                // var dateJul = new Date(oPricingDateString.getFullYear(), constants.INTSIX, constants.INTONE);
+                // // Get timezone offset
+                // var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                // if (oPricingDateString.getTimezoneOffset() < timezoneOffset) {
+                //     // Adjust date by 5 hours
+                //     oPricingDateString = new Date(oPricingDateString.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                // }
+                // else {
                     // Adjust date by 6 hours
                     oPricingDateString = new Date(oPricingDateString.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                }
+                // }
                 var oPriDate = oPricingDateString.toISOString(),
                     jsonCC1 = {
                         "Key": constants.pricingDate,
@@ -1823,8 +1831,16 @@ sap.ui.define([
               * @public
               */
             onPressEditOnDemand: function () {
-                BusyIndicator.show();
-                this.getJSStatusOnDemand();
+                var that = this;
+                that.getView().byId("idMultiInputCustomer").setEnabled(true);
+                that.getView().byId("idDatePickerOnDemand").setEnabled(true);
+                that.getView().byId("idDatePickerPricingDate").setEnabled(true);
+                // that.getView().byId("idMultiInputTerminal").setEnabled(true);
+                that.getView().byId("idButtonSave").setVisible(true);
+                that.getView().byId("idButtonCancel").setVisible(true);
+                that.getView().byId("idButtonEdit").setVisible(false);
+                // BusyIndicator.show();
+                // this.getJSStatusOnDemand();
             },
             getJSStatusOnDemand: function () {
                 var that = this;
@@ -1893,76 +1909,85 @@ sap.ui.define([
                     checkpri = this.getView().byId("idDatePickerPricingDate").getValueState(),
                     checkCus = this.getView().byId("idMultiInputCustomer").getValueState(),
                     checkDate = this.getView().byId("idDatePickerOnDemand").getValueState(),
-                    xLen = oDate.length - 21,
-                    result = oDate.slice(constants.INTZERO, xLen),
-                    dateValue = new Date(result);
-                // Get dates for January and July
-                var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
-                var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
-                // Get timezone offset
-                var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                if (dateValue.getTimezoneOffset() < timezoneOffset) {
-                    // Adjust date by 5 hours
-                    dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                }
-                else {
-                    // Adjust date by 6 hours
-                    dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                }
-                var xTime = dateValue.toLocaleString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                }),
-                    onDemand = dateValue.toDateString().slice(4) + constants.SPACE + xTime;
-                if (oStatus !== "Suspended") {
-                    if ((oDate !== "" && oDate !== constants.SPACE && oDate !== undefined) && oCust.length !== constants.INTZERO && (oPricingDateString !== "" && oPricingDateString !== constants.SPACE && oPricingDateString !== undefined && oPricingDateString !== null)) {
-                        if (checkCus !== constants.ERROR && checkDate !== constants.ERROR && checkpri !== constants.ERROR) {
-                            this.getView().byId("idMultiInputCustomer").setEnabled(false);
-                            this.getView().byId("idDatePickerPricingDate").setEnabled(false);
-                            this.getView().byId("idDatePickerOnDemand").setEnabled(false);
-                            // this.getView().byId("idMultiInputTerminal").setEnabled(false);
-                            this.getView().byId("idButtonSave").setVisible(false);
-                            this.getView().byId("idButtonCancel").setVisible(false);
-                            this.getView().byId("idButtonEdit").setVisible(true);
-                            this.getView().byId("idTextOnDemandST").setText(result);
-                            this.getView().getModel("oModel").setProperty("/dateValue", result);
-                            var oJsonData = this.getPayloadJson(oCust);
+                    // xLen = oDate.length - 21,
+                    // result = oDate.slice(constants.INTZERO, xLen),
+                    dateValue = new Date(oDate);
+                var now = new Date(),
+                    cDate = now.toLocaleString("en-US", {
+                        timeZone: "America/Mexico_City",
+                    });
+                cDate = new Date(cDate);
+                if (dateValue < cDate) {
+                    this.getView().byId("idDatePickerOnDemand").setValueState("Error");
+                    MessageBox.error(this.oBundle.getText("dateError"));
+                } else {
+                    // Get dates for January and July
+                    // var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
+                    // var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
+                    // // Get timezone offset
+                    // var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                    // if (dateValue.getTimezoneOffset() < timezoneOffset) {
+                    //     // Adjust date by 5 hours
+                    //     dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                    // }
+                    // else {
+                        // Adjust date by 6 hours
+                        dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                    // }
+                    var xTime = dateValue.toLocaleString('en-US', {
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: true
+                    }),
+                        onDemand = dateValue.toDateString() + constants.SPACE + xTime;
+                    if (oStatus !== "Suspended") {
+                        if ((oDate !== "" && oDate !== constants.SPACE && oDate !== undefined) && oCust.length !== constants.INTZERO && (oPricingDateString !== "" && oPricingDateString !== constants.SPACE && oPricingDateString !== undefined && oPricingDateString !== null)) {
+                            if (checkCus !== constants.ERROR && checkDate !== constants.ERROR && checkpri !== constants.ERROR) {
+                                this.getView().byId("idMultiInputCustomer").setEnabled(false);
+                                this.getView().byId("idDatePickerPricingDate").setEnabled(false);
+                                this.getView().byId("idDatePickerOnDemand").setEnabled(false);
+                                // this.getView().byId("idMultiInputTerminal").setEnabled(false);
+                                this.getView().byId("idButtonSave").setVisible(false);
+                                this.getView().byId("idButtonCancel").setVisible(false);
+                                this.getView().byId("idButtonEdit").setVisible(true);
+                                this.getView().byId("idTextOnDemandST").setText(oDate);
+                                this.getView().getModel("oModel").setProperty("/dateValue", oDate);
 
+                                var oJsonData = this.getPayloadJson(oCust);
+                                this.oDataModelT.callFunction("/createOnDemandSchedule", {
+                                    method: constants.httpGet,
+                                    urlParameters: {
+                                        time: onDemand,
+                                        desc: constants.onDemand
+                                    },
+                                    success: function (oData) {
+                                        BusyIndicator.hide();
+                                        if (oData.createOnDemandSchedule) {
+                                            that.updateOndemandData(oJsonData);
+                                            that.onCreatePricingDate(oPricingDateString);
+                                            MessageBox.success(that.oBundle.getText("succJSOD"));
+                                            that.getCustomerDetails();
+                                            that.getTerminalDetails();
+                                        }
 
-                            this.oDataModelT.callFunction("/createOnDemandSchedule", {
-                                method: constants.httpGet,
-                                urlParameters: {
-                                    time: onDemand,
-                                    desc: constants.onDemand
-                                },
-                                success: function (oData) {
-                                    BusyIndicator.hide();
-                                    if (oData.createOnDemandSchedule) {
-                                        that.updateOndemandData(oJsonData);
-                                        that.onCreatePricingDate(oPricingDateString);
-                                        MessageBox.success(that.oBundle.getText("succJSOD"));
-                                        that.getCustomerDetails();
-                                        that.getTerminalDetails();
+                                    },
+                                    error: function (err) {
+                                        BusyIndicator.hide();
+                                        MessageBox.error(that.oBundle.getText("techError"), {
+                                            details: err
+                                        });
+
                                     }
+                                });
 
-                                },
-                                error: function (err) {
-                                    BusyIndicator.hide();
-                                    MessageBox.error(that.oBundle.getText("techError"), {
-                                        details: err
-                                    });
+                            }
+                        } else {
 
-                                }
-                            });
-
+                            MessageBox.error(that.oBundle.getText("errormsgrequired"));
                         }
                     } else {
-
-                        MessageBox.error(that.oBundle.getText("errormsgrequired"));
+                        MessageBox.error(that.oBundle.getText("susCheck"));
                     }
-                } else {
-                    MessageBox.error(that.oBundle.getText("susCheck"));
                 }
             },
             /**
@@ -2050,28 +2075,28 @@ sap.ui.define([
                     checkVSF = this.getView().byId("idDatePickerSuspend").getValueState(),
                     checkVST = this.getView().byId("idDatePicker2Suspend").getValueState(),
                     oArr = [], that = this,
-                    len = oDateSuspendTo.length - 21,
-                    lenF = oDateSuspendFrom.length - 21,
-                    resultTo = oDateSuspendTo.substring(0, len),
-                    resultFrom = oDateSuspendFrom.substring(0, lenF),
-                    oSusFrom = new Date(resultFrom),
-                    oSusTo = new Date(resultTo),
+                    // len = oDateSuspendTo.length - 21,
+                    // lenF = oDateSuspendFrom.length - 21,
+                    // resultTo = oDateSuspendTo.substring(0, len),
+                    // resultFrom = oDateSuspendFrom.substring(0, lenF),
+                    oSusFrom = new Date(oDateSuspendFrom),
+                    oSusTo = new Date(oDateSuspendTo),
                     // Get dates for January and July
-                    dateJanF = new Date(oSusFrom.getFullYear(), constants.INTZERO, constants.INTONE),
-                    dateJulF = new Date(oSusFrom.getFullYear(), constants.INTSIX, constants.INTONE),
-                    dateJanT = new Date(oSusTo.getFullYear(), constants.INTZERO, constants.INTONE),
-                    dateJulT = new Date(oSusTo.getFullYear(), constants.INTSIX, constants.INTONE);
-                // Get timezone offset
-                var timezoneOffsetFrom = Math.max(dateJanF.getTimezoneOffset(), dateJulF.getTimezoneOffset());
-                var timezoneOffsetTo = Math.max(dateJanT.getTimezoneOffset(), dateJulT.getTimezoneOffset());
-                if (oSusFrom.getTimezoneOffset() < timezoneOffsetFrom) {
-                    // Adjust date by 5 hours
-                    oSusFrom = new Date(oSusFrom.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                }
-                else {
+                //     dateJanF = new Date(oSusFrom.getFullYear(), constants.INTZERO, constants.INTONE),
+                //     dateJulF = new Date(oSusFrom.getFullYear(), constants.INTSIX, constants.INTONE),
+                //     dateJanT = new Date(oSusTo.getFullYear(), constants.INTZERO, constants.INTONE),
+                //     dateJulT = new Date(oSusTo.getFullYear(), constants.INTSIX, constants.INTONE);
+                // // Get timezone offset
+                // var timezoneOffsetFrom = Math.max(dateJanF.getTimezoneOffset(), dateJulF.getTimezoneOffset());
+                // var timezoneOffsetTo = Math.max(dateJanT.getTimezoneOffset(), dateJulT.getTimezoneOffset());
+                // if (oSusFrom.getTimezoneOffset() < timezoneOffsetFrom) {
+                //     // Adjust date by 5 hours
+                //     oSusFrom = new Date(oSusFrom.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                // }
+                // else {
                     // Adjust date by 6 hours
                     oSusFrom = new Date(oSusFrom.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                }
+                // }
                 if (oSusTo.getTimezoneOffset() < timezoneOffsetTo) {
                     // Adjust date by 5 hours
                     oSusTo = new Date(oSusTo.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
@@ -2085,14 +2110,14 @@ sap.ui.define([
                     minute: 'numeric',
                     hour12: true
                 }),
-                    SuspendTo = oSusTo.toDateString().slice(4) + constants.SPACE + xSuspendTo,
+                    SuspendTo = oSusTo.toDateString() + constants.SPACE + xSuspendTo,
                     // SuspendTo = oSusTo.toDateString() + oSusTo.toString().substring(xSuspendTo, xSuspendTo + constants.INTNINE),
                     xSuspendFrom = oSusFrom.toLocaleString('en-US', {
                         hour: 'numeric',
                         minute: 'numeric',
                         hour12: true
                     }),
-                    SuspendFrom = oSusFrom.toDateString().slice(4) + constants.SPACE + xSuspendFrom;
+                    SuspendFrom = oSusFrom.toDateString() + constants.SPACE + xSuspendFrom;
 
 
                 if ((oDateSuspendTo !== "" && oDateSuspendTo !== constants.SPACE && oDateSuspendTo !== undefined) && (oDateSuspendFrom !== "" && oDateSuspendFrom !== constants.SPACE && oDateSuspendFrom !== undefined)) {
@@ -2103,10 +2128,10 @@ sap.ui.define([
                         // this.getView().byId("idButtonSuspendSave").setVisible(false);
                         // this.getView().byId("idButtonSuspendEdit").setVisible(true);
                         // this.getView().byId("idButtonSuspendCancel").setVisible(false);
-                        this.getView().byId("idObjStatusS1").setText(resultFrom);
-                        this.getView().byId("idObjStatusS2").setText(resultTo);
-                        this.getView().getModel("oModel").setProperty("/dateValueF", resultFrom);
-                        this.getView().getModel("oModel").setProperty("/dateValueT", resultTo);
+                        this.getView().byId("idObjStatusS1").setText(oDateSuspendFrom);
+                        this.getView().byId("idObjStatusS2").setText(oDateSuspendTo);
+                        this.getView().getModel("oModel").setProperty("/dateValueF", oDateSuspendFrom);
+                        this.getView().getModel("oModel").setProperty("/dateValueT", oDateSuspendTo);
                         oArr.push({
                             "time": SuspendFrom,
                             "Desc": "SUSPENDFROM"
@@ -2182,21 +2207,21 @@ sap.ui.define([
                         oSusFrom = new Date(resultFrom),
                         oSusTo = new Date(resultTo),
                         // Get dates for January and July
-                        dateJanF = new Date(oSusFrom.getFullYear(), constants.INTZERO, constants.INTONE),
-                        dateJulF = new Date(oSusFrom.getFullYear(), constants.INTSIX, constants.INTONE),
-                        dateJanT = new Date(oSusTo.getFullYear(), constants.INTZERO, constants.INTONE),
-                        dateJulT = new Date(oSusTo.getFullYear(), constants.INTSIX, constants.INTONE);
-                    // Get timezone offset
-                    var timezoneOffsetFrom = Math.max(dateJanF.getTimezoneOffset(), dateJulF.getTimezoneOffset());
-                    var timezoneOffsetTo = Math.max(dateJanT.getTimezoneOffset(), dateJulT.getTimezoneOffset());
-                    if (oSusFrom.getTimezoneOffset() < timezoneOffsetFrom) {
-                        // Adjust date by 5 hours
-                        oSusFrom = new Date(oSusFrom.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                    }
-                    else {
+                    //     dateJanF = new Date(oSusFrom.getFullYear(), constants.INTZERO, constants.INTONE),
+                    //     dateJulF = new Date(oSusFrom.getFullYear(), constants.INTSIX, constants.INTONE),
+                    //     dateJanT = new Date(oSusTo.getFullYear(), constants.INTZERO, constants.INTONE),
+                    //     dateJulT = new Date(oSusTo.getFullYear(), constants.INTSIX, constants.INTONE);
+                    // // Get timezone offset
+                    // var timezoneOffsetFrom = Math.max(dateJanF.getTimezoneOffset(), dateJulF.getTimezoneOffset());
+                    // var timezoneOffsetTo = Math.max(dateJanT.getTimezoneOffset(), dateJulT.getTimezoneOffset());
+                    // if (oSusFrom.getTimezoneOffset() < timezoneOffsetFrom) {
+                    //     // Adjust date by 5 hours
+                    //     oSusFrom = new Date(oSusFrom.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                    // }
+                    // else {
                         // Adjust date by 6 hours
                         oSusFrom = new Date(oSusFrom.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                    }
+                    // }
                     if (oSusTo.getTimezoneOffset() < timezoneOffsetTo) {
                         // Adjust date by 5 hours
                         oSusTo = new Date(oSusTo.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
@@ -2210,14 +2235,14 @@ sap.ui.define([
                         minute: 'numeric',
                         hour12: true
                     }),
-                        SuspendTo = oSusTo.toDateString().slice(4) + constants.SPACE + xSuspendTo,
+                        SuspendTo = oSusTo.toDateString() + constants.SPACE + xSuspendTo,
                         // SuspendTo = oSusTo.toDateString() + oSusTo.toString().substring(xSuspendTo, xSuspendTo + constants.INTNINE),
                         xSuspendFrom = oSusFrom.toLocaleString('en-US', {
                             hour: 'numeric',
                             minute: 'numeric',
                             hour12: true
                         }),
-                        SuspendFrom = oSusFrom.toDateString().slice(4) + constants.SPACE + xSuspendFrom;
+                        SuspendFrom = oSusFrom.toDateString() + constants.SPACE + xSuspendFrom;
 
 
                     if ((oDateSuspendTo !== "" && oDateSuspendTo !== constants.SPACE && oDateSuspendTo !== undefined) && (oDateSuspendFrom !== "" && oDateSuspendFrom !== constants.SPACE && oDateSuspendFrom !== undefined)) {
@@ -2232,6 +2257,7 @@ sap.ui.define([
                             this.getView().byId("idObjStatusS2").setText(resultTo);
                             this.getView().getModel("oModel").setProperty("/dateValueF", resultFrom);
                             this.getView().getModel("oModel").setProperty("/dateValueT", resultTo);
+
                             oArr.push({
                                 "time": SuspendFrom,
                                 "Desc": "SUSPENDFROM"
@@ -2302,10 +2328,10 @@ sap.ui.define([
             onhandleDateCheck: function (oEvent) {
                 var oDTP = oEvent.getSource(),
                     sValue = oEvent.getParameter("value"),
-                    bValid = oEvent.getParameter("valid"),
-                    xLen = sValue.length - 21,
-                    result = sValue.slice(constants.INTZERO, xLen);
-                var selectedDate = new Date(result);
+                    bValid = oEvent.getParameter("valid");
+                    // xLen = sValue.length - 21,
+                    // result = sValue.slice(constants.INTZERO, xLen);
+                var selectedDate = new Date(sValue);
                 var now = new Date(),
                     cDate = now.toLocaleString("en-US", {
                         timeZone: "America/Mexico_City",
@@ -2687,7 +2713,7 @@ sap.ui.define([
                 })
             },
             onPressUnbind: function (oEvt) {
-                debugger;
+
 
                 var oPath = oEvt.oSource.getParent().getBindingContextPath(), that = this,
                     oData = this.getView().getModel("oModel").getProperty(oPath);
@@ -2963,76 +2989,127 @@ sap.ui.define([
             onSwtichChangeDataInc: function (oEvent) {
                 BusyIndicator.show();
                 var oState = oEvent.getSource().getState(),
-                    oDateD = this.getView().byId("idTimePickerInputDI").getValue(), that = this;
-                if (oState === false) {
-                    this.getView().byId("idTimePickerInputDI").setEnabled(true);
-                    //Delete Schedule
-                    this.oDataModelT.callFunction("/deleteSchedule", {
-                        // this.oDataModelT.callFunction("/updateSchedule", { 
-                        method: constants.httpGet,
-                        urlParameters: {
-                            desc: constants.checkData
-                        },
-                        success: function (oData) {
-                            BusyIndicator.hide();
-                        },
-                        error: function (err) {
-                            BusyIndicator.hide();
-                            MessageBox.error(that.oBundle.getText("techError"), {
-                                details: err
+                    oDateD = this.getView().byId("idTimePickerInputDI").getValue(), that = this,
+                    mailData = this.getView().getModel("oModel").getProperty("/emailsCCInc");
+                if (mailData) {
+                    if (mailData[0] != '') {
+                        if (oState === false) {
+                            this.getView().byId("idTimePickerInputDI").setEnabled(true);
+                            //Delete Schedule
+                            this.oDataModelT.callFunction("/deleteSchedule", {
+                                // this.oDataModelT.callFunction("/updateSchedule", { 
+                                method: constants.httpGet,
+                                urlParameters: {
+                                    desc: constants.checkData
+                                },
+                                success: function (oData) {
+                                    BusyIndicator.hide();
+                                },
+                                error: function (err) {
+                                    BusyIndicator.hide();
+                                    MessageBox.error(that.oBundle.getText("techError"), {
+                                        details: err
+                                    });
+                                }
                             });
-                        }
-                    });
-                } else {
-                    if (oDateD !== "" && oDateD !== constants.SPACE && oDateD !== undefined) {
-                        BusyIndicator.show();
-                        var oDate = new Date(this.getView().byId("idTimePickerInputDI").getDateValue()),
-                            dateH = oDate.getHours(),
-                            dateM = (oDate.getMinutes() < constants.INTTEN ? constants.ZERO : '') + oDate.getMinutes(),
-                            dateValue = new Date();
-                        dateValue.setHours(dateH);
-                        dateValue.setMinutes(dateM);
-                        // Get dates for January and July
-                        var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
-                        var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
-                        // Get timezone offset
-                        var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
-                        if (dateValue.getTimezoneOffset() < timezoneOffset) {
-                            // Adjust date by 5 hours
-                            dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
-                        }
-                        else {
-                            // Adjust date by 6 hours
-                            dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
-                        }
-                        var oMin = (dateValue.getMinutes() < constants.INTTEN ? constants.ZERO : '') + dateValue.getMinutes();
-                        var oTime = dateValue.getHours() + constants.DIV + oMin;
-                        this.getView().byId("idTimePickerInputDI").setEnabled(false);
-                        //Create Daily Schedule
-                        this.oDataModelT.callFunction("/createSchedule", {
-                            method: constants.httpGet,
-                            urlParameters: {
-                                time: oTime,
-                                desc: constants.checkData
-                            },
-                            success: function (oData) {
-                                BusyIndicator.hide();
-                                MessageBox.success(that.oBundle.getText("succJSInconsis"));
-                            },
-                            error: function (err) {
-                                BusyIndicator.hide();
-                                MessageBox.error(that.oBundle.getText("techError"), {
-                                    details: err
-                                });
+                        } else {
+                            if (oDateD !== "" && oDateD !== constants.SPACE && oDateD !== undefined) {
+                                BusyIndicator.show();
+                                var oDate = new Date(this.getView().byId("idTimePickerInputDI").getDateValue()),
+                                    dateH = oDate.getHours(),
+                                    dateM = (oDate.getMinutes() < constants.INTTEN ? constants.ZERO : '') + oDate.getMinutes(),
+                                    dateValue = new Date();
+                                dateValue.setHours(dateH);
+                                dateValue.setMinutes(dateM);
+                                // // Get dates for January and July
+                                // var dateJan = new Date(dateValue.getFullYear(), constants.INTZERO, constants.INTONE);
+                                // var dateJul = new Date(dateValue.getFullYear(), constants.INTSIX, constants.INTONE);
+                                // // Get timezone offset
+                                // var timezoneOffset = Math.max(dateJan.getTimezoneOffset(), dateJul.getTimezoneOffset());
+                                // if (dateValue.getTimezoneOffset() < timezoneOffset) {
+                                //     // Adjust date by 5 hours
+                                //     dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTFIVE));
+                                // }
+                                // else {
+                                    // Adjust date by 6 hours
+                                    dateValue = new Date(dateValue.getTime() + ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                                // }
+                                var oMin = (dateValue.getMinutes() < constants.INTTEN ? constants.ZERO : '') + dateValue.getMinutes();
+                                var oTime = dateValue.getHours() + constants.DIV + oMin;
+                                this.getView().byId("idTimePickerInputDI").setEnabled(false);
+                                //Create Daily Schedule
+                                this.oDataModelT.callFunction("/createSchedule", {
+                                    method: constants.httpGet,
+                                    urlParameters: {
+                                        time: oTime,
+                                        desc: constants.checkData
+                                    },
+                                    success: function (oData) {
+                                        BusyIndicator.hide();
+                                        MessageBox.success(that.oBundle.getText("succJSInconsis"));
+                                    },
+                                    error: function (err) {
+                                        BusyIndicator.hide();
+                                        MessageBox.error(that.oBundle.getText("techError"), {
+                                            details: err
+                                        });
 
+                                    }
+                                });
+                            } else {
+                                that.getView().byId("idSwitchInputDataInc").setState(false);
+                                BusyIndicator.hide();
+                                MessageBox.error(that.oBundle.getText("manTime"));
                             }
-                        });
+                        }
                     } else {
-                        that.getView().byId("idSwitchInputDataInc").setState(false);
                         BusyIndicator.hide();
-                        MessageBox.error(that.oBundle.getText("manTime"));
+                        that.getView().byId("idSwitchInputDataInc").setState(false);
+                        MessageBox.error(this.oBundle.getText("errorDate"));
                     }
                 }
             },
+            onInstantCheck: function () {
+
+                var that = this,
+                    mailData = this.getView().getModel("oModel").getProperty("/emailsCCInc");
+                if (mailData) {
+                    if (mailData[0] != '') {
+                        BusyIndicator.show();
+                        this.oDataModelT.callFunction("/dataInconCheck", {
+                            method: constants.httpGet,
+                            success: function (oData) {
+
+                                var res = oData.dataInconCheck;
+                                BusyIndicator.hide();
+                                if (res.data) {
+                                    if (res.data[0].DataCheck.results.length === 0) {
+                                        MessageBox.information("No Data Inconsistency Found");
+                                    } else {
+                                        MessageBox.warning("Master Data Inconsistency found.An email will be sent shortly");
+                                        that.oDataModelT.callFunction("/sendInconEmail", {
+                                            method: constants.httpGet,
+                                            success: function (oData) {
+
+                                            },
+                                            error: function (err) {
+                                            }
+                                        });
+                                    }
+                                }
+
+                            },
+                            error: function (err) {
+                                BusyIndicator.hide();
+                                MessageBox.error(err.message, {
+                                    details: err
+                                });
+                            }
+                        });
+                    } else {
+                        MessageBox.error(this.oBundle.getText("errorDate"));
+                    }
+                }
+            }
         });
     });
