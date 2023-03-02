@@ -248,7 +248,7 @@ sap.ui.define([
                         },
                         error: function (err) {
                             BusyIndicator.hide();
-                            var msg = err.message; //JSON.parse(err.responseText).error.message.value;
+                            var msg = err.message; 
                             MessageBox.error(msg, {
                                 details: err
                             });

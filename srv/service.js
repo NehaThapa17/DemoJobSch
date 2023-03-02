@@ -231,7 +231,7 @@ module.exports = cds.service.impl(async function () {
       };
       log.info("Daily Schedule Created" + scJob);
       console.log("Schedule Created" + JSON.stringify(scJob));
-      // return new Promise((resolve, reject) => {
+      
         scheduler.createJobSchedule(scJob, function (error, body) {
           if (error) {
             reject(error.message);
@@ -239,7 +239,7 @@ module.exports = cds.service.impl(async function () {
           // Job successfully created.
           resolve('Job successfully created')
         });
-      // })
+      
     }
   });
   this.on('sendInconEmail', async (req) => {
@@ -272,19 +272,6 @@ module.exports = cds.service.impl(async function () {
               "active": false
             }
           };
-          // var scJob = {
-          //   jobId: jobID._id,
-          //   schedule: {
-          //     "repeatAt": sTime,
-          //     "type": "recurring",
-          //     "description": sDesc,
-          //     "data": {
-          //       "headers": { "Content-Type": "application/json" },
-          //       "suspendStatus": "INACTIVE"
-          //     },
-          //     "active": true
-          //   }
-          // };
           log.info("Schedule Updated" + JSON.stringify(scJob));
           console.log("Schedule Updated" + JSON.stringify(scJob));
           
@@ -533,7 +520,7 @@ module.exports = cds.service.impl(async function () {
       log.info("Schedule Description" + oDesc);
       let suspendStatus;
       for (var q = 0; q < resultJob.length; q++) {
-        if (resultJob[q].description === constants.daily || resultJob[q].description === constants.onDemand) {
+        if (resultJob[q].description === oDesc) {
           let test = JSON.parse(resultJob[q].data);
           suspendStatus = test.suspendStatus;
         }
@@ -581,7 +568,7 @@ module.exports = cds.service.impl(async function () {
         if( oDesc === constants.onDemand && response === "Mail sent Successfully"){
           let oUrl = constants.URL_CLRPOST;
           let oStatus = await clearOnDemandFlag(oUrl);
-          console.log("NEHA3" + JSON.stringify(oStatus));
+          log.info("clearOnDemandFlag output" + JSON.stringify(oStatus));
         }
         
         return response;

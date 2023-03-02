@@ -18,13 +18,20 @@
                         <Text id="idTextDailyST" />
                     </l:HorizontalLayout>
                     <l:HorizontalLayout class="sapUiSmallMarginBeginEnd">
-                        <Label text="{i18n>onDemandStartTime}:" />
+                        <Label text="{i18n>onDemandLabel}:" />
                         <Text id="idTextOnDemandST" />
                     </l:HorizontalLayout>
                 </l:VerticalLayout>
                 <l:VerticalLayout class="sapUiSmallMarginBeginEnd">
                     <ObjectStatus id="idObjStatusS1" title="Suspend Start Time" state="Warning" />
                     <ObjectStatus id="idObjStatusS2" title="Suspend End Time" state="Warning" />
+                </l:VerticalLayout>
+                
+                <l:VerticalLayout class="sapUiSmallMarginEnd">
+                    <l:HorizontalLayout class="sapUiSmallMarginBeginEnd">
+                        <Label text="{i18n>IncLabel}:" />
+                        <Text id="idTextIncST" />
+                    </l:HorizontalLayout>
                 </l:VerticalLayout>
             </FlexBox>
         </uxap:headerContent>
@@ -35,7 +42,7 @@
                     <uxap:ObjectPageSubSection title="{i18n>dailyProcessing}" titleUppercase="true">
                         <uxap:blocks>
                             <forms:SimpleForm labelSpanXL="3" columnsXL="2" columnsL="1" columnsM="1" labelSpanL="2" labelSpanM="3" labelSpanS="12" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
-                                <Label text="{i18n>dailyProcessingStartTime}" />
+                                <Label text="{i18n>dailyProcessingStartTime}" required="true"/>
                                 <TimePicker id="idTimePickerInput" displayFormat="hh:mm a" valueFormat="hh:mm a" width="80%" />
                                 <Switch id="idSwitchInput" change="onSwtichChange" />
                             </forms:SimpleForm>
@@ -58,6 +65,7 @@
                         </uxap:blocks>
                         <uxap:actions>
                             <Button id="idButtonEdit" text="{i18n>edit}" type="Emphasized" press="onPressEditOnDemand" />
+                            <Button id="idButtonOff" text="{i18n>turnoff}" type="Emphasized" press="onPressOffOnDemand" />
                             <Button id="idButtonSave" text="{i18n>save}" type="Emphasized" visible="false" press="onPressSaveOnDemand" />
                             <Button id="idButtonCancel" text="{i18n>cancel}" type="Emphasized" visible="false" press="onPressCancelOnDemand" />
                         </uxap:actions>
@@ -68,7 +76,7 @@
                 <uxap:subSections>
                     <uxap:ObjectPageSubSection title="{i18n>dataInc}" titleUppercase="true">
                         <uxap:blocks>
-                            <forms:SimpleForm labelSpanXL="3" columnsXL="2" columnsL="1" columnsM="1" labelSpanL="2" labelSpanM="3" labelSpanS="12" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
+                            <forms:SimpleForm labelSpanXL="3" columnsXL="2" columnsL="1" columnsM="1" labelSpanL="1" labelSpanM="2" labelSpanS="12" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>dataIncInput}" required="true" />
                                 <TimePicker id="idTimePickerInputDI" displayFormat="hh:mm a" valueFormat="hh:mm a" width="80%" />
                                 <Switch id="idSwitchInputDataInc" change="onSwtichChangeDataInc" />
@@ -77,7 +85,6 @@
                         <uxap:actions>
                             <Button id="idButtonCCdataInc" text="To" type="Emphasized" press="onEmailCCSelectDialogPressD" />
                             <Button id="idButtonCheck" tooltip="Instant Check" icon="sap-icon://validate" type="Emphasized" press="onInstantCheck" />
-                            <!-- text="{i18n>checkInconsis}" -->
                         </uxap:actions>
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
@@ -88,9 +95,9 @@
                         <uxap:blocks>
                             <forms:SimpleForm columnsXL="3" columnsL="3" columnsM="1" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>suspendFrom}" required="true" />
-                                <DateTimePicker id="idDatePickerSuspend"  timezone="America/Mexico_City" displayFormat="MMM dd YYYY hh:mm a" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheck" />
+                                <DateTimePicker id="idDatePickerSuspend" timezone="America/Mexico_City" displayFormat="MMM dd YYYY hh:mm a" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheckSusFrom" />
                                 <Label text="{i18n>suspendTo}" required="true" />
-                                
+
                                 <DateTimePicker
                                     id="idDatePicker2Suspend"
                                     timezone="America/Mexico_City"
@@ -98,24 +105,15 @@
                                     placeholder="Enter Date and Time"
                                     afterValueHelpClose="onhandleChangeDP2Suspend"
                                     class="sapUiSmallMarginBottom"
-                                    change="onhandleDateCheck"
-                                    valueStateText="{i18n>plcErrorDate}" 
+                                    change="onhandleDateCheckSusTo"
+                                    valueStateText="{i18n>plcErrorDate}"
                                 />
-                            
-                              <Label ></Label>
-                                <Switch id="idSwitchInputSuspend" change="onSwtichChangeSuspend" enabled="false"/>
-                               
-                               
-                    
+
+                                <Label />
+                                <Switch id="idSwitchInputSuspend" change="onSwtichChangeSuspend" />
                             </forms:SimpleForm>
                         </uxap:blocks>
-                        <uxap:actions>
-                            <!-- <Button id="idButtonSuspendEdit" text="{i18n>edit}" type="Emphasized" press="" enabled="false" /> -->
-                            <!-- onPressSuspendEdit -->
-                            <!-- <Button id="idButtonSuspendSave" text="{i18n>save}" type="Emphasized" visible="false" press="" enabled="false" /> -->
-                            <!-- //onPressSuspendSave -->
-                            <!-- <Button id="idButtonSuspendCancel" text="{i18n>cancel}" type="Emphasized" press="onPressSuspendClear" visible="false" enabled="false" /> -->
-                        </uxap:actions>
+                        <uxap:actions />
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
             </uxap:ObjectPageSection>
@@ -151,11 +149,6 @@
                                         </OverflowToolbar>
                                     </headerToolbar>
                                     <columns>
-                                        <!-- <Column mergeDuplicates="true" width="16rem">
-                                            <header>
-                                                <Text text="{i18n>customer}" />
-                                            </header>
-                                        </Column> -->
                                         <Column demandPopin="true" hAlign="Begin" width="15rem">
                                             <header>
                                                 <Text text="{i18n>shipTo}" />
@@ -188,12 +181,11 @@
                                         </Column>
                                     </columns>
                                     <ColumnListItem>
-                                        <!-- <ObjectIdentifier title="{oModel>Customer}" text="{oModel>CustomerName}" /> -->
                                         <ObjectIdentifier title="{oModel>ShipTo}" text="{oModel>ShipToName}" />
                                         <VBox>
                                             <HBox>
                                                 <Link text="{oModel>TerminalFirst}" press="handleTerPopoverPress" ariaHasPopup="Dialog" />
-                                                <!-- <tnt:InfoLabel text="{oModel>CountTerminal}" colorScheme="1" renderMode="Narrow" /> -->
+
                                                 <tnt:InfoLabel text="{oModel>CountTerminal}" visible="{path:'oModel>CountTerminal', formatter: '.formatter.getStatus'}" colorScheme="1" renderMode="Narrow" />
                                             </HBox>
                                             <Text text="{oModel>TerNameFirst}" />
@@ -205,7 +197,7 @@
                                             </HBox>
                                             <Text text="{oModel>ProdNameFirst}" />
                                         </VBox>
-                                        <!-- <Link visible="false" text="{path:'oModel>EmailTo', formatter: '.formatter.getFirstEmail'}" press="handleEmailPopoverPress" ariaHasPopup="Dialog" /> -->
+
                                         <HBox>
                                             <Link text="{path:'oModel>EmailTo', formatter: '.formatter.getFirstEmail'}" press="handleEmailPopoverPress" ariaHasPopup="Dialog" />
                                             <tnt:InfoLabel text="{oModel>CountEmail}" colorScheme="1" renderMode="Narrow" />
@@ -253,9 +245,6 @@
                                         <Text text="{oModel>Terminal}" />
                                         <Text text="{oModel>TerminalName}" />
                                         <ObjectStatus text="{oModel>ShiptoCount}" />
-                                        <!-- <core:Icon src="sap-icon://broken-link" press="onPressUnbind"></core:Icon> -->
-                                        <!-- <ObjectStatus icon="{path:'oModel>DailyJob', formatter: '.formatter.getIconOrder'}" />
-                                        <ObjectStatus icon="{path:'oModel>OnDemandJob', formatter: '.formatter.getIconOrder'}" /> -->
                                     </ColumnListItem>
                                 </Table>
                             </VBox>
@@ -286,8 +275,8 @@
                                             <header>
                                                 <Text text="{i18n>productName}" />
                                             </header>
-                                        </Column> 
-                                         <Column demandPopin="true" hAlign="Center">
+                                        </Column>
+                                        <Column demandPopin="true" hAlign="Center">
                                             <header>
                                                 <Text text="{i18n>shipTo}" />
                                             </header>
@@ -296,7 +285,7 @@
                                     <ColumnListItem>
                                         <Text text="{oModel>Product}" />
                                         <Text text="{oModel>ProductName}" />
-                                         <ObjectStatus text="{oModel>ShiptoCount}" />
+                                        <ObjectStatus text="{oModel>ShiptoCount}" />
                                     </ColumnListItem>
                                 </Table>
                             </VBox>
