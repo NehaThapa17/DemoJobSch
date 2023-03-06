@@ -97,9 +97,9 @@
                                 <Label text="{i18n>suspendFrom}" required="true" />
                                 <DateTimePicker id="idDatePickerSuspend" timezone="America/Mexico_City" displayFormat="MMM dd YYYY hh:mm a" placeholder="Enter Date and Time" afterValueHelpClose="onhandleChangeDP1Suspend" class="sapUiSmallMarginBottom" change="onhandleDateCheckSusFrom" />
                                 <Label text="{i18n>suspendTo}" required="true" />
-
+<!--  sap-timezone="America/Mexico_City"-->
                                 <DateTimePicker
-                                    id="idDatePicker2Suspend"
+                                    id="idDatePicker2Suspend" 
                                     timezone="America/Mexico_City"
                                     displayFormat="MMM dd YYYY hh:mm a"
                                     placeholder="Enter Date and Time"

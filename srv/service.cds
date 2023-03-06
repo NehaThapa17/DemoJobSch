@@ -21,19 +21,22 @@ service CatalogService @(requires : 'authenticated-user')
     function getOnCCEmail() returns response; 
     function dataInconCheck() returns response; 
     function sendInconEmail() returns response;
+    function getTerminal(terminal:String) returns response;
+    function getProduct(product:String) returns response;
+    function getCustomer(customer:String,shipTo:String) returns response;
     action updateOnDemand(createData: String) returns response;
     action createCCEmail(createData: String) returns response;
     action createProduct(createData: String) returns response;
     action createTerminal(createData: String) returns response; 
     action createCustomer(createData: String) returns response; 
-    action updateTerminal(createData: String,terminal:String) returns response;  
-    action updateProduct(createData: String,product:String) returns response;
-    action updateCustomer(createData: String) returns response; 
-    action deleteCustomer(customer:String,shipTo:String) returns response; 
-    action deleteTerminal(terminal:String) returns response;
-    action deleteProduct(product:String) returns response;
-    action unbindShipTo(createData:String,terminal:String) returns response;
-     action unbindProdShipTo(createData:String,terminal:String) returns response;
+    action updateTerminal(etag:String,createData: String,terminal:String) returns response;  
+    action updateProduct(etag:String,createData: String,product:String) returns response;
+    action updateCustomer(etag:String,createData: String) returns response; 
+    action deleteCustomer(etag:String,customer:String,shipTo:String) returns response; 
+    action deleteTerminal(etag:String,terminal:String) returns response;
+    action deleteProduct(etag:String,product:String) returns response;
+    action unbindShipTo(etag:String,createData:String,terminal:String) returns response;
+     action unbindProdShipTo(etag:String,createData:String,product:String) returns response;
     
   
 }

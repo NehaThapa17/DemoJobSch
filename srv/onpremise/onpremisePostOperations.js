@@ -82,6 +82,50 @@ let createonPremCall = async (req,sUrl) => {
     }
 }
 /**
+* Function call to edit Customer Table Details
+* Function invoked in all create/POST function calls
+* @param {Object} req
+* @param {String} sUrl
+*/
+let editcustonPremCall = async (req,sUrl) => {
+    
+    try {
+        const authorization = req.headers.authorization;
+        let url = constants.PPSERVICEURL;
+        // let sUrl = constants.DEFAULTURL;
+        const sap_client = await getClientFromDestination(xsuaaService, destService, destination);
+        let payload = JSON.parse(req.data.createData);
+        let n = req.data.etag;
+        let { xcsrfToken, cookie1 } = await getToken(req, authorization, sap_client,url);//get xcsrf token
+        let result = await sapcfaxios({
+            method: constants.httpPost,
+            url: constants.DEFAULTURL + sUrl,
+            headers: {
+                "CUSTOMETAG":n,
+                "content-type": "application/json",
+                'x-csrf-token': xcsrfToken,
+                'sap-client': sap_client,
+                'Authorization': authorization,
+                'Cookie': cookie1
+            },
+            data: payload
+        });       
+        return result.data.d;
+    }
+    catch (error) {
+        log.error("editcustonPremCall error" +error);
+        if (error.response.data.error.innererror.errordetails !== undefined){
+            error.message = error.response.data.error.innererror.errordetails[0].message;
+        }
+        else {
+            error.message = error.response.data.error.message.value;
+        }
+        return error;
+        // req.error({ message: error.response.data.error.innererror.errordetails[0].message });
+       
+    }
+}
+/**
 * Function call to update Details
 * Function invoked in update function calls
 * @param {Object} req
@@ -93,11 +137,13 @@ let updateonPremCall = async (req,sUrl) => {
         let url = constants.PPSERVICEURL;
         const sap_client = await getClientFromDestination(xsuaaService, destService, destination);
         let payload = JSON.parse(req.data.createData);
+        let n = req.data.etag;
         let { xcsrfToken, cookie1 } = await getToken(req, authorization, sap_client,url);//get xcsrf token
         let result = await sapcfaxios({
             method: constants.httpPut,
             url: constants.DEFAULTURL + sUrl,
             headers: {
+                "if-match":  n,
                 "content-type": "application/json",
                 'x-csrf-token': xcsrfToken,
                 'sap-client': sap_client,
@@ -132,12 +178,13 @@ let deleteonPremCall = async (req,sUrl) => {
         const authorization = req.headers.authorization;
         let url = constants.PPSERVICEURL;
         const sap_client = await getClientFromDestination(xsuaaService, destService, destination);
-        // let payload = JSON.parse(req.data.createData);
+        let n = req.data.etag;
         let { xcsrfToken, cookie1 } = await getToken(req, authorization, sap_client,url);//get xcsrf token
         let result = await sapcfaxios({
             method: constants.httpDelete,
             url: constants.DEFAULTURL + sUrl,
             headers: {
+                "if-match":  n,
                 "content-type": "application/json",
                 'x-csrf-token': xcsrfToken,
                 'sap-client': sap_client,
@@ -215,4 +262,4 @@ let clearOnDemandFlag = async (oUrl) => {
         return error;
     }
 }
-module.exports = {updateonPremCall,createonPremCall,deleteonPremCall,clearOnDemandFlag};
+module.exports = {updateonPremCall,createonPremCall,deleteonPremCall,clearOnDemandFlag,editcustonPremCall};

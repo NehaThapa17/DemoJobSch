@@ -26,7 +26,7 @@ sap.ui.define([
             /**
               * Method to initialize all models and global variables
               * @public
-              */    
+              */
             onInit: function () {
                 //fetch i18n model for text translation
                 this.oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
@@ -38,11 +38,39 @@ sap.ui.define([
             /**
       * Method for  Routing
       * @public
-      */             
+      */
             onRouteEditCustomer: function () {
-                var oModel = new JSONModel();
+                var oModel = new JSONModel(),that=this;
                 var fgModel = this.getOwnerComponent().getModel("oModel");
-                var aArray = fgModel.oData.selectedRow; 
+                var aArray = fgModel.oData.selectedRow;
+                
+                this.oDataModelE.callFunction("/getCustomer", {
+                    method: constants.httpGet,
+                    urlParameters: {
+                        customer: aArray[constants.INTZERO].Customer,
+                        shipTo: aArray[constants.INTZERO].ShipTo
+                    },
+                    success: function (oData) {
+                        BusyIndicator.hide();
+                        var oDataCust = oData.getCustomer.data;
+                        if (oDataCust) {
+                            
+                            var etag = oData.getCustomer.data.UpdTimestamp,
+                             eFormat = etag.match(/\(([^)]+)\)/)[1],
+                             eDate = new Date(parseInt(eFormat)),
+                             atomFormat = eDate.toISOString(),
+                             aFormat = atomFormat.replace(/\.\d+Z$/, '');
+                             that.getView().getModel("detailModel").setProperty("/CustEtag", aFormat);
+                        }
+                    },
+                    error: function (err) {
+
+                        BusyIndicator.hide();
+                        MessageBox.error(that.oBundle.getText("techError"), {
+                            details: err
+                        });
+                    }
+                })
                 this.getView().byId("idInputCustomerID").setValue(aArray[constants.INTZERO].Customer);
                 this.getView().byId("idInputCustomerName").setValue(aArray[constants.INTZERO].CustomerName);
                 this.getView().byId("idInputShipToID").setValue(aArray[constants.INTZERO].ShipTo);
@@ -50,7 +78,7 @@ sap.ui.define([
                 this.getView().byId("idMultiComboBoxTerminal").removeAllTokens();
                 this.getView().byId("idMultiComboBoxProducts").removeAllTokens();
 
-                var tokenArray = [],tokenArrayT = [];
+                var tokenArray = [], tokenArrayT = [];
                 if (aArray[constants.INTZERO].ProductList.length != constants.INTZERO) {
                     for (var i = constants.INTZERO; i < aArray[constants.INTZERO].ProductList.length; i++) {
                         var otokenProduct = new sap.m.Token({ key: aArray[constants.INTZERO].ProductList[i].Product, text: aArray[constants.INTZERO].ProductList[i].ProductName });
@@ -74,11 +102,12 @@ sap.ui.define([
                 this.getView().getModel("detailModel").setProperty("/ProductData", fgModel.oData.ProductData);
                 this.getView().getModel("detailModel").setProperty("/TerminalData", fgModel.oData.TerminalData);
                 
+
             },
             /**
       * Method to handle Save of create Customer 
       * @public 
-      */                
+      */
             onPressSaveEditCust: function () {
                 var oCustID = this.getView().byId("idInputCustomerID").getValue(),
                     oCustName = this.getView().byId("idInputCustomerName").getValue(),
@@ -87,15 +116,15 @@ sap.ui.define([
                     oProd = this.getView().byId("idMultiComboBoxProducts").getTokens(),
                     oTermi = this.getView().byId("idMultiComboBoxTerminal").getTokens(),
                     oEmail = this.getView().byId("idInputEmail").getTokens(), that = this,
-                    oDaily = this.getView().byId("idCheckBoxDaily").getSelected(), oProdArray = [],oTermiArray=[],
+                    oDaily = this.getView().byId("idCheckBoxDaily").getSelected(), oProdArray = [], oTermiArray = [],
                     oDemand = this.getView().byId("idCheckBoxOnDemand").getSelected(), oEmailString = "";
-                    if ( oDaily === true || oDemand === true ){
-                        if (oProd.length === constants.INTZERO || oTermi.length === constants.INTZERO){ 
-                            BusyIndicator.hide();
-                            MessageBox.error(that.oBundle.getText("errormsgCheckBox"));
-                            return;
-                        } 
-                    } 
+                if (oDaily === true || oDemand === true) {
+                    if (oProd.length === constants.INTZERO || oTermi.length === constants.INTZERO) {
+                        BusyIndicator.hide();
+                        MessageBox.error(that.oBundle.getText("errormsgCheckBox"));
+                        return;
+                    }
+                }
                 if (oCustID !== "" && oCustName !== "" && oSh !== "" && oSHName !== "" && oEmail.length !== constants.INTZERO) {
                     BusyIndicator.show();
                     for (var i = constants.INTZERO; i < oProd.length; i++) {
@@ -133,23 +162,32 @@ sap.ui.define([
                         "OnDemandJob": oDemand,
                         "EmailTo": oEmailString,
                         "ProductList": oProdArray,
-                        "TerminalList":oTermiArray
+                        "TerminalList": oTermiArray
                     }
                     var that = this;
-                    var oPayloadCus = JSON.stringify(oJsonData)
-                    this.oDataModelE.callFunction("/updateCustomer", {
+                    var oPayloadCus = JSON.stringify(oJsonData),
+                        etag = this.getView().getModel("detailModel").getProperty("/CustEtag");
+
+                    that.oDataModelE.callFunction("/updateCustomer", {
                         method: constants.httpPost,
                         urlParameters: {
+                            etag: etag,
                             createData: oPayloadCus
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            if (oData.updateCustomer.data.status !== undefined && oData.updateCustomer.data.status !== 200 ) {
-                                MessageBox.error(oData.updateCustomer.data.message);
+                            if (oData.updateCustomer.data.status !== undefined && oData.updateCustomer.data.status !== 200) {
+                                if (oData.updateCustomer.data.status === 412) {
+                                    var msg = that.oBundle.getText("msgError");
+                                    MessageBox.error(msg);
+                                } else {
+                                    var msg = oData.updateCustomer.data.message;
+                                    MessageBox.error(msg);
+                                }
+                                
                             }
-                            else 
-                            // if (oData.updateCustomer !== undefined)
-                             {
+                            else {
+                                that.getView().getModel("detailModel").setProperty("/CustEtag", constants.SPACE)
                                 MessageBox.success(that.oBundle.getText("savedSucc"), {
                                     onClose: function (sAction) {
                                         if (sAction === MessageBox.Action.OK) {
@@ -159,17 +197,19 @@ sap.ui.define([
                                         }
                                     }
                                 });
-                            } 
+                            }
                         },
                         error: function (err) {
                             BusyIndicator.hide();
-                            var msg = err.message; //JSON.parse(err.responseText).error.message.value;
-                            MessageBox.error(msg,{
+                            var msg = err.message; 
+                            MessageBox.error(msg, {
                                 details: err
                             });
 
                         }
                     });
+
+
                 } else {
                     BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("errormsgrequired"));
@@ -178,7 +218,7 @@ sap.ui.define([
             /**
       * Method to navigate Back through navigation
       * @public
-      */               
+      */
             onBack: function () {
                 var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 oRouter.navTo("RoutecontrolView");
@@ -187,7 +227,7 @@ sap.ui.define([
       * Method to validation on Email MutiInput
       * @public
       * @param {sap.ui.base.Event} oEvt An Event object consisting of an ID, a source and a map of parameter
-      */              
+      */
             onEmailChangeEditCust: function (oEvt) {
                 var oMultiInput1 = this.getView().byId("idInputEmail");
                 var sVal = oEvt.getParameters().value;
@@ -208,10 +248,10 @@ sap.ui.define([
                 oMultiInput1.addValidator(fnValidator);
             },
 
-           /**
-      * Method to handle the fragment TerminalVH
-      * @public
-      */               
+            /**
+       * Method to handle the fragment TerminalVH
+       * @public
+       */
             onTerminalValueHelpRequested: function () {
                 this._oBasicSearchField = new SearchField();
                 this.oColModel = new JSONModel();
@@ -262,64 +302,64 @@ sap.ui.define([
 
                 this._oValueHelpDialogTr.setTokens(this.getView().byId("idMultiComboBoxTerminal").getTokens());
                 this._oValueHelpDialogTr.open();
-            }, 
-       /**
-  * Method to handle search on Terminal F4 
-  * @public
-  * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
-  */               
-        onFilterBarSearchTer: function (oEvent) {
-            var sSearchQuery = this._oBasicSearchField.getValue(),
-                aSelectionSet = oEvent.getParameter("selectionSet");
-            var aFilters = aSelectionSet.reduce(function (aResult, oControl) {
-                if (oControl.getValue()) {
-                    if (oControl.getName() === "Terminal ID") {
-                        aResult.push(new Filter({
-                            path: constants.pathTer,
-                            operator: FilterOperator.Contains,
-                            value1: oControl.getValue()
-                        }));
-                    } else if (oControl.getName() === constants.terName) {
-                        aResult.push(new Filter({
-                            path: constants.pathTName,
-                            operator: FilterOperator.Contains,
-                            value1: oControl.getValue()
-                        }));
+            },
+            /**
+       * Method to handle search on Terminal F4 
+       * @public
+       * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+       */
+            onFilterBarSearchTer: function (oEvent) {
+                var sSearchQuery = this._oBasicSearchField.getValue(),
+                    aSelectionSet = oEvent.getParameter("selectionSet");
+                var aFilters = aSelectionSet.reduce(function (aResult, oControl) {
+                    if (oControl.getValue()) {
+                        if (oControl.getName() === "Terminal ID") {
+                            aResult.push(new Filter({
+                                path: constants.pathTer,
+                                operator: FilterOperator.Contains,
+                                value1: oControl.getValue()
+                            }));
+                        } else if (oControl.getName() === constants.terName) {
+                            aResult.push(new Filter({
+                                path: constants.pathTName,
+                                operator: FilterOperator.Contains,
+                                value1: oControl.getValue()
+                            }));
+                        }
                     }
-                }
-                return aResult;
-            }, []);
-            aFilters.push(new Filter({
-                filters: [
-                    new Filter({ path: constants.pathTer, operator: FilterOperator.Contains, value1: sSearchQuery }),
-                    new Filter({ path: constants.pathTName, operator: FilterOperator.Contains, value1: sSearchQuery })
-                ],
-                and: false
-            }));
-            this._filterTableTr(new Filter({
-                filters: aFilters,
-                and: true
-            }));
-        },
-        _filterTableTr: function (oFilter) {
-            var oVHD = this._oValueHelpDialogTr;
-            oVHD.getTableAsync().then(function (oTable) {
-                if (oTable.bindRows) {
-                    oTable.getBinding("rows").filter(oFilter);
-                }
-                if (oTable.bindItems) {
-                    oTable.getBinding("items").filter(oFilter);
-                }
-                // This method must be called after binding update of the table.
-                oVHD.update();
-            });
-        },                 
+                    return aResult;
+                }, []);
+                aFilters.push(new Filter({
+                    filters: [
+                        new Filter({ path: constants.pathTer, operator: FilterOperator.Contains, value1: sSearchQuery }),
+                        new Filter({ path: constants.pathTName, operator: FilterOperator.Contains, value1: sSearchQuery })
+                    ],
+                    and: false
+                }));
+                this._filterTableTr(new Filter({
+                    filters: aFilters,
+                    and: true
+                }));
+            },
+            _filterTableTr: function (oFilter) {
+                var oVHD = this._oValueHelpDialogTr;
+                oVHD.getTableAsync().then(function (oTable) {
+                    if (oTable.bindRows) {
+                        oTable.getBinding("rows").filter(oFilter);
+                    }
+                    if (oTable.bindItems) {
+                        oTable.getBinding("items").filter(oFilter);
+                    }
+                    // This method must be called after binding update of the table.
+                    oVHD.update();
+                });
+            },
             /**
   * Method to handle confirm on TerminalVH
   * @public
   * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
-  */               
-             onValueHelpOkPressTer: function (oEvent) {
+  */
+            onValueHelpOkPressTer: function (oEvent) {
                 var aTokens = oEvent.getParameter("tokens");
                 this.getView().byId("idMultiComboBoxTerminal").setTokens(aTokens);
                 this._oValueHelpDialogTr.close();
@@ -327,11 +367,11 @@ sap.ui.define([
             onValueHelpCancelPressTer: function () {
                 this._oValueHelpDialogTr.close();
                 this._oValueHelpDialogTr.destroy();
-            },                       
+            },
             /**
       * Method to handle the fragment ProductVH
       * @public
-      */             
+      */
             onProductsValueHelpRequested: function () {
                 this._oBasicSearchField = new SearchField();
                 this.oColModel = new JSONModel();
@@ -389,7 +429,7 @@ sap.ui.define([
       * Method to handle search on Product F4 
       * @public
       * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
-      */              
+      */
             onFilterBarSearchProd: function (oEvent) {
                 var sSearchQuery = this._oBasicSearchField.getValue(),
                     aSelectionSet = oEvent.getParameter("selectionSet");
@@ -436,30 +476,30 @@ sap.ui.define([
                     oVHD.update();
                 });
             },
-           /**
-      * Method to handle confirm on ProductVH
-      * @public
-      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
-      */             
+            /**
+       * Method to handle confirm on ProductVH
+       * @public
+       * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+       */
             onValueHelpOkPressProd: function (oEvent) {
                 var aTokens = oEvent.getParameter("tokens");
                 this.getView().byId("idMultiComboBoxProducts").setTokens(aTokens);
                 this._oValueHelpDialog.close();
             },
-           /**
-      * Method to handle cancel on ProductVH
-      * @public
-      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
-      */ 
+            /**
+       * Method to handle cancel on ProductVH
+       * @public
+       * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+       */
             onValueHelpCancelPressProd: function () {
                 this._oValueHelpDialog.close();
                 this._oValueHelpDialog.destroy();
             },
-           /**
-      * Method to handle afterclose on ProductVH
-      * @public
-      * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
-      */ 
+            /**
+       * Method to handle afterclose on ProductVH
+       * @public
+       * @param {sap.ui.base.Event} oEvent An Event object consisting of an ID, a source and a map of parameter
+       */
             onValueHelpAfterClose: function () {
                 this._oValueHelpDialog.destroy();
             },

@@ -31,7 +31,7 @@ const JobSchedulerClient = require('@sap/jobs-client');
 //Function referance to onpremiseGetOperations.js
 const { getOnPremDetails, getOnPremCall } = require('./onpremise/onpremiseGetOperations.js');
 //Function referance to onpremisePostOperations.js
-const { createonPremCall, updateonPremCall, deleteonPremCall,clearOnDemandFlag } = require('./onpremise/onpremisePostOperations.js');
+const { createonPremCall, updateonPremCall, deleteonPremCall, clearOnDemandFlag, editcustonPremCall } = require('./onpremise/onpremisePostOperations.js');
 
 module.exports = cds.service.impl(async function () {
   /**
@@ -46,7 +46,7 @@ module.exports = cds.service.impl(async function () {
     const scheduler = new JobSchedulerClient.Scheduler(options);
     let jobID = await getJobId(constants.jobNAME, scheduler);
     let jobDetails = await getJobDetals(jobID, scheduler);
-    let sdisplayT, sdemandT, sSuspendT, sSuspendF, sActiveT, sActiveF, SuspendActive,sCheckData;
+    let sdisplayT, sdemandT, sSuspendT, sSuspendF, sActiveT, sActiveF, SuspendActive, sCheckData;
     let resultJob = jobDetails.results;
     if (resultJob) {
       for (var i = 0; i < resultJob.length; i++) {
@@ -60,14 +60,16 @@ module.exports = cds.service.impl(async function () {
         } else if (resultJob[i].description === constants.suspendFrom) {
           sSuspendF = resultJob[i].time;
           sActiveF = resultJob[i].active;
-        } else if (resultJob[i].description === constants.checkData && resultJob[i].active === true){
+        } else if (resultJob[i].description === constants.checkData && resultJob[i].active === true) {
           sCheckData = resultJob[i].repeatAt
         }
       };
       if (sActiveF === false && sActiveT === true) {
-        SuspendActive = true;
+        SuspendActive = "Suspended";
       } else if (sActiveF === false && sActiveT === false) {
         SuspendActive = "Completed";
+      } else if (sActiveF === true && sActiveT === true){
+        SuspendActive = true;
       } else {
         SuspendActive = false;
       }
@@ -140,30 +142,75 @@ module.exports = cds.service.impl(async function () {
       for (var i = 0; i < resultJob.length; i++) {
         if (resultJob[i].description === constants.suspendFrom) {
           sSId = resultJob[i].scheduleId;
-          var req = {
+          //Coment this block in case of refresh code uncommented Start
+          // var req = {
+          //   jobId: jobID._id,
+          //   scheduleId: sSId
+          // };
+          // scheduler.deleteJobSchedule(req, function (err, result) {
+          //   if (err) {
+          //     return logger.log('Error deleting schedule: %s', err);
+          //   }
+          //   //Schedule deleted successfully
+          //   log.info(constants.LOG_JS_DEL);
+          // });
+          //Coment End
+          //Incase of schedule details needed even after refresh
+          
+          var scJob = {
             jobId: jobID._id,
-            scheduleId: sSId
-          };
-          scheduler.deleteJobSchedule(req, function (err, result) {
-            if (err) {
-              return logger.log('Error deleting schedule: %s', err);
+            scheduleId: sSId,
+            schedule: {
+              "active": false
             }
-            //Schedule deleted successfully
-            log.info(constants.LOG_JS_DEL);
-          });
+          };
+          log.info("Suspend Schedule Updated" + JSON.stringify(scJob));
+          console.log("Suspend Schedule Updated" + JSON.stringify(scJob));
+          
+            scheduler.updateJobSchedule(scJob, function (err, result) {
+              if (err) {
+                return logger.log('Error deactivating schedule: %s', err);
+              }
+              //Schedule deleted successfully
+              log.info(constants.LOG_SCH_DEL);
+            });
+            
         } else if (resultJob[i].description === constants.suspendTo) {
           sSId = resultJob[i].scheduleId;
-          var req = {
+          //Coment this block in case of refresh code uncommented Start
+          // var req = {
+          //   jobId: jobID._id,
+          //   scheduleId: sSId
+          // };
+          // scheduler.deleteJobSchedule(req, function (err, result) {
+          //   if (err) {
+          //     return logger.log('Error deleting schedule: %s', err);
+          //   }
+
+          //   //Schedule deleted successfully
+          //   log.info(constants.LOG_JS_DEL);
+          // });
+          //End
+          //Incase of schedule details needed even after refresh
+          
+          var scJob = {
             jobId: jobID._id,
-            scheduleId: sSId
-          };
-          scheduler.deleteJobSchedule(req, function (err, result) {
-            if (err) {
-              return logger.log('Error deleting schedule: %s', err);
+            scheduleId: sSId,
+            schedule: {
+              "active": false
             }
-            //Schedule deleted successfully
-            log.info(constants.LOG_JS_DEL);
-          });
+          };
+          log.info("Suspend Schedule Updated" + JSON.stringify(scJob));
+          console.log("Suspend Schedule Updated" + JSON.stringify(scJob));
+          
+            scheduler.updateJobSchedule(scJob, function (err, result) {
+              if (err) {
+                return logger.log('Error deactivating schedule: %s', err);
+              }
+              //Schedule deleted successfully
+              log.info(constants.LOG_SCH_DEL);
+            });
+
           let nRes = await suspendToOperation(resultJob, jobID._id);
           return nRes;
         }
@@ -184,7 +231,7 @@ module.exports = cds.service.impl(async function () {
     let jobDetails = await getJobDetals(jobID, scheduler);
     let sTime = req.data.time;
     let sDesc = req.data.desc;
-    let dFlag="";
+    let dFlag = "";
     let resultJob = jobDetails.results;
     if (resultJob) {
       for (var i = 0; i < resultJob.length; i++) {
@@ -207,13 +254,13 @@ module.exports = cds.service.impl(async function () {
       log.info("Schedule Updated" + scJob);
       console.log("Schedule Updated" + scJob);
       // return new Promise((resolve, reject) => {
-        scheduler.updateJobSchedule(scJob, function (err, result) {
-          if (err) {
-            return logger.log('Error deleting schedule: %s', err);
-          }
-          //Schedule deleted successfully
-          log.info(constants.LOG_SCH_DEL);
-        });
+      scheduler.updateJobSchedule(scJob, function (err, result) {
+        if (err) {
+          return logger.log('Error deleting schedule: %s', err);
+        }
+        //Schedule deleted successfully
+        log.info(constants.LOG_SCH_DEL);
+      });
       // })
     } else {
       var scJob = {
@@ -231,19 +278,19 @@ module.exports = cds.service.impl(async function () {
       };
       log.info("Daily Schedule Created" + scJob);
       console.log("Schedule Created" + JSON.stringify(scJob));
-      
-        scheduler.createJobSchedule(scJob, function (error, body) {
-          if (error) {
-            reject(error.message);
-          }
-          // Job successfully created.
-          resolve('Job successfully created')
-        });
-      
+
+      scheduler.createJobSchedule(scJob, function (error, body) {
+        if (error) {
+          reject(error.message);
+        }
+        // Job successfully created.
+        resolve('Job successfully created')
+      });
+
     }
   });
   this.on('sendInconEmail', async (req) => {
-    let resultR= await triggerCPI(); 
+    let resultR = await triggerCPI();
     return resultR;
   });
   /**
@@ -274,15 +321,15 @@ module.exports = cds.service.impl(async function () {
           };
           log.info("Schedule Updated" + JSON.stringify(scJob));
           console.log("Schedule Updated" + JSON.stringify(scJob));
-          
-            scheduler.updateJobSchedule(scJob, function (err, result) {
-              if (err) {
-                return logger.log('Error deleting schedule: %s', err);
-              }
-              //Schedule deleted successfully
-              log.info(constants.LOG_SCH_DEL);
-            });
-         
+
+          scheduler.updateJobSchedule(scJob, function (err, result) {
+            if (err) {
+              return logger.log('Error deleting schedule: %s', err);
+            }
+            //Schedule deleted successfully
+            log.info(constants.LOG_SCH_DEL);
+          });
+
         }
       }
     }
@@ -404,6 +451,95 @@ module.exports = cds.service.impl(async function () {
     }
 
   });
+  // this.on('createSuspendSchedule', async (req) => {
+  //   let timeArray = JSON.parse(req.data.time);
+  //   const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
+  //   const options = {
+  //     baseURL: baseURL,
+  //     token: token
+  //   };
+  //   const scheduler = new JobSchedulerClient.Scheduler(options);
+  //   let jobID = await getJobId(constants.jobNAME, scheduler);
+  //   let jobDetails = await getJobDetals(jobID, scheduler);
+  //   let sSId;
+  //   let dFlag = "";
+  //   let resultJob = jobDetails.results;
+  //   if (resultJob) {
+  //     for (var i = 0; i < resultJob.length; i++) {
+  //       if (resultJob[i].description === constants.suspendTo || resultJob[i].description === constants.suspendFrom) {
+  //         dFlag = "X";
+  // for (var j = 0; j < timeArray.length; j++) {
+  //   var scJob = {
+  //     jobId: jobID._id,
+  //     schedule: {
+  //       "time": timeArray[j].time,
+  //       "description": timeArray[j].Desc,
+  //       "data": {
+  //         "headers": { "Content-Type": "application/json" }
+  //       },
+  //       "active": true
+  //     }
+  //   };
+  //   log.info("Suspend Schedule Created" + scJob);
+
+  //   scheduler.createJobSchedule(scJob, function (error, body) {
+  //     if (error) {
+  //       reject(error.message);
+  //     }
+  //     // Job successfully created.
+  //     resolve('Job successfully created')
+  //   });
+  // }
+  //         sSId = resultJob[i].scheduleId;
+  //         var scJob = {
+  //           jobId: jobID._id,
+  //           scheduleId: sSId,
+  //           schedule: {
+  //             "active": true
+  //           }
+  //         };
+  //       }
+  //     };
+  //   }
+  //   if (dFlag === "X") {
+  //     log.info("Schedule Updated" + scJob);
+  //     console.log("Schedule Updated" + scJob);
+  //     // return new Promise((resolve, reject) => {
+  //     scheduler.updateJobSchedule(scJob, function (err, result) {
+  //       if (err) {
+  //         return logger.log('Error deleting schedule: %s', err);
+  //       }
+  //       //Schedule deleted successfully
+  //       log.info(constants.LOG_SCH_DEL);
+  //     });
+  //     // })
+  //   } else {
+  //     var scJob = {
+  //       jobId: jobID._id,
+  //       schedule: {
+  //         "repeatAt": sTime,
+  //         "type": "recurring",
+  //         "description": sDesc,
+  //         "data": {
+  //           "headers": { "Content-Type": "application/json" },
+  //           "suspendStatus": "INACTIVE"
+  //         },
+  //         "active": true
+  //       }
+  //     };
+  //     log.info("Daily Schedule Created" + scJob);
+  //     console.log("Schedule Created" + JSON.stringify(scJob));
+
+  //     scheduler.createJobSchedule(scJob, function (error, body) {
+  //       if (error) {
+  //         reject(error.message);
+  //       }
+  //       // Job successfully created.
+  //       resolve('Job successfully created')
+  //     });
+
+  //   }
+  // });
   /**
 * Function to get Job Details
 */
@@ -455,7 +591,7 @@ module.exports = cds.service.impl(async function () {
     return new Promise((resolve, reject) => {
       scheduler.fetchJob(req, function (err, result) {
         if (err) {
-          
+
           reject(err.message);
         }
         resolve(result);
@@ -526,11 +662,11 @@ module.exports = cds.service.impl(async function () {
         }
       }
       log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
-      log.info("suspendStatus " + suspendStatus +"for "+oDesc);
+      log.info("suspendStatus " + suspendStatus + "for " + oDesc);
       if (suspendStatus === constants.inactive && (oDesc === constants.daily || oDesc === constants.onDemand)) {
 
         log.info("Call for Data inconsistency check for" + oDesc);
-        let resultR= await triggerCPI();
+        let resultR = await triggerCPI();
         log.info("Result for Data inconsistency check" + resultR);
         let top = constants.TOP;
         let response;
@@ -565,12 +701,12 @@ module.exports = cds.service.impl(async function () {
             log.info("CPI No Data:" + oDesc + "/" + responseData.data.d.results.length + "/" + responseData.data.d);
           }
         }
-        if( oDesc === constants.onDemand && response === "Mail sent Successfully"){
+        if (oDesc === constants.onDemand && response === "Mail sent Successfully") {
           let oUrl = constants.URL_CLRPOST;
           let oStatus = await clearOnDemandFlag(oUrl);
           log.info("clearOnDemandFlag output" + JSON.stringify(oStatus));
         }
-        
+
         return response;
 
       } else if (oDesc === constants.suspendFrom) {
@@ -583,7 +719,7 @@ module.exports = cds.service.impl(async function () {
           };
           const scheduler = new JobSchedulerClient.Scheduler(options);
           for (var k = 0; k < resultJob.length; k++) {
-            if (resultJob[k].description === constants.daily ) { //|| resultJob[k].description === constants.onDemand
+            if (resultJob[k].description === constants.daily) { //|| resultJob[k].description === constants.onDemand
               sSId = resultJob[k].scheduleId;
               var scJob = {
                 jobId: job_Id,
@@ -613,9 +749,9 @@ module.exports = cds.service.impl(async function () {
         }
       } else if (oDesc === constants.checkData) {
         log.info(oDesc + " Triggered");
-        let resultR= await triggerCPI();
+        let resultR = await triggerCPI();
       }
-      log.info("operationTriggerEndpoint - Out of IF condition" );
+      log.info("operationTriggerEndpoint - Out of IF condition");
     }
     catch (error) {
       req.error({ code: constants.ERR, message: error.message });
@@ -631,7 +767,7 @@ module.exports = cds.service.impl(async function () {
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
     for (var k = 0; k < resultJob.length; k++) {
-      if (resultJob[k].description === constants.daily ) { //|| resultJob[k].description === constants.onDemand
+      if (resultJob[k].description === constants.daily) { //|| resultJob[k].description === constants.onDemand
         sSId = resultJob[k].scheduleId;
         var scJob = {
           jobId: job_Id,
@@ -672,7 +808,7 @@ module.exports = cds.service.impl(async function () {
       }).catch(async (error) => {
         log.error("Error in CPI call" + error);
         return error;
-      })          
+      })
     }
   }
 
@@ -777,6 +913,64 @@ module.exports = cds.service.impl(async function () {
     }
   });
   /**
+* Function to get Terminal Entity Details
+*/
+  this.on('getTerminal', async (req) => {
+    try {
+      let m = req.data.terminal;
+      let sUrl = constants.URL_Ter + "('" + m + "')";
+      let response = await getOnPremCall(req, sUrl);
+      let resultData = {
+        data: response.data.d
+      }
+      log.info("getTerminal success");
+      return resultData;
+    }
+    catch (error) {
+      log.error("getTerminal Error" + error);
+      return error
+    }
+  });
+  /**
+* Function to get Product Entity Details
+*/
+  this.on('getProduct', async (req) => {
+    try {
+      let m = req.data.product;
+      let sUrl = constants.URL_Prod + "('" + m + "')";
+      let response = await getOnPremCall(req, sUrl);
+      let resultData = {
+        data: response.data.d
+      }
+      log.info("getProduct success");
+      return resultData;
+    }
+    catch (error) {
+      log.error("getProduct Error" + error);
+      return error
+    }
+  });
+  /**
+* Function to get Customer Entity Details
+*/
+  this.on('getCustomer', async (req) => {
+    try {
+      let m = req.data.customer;
+      let n = req.data.shipTo;
+      let sUrl = constants.URL_Cust + "(Customer='" + m + "',ShipTo='" + n + "')";
+      let response = await getOnPremCall(req, sUrl);
+      let resultData = {
+        data: response.data.d
+      }
+      log.info("getCustomer success");
+      return resultData;
+    }
+    catch (error) {
+      log.error("getCustomer Error" + error);
+      return error
+    }
+  });
+  /**
 * Function to get Customer Details
 */
   this.on('getCustomerDetails', async (req) => {
@@ -812,24 +1006,24 @@ module.exports = cds.service.impl(async function () {
       return error
     }
   });
-    /**
+  /**
 * Function to get data Inconsistency data
 */
-this.on('dataInconCheck', async (req) => {
-  try {
-    let sUrl = constants.URL_Check;
-    let response = await getOnPremCall(req, sUrl);
-    let resultData = {
-      data: response.data.d.results
+  this.on('dataInconCheck', async (req) => {
+    try {
+      let sUrl = constants.URL_Check;
+      let response = await getOnPremCall(req, sUrl);
+      let resultData = {
+        data: response.data.d.results
+      }
+      log.info("dataInconCheck success");
+      return resultData;
     }
-    log.info("dataInconCheck success");
-    return resultData;
-  }
-  catch (error) {
-    log.error("dataInconCheck error" + error);
-    return error
-  }
-});
+    catch (error) {
+      log.error("dataInconCheck error" + error);
+      return error
+    }
+  });
   /**
 * Function to get Customer F4 help data
 */
@@ -1047,6 +1241,7 @@ this.on('dataInconCheck', async (req) => {
   this.on("updateTerminal", async (req) => {
     try {
       let m = req.data.terminal;
+
       let sUrl = "/TerminalDetailSet('" + m + "')";
       let response = await updateonPremCall(req, sUrl);
       let resultData = { data: response };
@@ -1066,7 +1261,7 @@ this.on('dataInconCheck', async (req) => {
     try {
       // let response = await  updateCustomerDetail(req);
       let sUrl = constants.URL_CusCreate;
-      let response = await createonPremCall(req, sUrl);
+      let response = await editcustonPremCall(req, sUrl);
       let resultData = { data: response };
       log.info("updateCustomer success");
       return resultData;
@@ -1116,7 +1311,7 @@ this.on('dataInconCheck', async (req) => {
   */
   this.on("unbindProdShipTo", async (req) => {
     try {
-      let m = req.data.terminal;
+      let m = req.data.product;
       let sUrl = "/ProductDetailSet('" + m + "')";
       let response = await updateonPremCall(req, sUrl);
       let resultData = { data: response };
