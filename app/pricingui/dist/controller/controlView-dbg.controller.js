@@ -133,8 +133,8 @@ sap.ui.define([
                             });
                             var dDateT = dateTo.toDateString().replace(/^\S+\s/, ''),
                                 finalTextTo = dDateT + constants.SPACE + sTimeT;
-                            if (oDataArr2.sActive === "Suspended") {
-                                that.getView().byId("idInfoLabel").setText("Suspended");
+                            if (oDataArr2.sActive === constants.suspended) {
+                                that.getView().byId("idInfoLabel").setText(constants.suspended);
                                 that.getView().byId("idInfoLabel").setColorScheme(2);
                                 that.getView().byId("idDatePickerSuspend").setEnabled(false);
                                 that.getView().byId("idDatePicker2Suspend").setEnabled(false);
@@ -327,7 +327,7 @@ sap.ui.define([
                 this.oDataModelT.callFunction("/getCustomerDetails", {
                     method: constants.httpGet,
                     success: function (oData) {
-                        var finalArray = [], tokenArray = [];
+                        var finalArray = [], tokenArray = [], f4CusArr = [];
                         var oDataCust = oData.getCustomerDetails.data;
                         if (oDataCust) {
                             that.getView().byId("idTitleCustomer").setText(that.oBundle.getText("comCusText", [oData.getCustomerDetails.data.length]));
@@ -374,9 +374,13 @@ sap.ui.define([
                                     "VHKey": oDataCust[a].Customer + "/" + oDataCust[a].ShipTo
                                 }
                                 finalArray.push(objData);
+                                if (parseInt(oDataCust[a].CountProduct) !== constants.INTZERO && parseInt(oDataCust[a].CountTerminal) !== constants.INTZERO) {
+                                    f4CusArr.push(objData);
+                                }
                             }
                             that.getView().byId("idMultiInputCustomer").setTokens(tokenArray);
                             that.getView().getModel("oModel").setProperty("/CustomerData", finalArray);
+                            that.getView().getModel("oModel").setProperty("/CustomerDataOnDemandF4", f4CusArr);
                             BusyIndicator.hide();
                         }
                     },
@@ -471,7 +475,7 @@ sap.ui.define([
                             BusyIndicator.hide();
                             var oDataCust = oData.getCustomer.data;
                             if (oDataCust) {
-                                debugger;
+                                
 
                                 var etag = oData.getCustomer.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/CusEtag", etag);
@@ -501,7 +505,7 @@ sap.ui.define([
                                     success: function (oData) {
                                         BusyIndicator.hide();
                                         if (oData.deleteCustomer.data.message !== undefined) {
-                                            if (oData.deleteCustomer.data.status === 412) {
+                                            if (oData.deleteCustomer.data.status === constants.INT412) {
                                                 var msg = that.oBundle.getText("msgError");
                                                 MessageBox.error(msg);
                                             } else {
@@ -558,7 +562,7 @@ sap.ui.define([
                             BusyIndicator.hide();
                             var oDataCust = oData.getCustomer.data;
                             if (oDataCust) {
-                                debugger;
+                                
 
                                 var etag = oData.getCustomer.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/CusEtag", etag);
@@ -588,7 +592,7 @@ sap.ui.define([
                                     success: function (oData) {
                                         BusyIndicator.hide();
                                         if (oData.deleteCustomer.data.message !== undefined) {
-                                            if (oData.deleteCustomer.data.status === 412) {
+                                            if (oData.deleteCustomer.data.status === constants.INT412) {
                                                 var msg = that.oBundle.getText("msgError");
                                                 MessageBox.error(msg);
                                             } else {
@@ -642,14 +646,14 @@ sap.ui.define([
                     success: function (oData) {
                         BusyIndicator.hide();
                         var oDataArr2 = JSON.parse(oData.getJobDetails);
-                        if (oDataArr2.sActive === "Suspended") {
+                        if (oDataArr2.sActive === constants.suspended) {
 
                             if (oState === false) {
                                 that.getView().byId("idSwitchInput").setState(true);
                             } else {
                                 that.getView().byId("idSwitchInput").setState(false);
                             }
-                            that.getView().byId("idInfoLabel").setText("Suspended");
+                            that.getView().byId("idInfoLabel").setText(constants.suspended);
                             that.getView().byId("idInfoLabel").setColorScheme(2);
                             that.getView().byId("idDatePickerSuspend").setEnabled(false);
                             that.getView().byId("idDatePicker2Suspend").setEnabled(false);
@@ -747,14 +751,14 @@ sap.ui.define([
                     success: function (oData) {
                         BusyIndicator.hide();
                         var oDataArr2 = JSON.parse(oData.getJobDetails);
-                        if (oDataArr2.sActive === "Suspended") {
+                        if (oDataArr2.sActive === constants.suspended) {
 
                             if (oState === false) {
                                 that.getView().byId("idSwitchInput").setState(true);
                             } else {
                                 that.getView().byId("idSwitchInput").setState(false);
                             }
-                            that.getView().byId("idInfoLabel").setText("Suspended");
+                            that.getView().byId("idInfoLabel").setText(constants.suspended);
                             that.getView().byId("idInfoLabel").setColorScheme(2);
 
                         }
@@ -821,11 +825,11 @@ sap.ui.define([
                     oTable.setModel(this.oColModel, "columns");
 
                     if (oTable.bindRows) {
-                        oTable.bindAggregation("rows", "/CustomerData");
+                        oTable.bindAggregation("rows", "/CustomerDataOnDemandF4");
                     }
 
                     if (oTable.bindItems) {
-                        oTable.bindAggregation("items", "/CustomerData", function () {
+                        oTable.bindAggregation("items", "/CustomerDataOnDemandF4", function () {
                             return new ColumnListItem({
                                 cells: aCols.map(function (column) {
                                     return new Label({ text: "{" + column.template + "}" });
@@ -1057,7 +1061,7 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             if (oData.getTerminal.data.status === undefined) {
-                                debugger;
+                                
                                 BusyIndicator.hide();
                                 var etag = oData.getTerminal.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/TerEtag", etag);
@@ -1110,7 +1114,7 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             if (oData.getTerminal.data.status === undefined) {
-                                debugger;
+                                
                                 BusyIndicator.hide();
                                 var etag = oData.getTerminal.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/TerEtag", etag);
@@ -1190,7 +1194,7 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             if (oData.getProduct.data.status === undefined) {
-                                debugger;
+                                
                                 BusyIndicator.hide();
                                 var etag = oData.getProduct.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/ProEtag", etag);
@@ -1250,7 +1254,7 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             if (oData.getProduct.data.status === undefined) {
-                                debugger;
+                                
                                 BusyIndicator.hide();
                                 var etag = oData.getProduct.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/ProEtag", etag);
@@ -1515,7 +1519,7 @@ sap.ui.define([
                                     success: function (oData) {
                                         BusyIndicator.hide();
                                         if (oData.deleteTerminal.data.message !== undefined) {
-                                            if (oData.deleteTerminal.data.status === 412) {
+                                            if (oData.deleteTerminal.data.status === constants.INT412) {
                                                 var msg = that.oBundle.getText("msgError");
                                                 MessageBox.error(msg);
                                             } else {
@@ -1570,7 +1574,7 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             if (oData.getProduct.data.status === undefined) {
-                                debugger;
+                                
                                 BusyIndicator.hide();
                                 var etag = oData.getProduct.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/ProEtag", etag);
@@ -1597,7 +1601,7 @@ sap.ui.define([
                                     success: function (oData) {
                                         BusyIndicator.hide();
                                         if (oData.deleteProduct.data.message !== undefined) {
-                                            if (oData.deleteProduct.data.status === 412) {
+                                            if (oData.deleteProduct.data.status === constants.INT412) {
                                                 var msg = that.oBundle.getText("msgError");
                                                 MessageBox.error(msg);
                                             } else {
@@ -1654,7 +1658,7 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             if (oData.getTerminal.data.status === undefined) {
-                                debugger;
+                                
                                 BusyIndicator.hide();
                                 var etag = oData.getTerminal.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/TerEtag", etag);
@@ -1681,7 +1685,7 @@ sap.ui.define([
                                     success: function (oData) {
                                         BusyIndicator.hide();
                                         if (oData.deleteTerminal.data.message !== undefined) {
-                                            if (oData.deleteTerminal.data.status === 412) {
+                                            if (oData.deleteTerminal.data.status === constants.INT412) {
                                                 var msg = that.oBundle.getText("msgError");
                                                 MessageBox.error(msg);
                                             } else {
@@ -1727,7 +1731,7 @@ sap.ui.define([
 
                 if (itemIndex !== constants.INTNEGONE) {
                     var oItems = this.getView().getModel("oModel").getProperty(Index);
-                    // var oItems = oTableData[itemIndex];
+                    
                     that.oDataModelT.callFunction("/getProduct", {
                         method: constants.httpGet,
                         urlParameters: {
@@ -1735,7 +1739,6 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             if (oData.getProduct.data.status === undefined) {
-                                debugger;
                                 BusyIndicator.hide();
                                 var etag = oData.getProduct.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/ProEtag", etag);
@@ -1762,7 +1765,7 @@ sap.ui.define([
                                     success: function (oData) {
                                         BusyIndicator.hide();
                                         if (oData.deleteProduct.data.message !== undefined) {
-                                            if (oData.deleteProduct.data.status === 412) {
+                                            if (oData.deleteProduct.data.status === constants.INT412) {
                                                 var msg = that.oBundle.getText("msgError");
                                                 MessageBox.error(msg);
                                             } else {
@@ -2067,8 +2070,8 @@ sap.ui.define([
                     success: function (oData) {
                         BusyIndicator.hide();
                         var oDataArr2 = JSON.parse(oData.getJobDetails);
-                        if (oDataArr2.sActive === "Suspended") {
-                            that.getView().byId("idInfoLabel").setText("Suspended");
+                        if (oDataArr2.sActive === constants.suspended) {
+                            that.getView().byId("idInfoLabel").setText(constants.suspended);
                             that.getView().byId("idInfoLabel").setColorScheme(2);
                             MessageBox.error(that.oBundle.getText("susCheck"));
                         } else {
@@ -2157,7 +2160,7 @@ sap.ui.define([
                     dateValue = new Date(oDate);
                 var now = new Date(),
                     cDate = now.toLocaleString("en-US", {
-                        timeZone: "America/Mexico_City",
+                        timeZone: constants.timezone,
                     });
                 cDate = new Date(cDate);
                 if (dateValue < cDate) {
@@ -2297,8 +2300,7 @@ sap.ui.define([
                 if (oState === false) {
                     this.getView().byId("idDatePickerSuspend").setEnabled(true);
                     this.getView().byId("idDatePicker2Suspend").setEnabled(true);
-                    this.getView().byId("idInfoLabel").setText("InActive");
-                    this.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
+
 
                     //Delete Schedule
                     that.oDataModelT.callFunction("/deleteSuspendSchedule", {
@@ -2308,18 +2310,28 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
+                            var dState = that.getView().byId("idSwitchInput").getState();
+                            if (dState === true) {
+                                that.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
+                                that.getView().byId("idInfoLabel").setText("Active");
+                            } else {
+                                that.getView().byId("idInfoLabel").setText("InActive");
+                                that.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
+                            }
                             MessageBox.information(that.oBundle.getText("turnOffSus"));
                         },
                         error: function (err) {
                             BusyIndicator.hide();
                             that.getView().byId("idSwitchInputSuspend").setState(true);
+                            that.getView().byId("idDatePickerSuspend").setEnabled(false);
+                            that.getView().byId("idDatePicker2Suspend").setEnabled(false);
                             MessageBox.error(that.oBundle.getText("techError"), {
                                 details: err
                             });
 
                         }
                     });
-                    
+
 
                 } else {
                     var oDateSuspendFrom = this.getView().byId("idDatePickerSuspend").getValue(),
@@ -2347,14 +2359,16 @@ sap.ui.define([
                             hour12: true
                         }),
                         SuspendFrom = oSusFrom.toDateString() + constants.SPACE + xSuspendFrom,
+                        FromDate = new Date(oDateSuspendFrom),
                         ToDate = new Date(oDateSuspendTo);
                     var now = new Date(),
                         cDate = now.toLocaleString("en-US", {
-                            timeZone: "America/Mexico_City",
+                            timeZone: constants.timezone,
                         });
                     cDate = new Date(cDate);
                     if (ToDate < cDate) {
                         BusyIndicator.hide();
+                        that.getView().byId("idSwitchInputSuspend").setState(false);
                         this.getView().byId("idDatePicker2Suspend").setValueState("Error");
                         MessageBox.error(this.oBundle.getText("dateError"));
                     } else {
@@ -2385,12 +2399,22 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
+                                        var now = new Date(),
+                                            curr = now.toLocaleString("en-US", {
+                                                timeZone: constants.timezone,
+                                            });
+                                        curr = new Date(curr);
+                                        if (FromDate < curr) {
+                                            that.getView().byId("idInfoLabel").setText(constants.suspended);
+                                            that.getView().byId("idInfoLabel").setColorScheme(2);
+                                        }
                                         MessageBox.success(that.oBundle.getText("succJSSus"));
-
-
                                     },
                                     error: function (err) {
                                         BusyIndicator.hide();
+                                        that.getView().byId("idSwitchInputSuspend").setState(false);
+                                        that.getView().byId("idDatePickerSuspend").setEnabled(true);
+                                        that.getView().byId("idDatePicker2Suspend").setEnabled(true);
                                         MessageBox.error(that.oBundle.getText("techError"), {
                                             details: err
                                         });
@@ -2422,7 +2446,8 @@ sap.ui.define([
                     oDateSuspendFrom = this.getView().byId("idDatePicker2Suspend").getDateValue();
                 if (oDateSuspendFrom != null && oDateSuspendFrom <= oDateSuspendTo) {
                     this.getView().byId("idDatePicker2Suspend").setValueState("Error");
-                }
+                    this.getView().byId("idDatePicker2Suspend").setValueStateText(this.oBundle.getText("plcErrorDate"));
+                } 
                 else {
                     this.getView().byId("idDatePicker2Suspend").setValueState("None");
                 }
@@ -2436,8 +2461,10 @@ sap.ui.define([
                     oDateSuspendFrom = this.getView().byId("idDatePicker2Suspend").getDateValue();
                 if (oDateSuspendFrom <= oDateSuspendTo) {
                     this.getView().byId("idDatePicker2Suspend").setValueState("Error");
+                    this.getView().byId("idDatePicker2Suspend").setValueStateText(this.oBundle.getText("plcErrorDate"));
                 } else if (oDateSuspendTo === null) {
                     this.getView().byId("idDatePicker2Suspend").setValueState("Error");
+                    this.getView().byId("idDatePicker2Suspend").setValueStateText(this.oBundle.getText("timeTo"));
                 }
                 else {
                     this.getView().byId("idDatePicker2Suspend").setValueState("None");
@@ -2450,7 +2477,7 @@ sap.ui.define([
                 var selectedDate = new Date(sValue);
                 var now = new Date(),
                     cDate = now.toLocaleString("en-US", {
-                        timeZone: "America/Mexico_City",
+                        timeZone: constants.timezone,
                     });
                 cDate = new Date(cDate);
                 if (bValid) {
@@ -2473,13 +2500,14 @@ sap.ui.define([
                 var selectedDate = new Date(sValue);
                 var now = new Date(),
                     cDate = now.toLocaleString("en-US", {
-                        timeZone: "America/Mexico_City",
+                        timeZone: constants.timezone,
                     });
                 cDate = new Date(cDate);
                 if (bValid) {
                     if (selectedDate < cDate) {
                         oDTP.setValueState("Error");
-                        MessageBox.error(this.oBundle.getText("dateError"));
+                        oDTP.setValueStateText(this.oBundle.getText("timeCurr"));
+                        // MessageBox.error(this.oBundle.getText("dateError"));
                     } else if (oDateSuspendFrom != null && oDateSuspendFrom <= oDateSuspendTo) {
                         oDTP.setValueState("Error");
                     } else {
@@ -2498,13 +2526,14 @@ sap.ui.define([
                 var selectedDate = new Date(sValue);
                 var now = new Date(),
                     cDate = now.toLocaleString("en-US", {
-                        timeZone: "America/Mexico_City",
+                        timeZone: constants.timezone,
                     });
                 cDate = new Date(cDate);
                 if (bValid) {
                     if (selectedDate < cDate) {
                         oDTP.setValueState("Error");
-                        MessageBox.error(this.oBundle.getText("dateError"));
+                        oDTP.setValueStateText(this.oBundle.getText("timeCurr"));
+                        // MessageBox.error(this.oBundle.getText("dateError"));
                     } else if (oDateSuspendTo === null) {
                         this.getView().byId("idDatePicker2Suspend").setValueState("Error");
                     } else if (oDateSuspendFrom <= oDateSuspendTo) {
@@ -2614,7 +2643,7 @@ sap.ui.define([
                             success: function (oData) {
                                 BusyIndicator.hide();
                                 if (oData.updateTerminal.data.status !== undefined && oData.updateTerminal.data.status !== 200) {
-                                    if (oData.updateTerminal.data.status === "412") {
+                                    if (oData.updateTerminal.data.status === constants.INT412) {
                                         var msg = that.oBundle.getText("msgError");
                                         MessageBox.error(msg);
                                     } else {
@@ -2736,11 +2765,11 @@ sap.ui.define([
                             success: function (oData) {
                                 BusyIndicator.hide();
                                 if (oData.updateProduct.data.status !== undefined && oData.updateProduct.data.status !== 200) {
-                                    if (oData.updateTerminal.data.status === "412") {
+                                    if (oData.updateProduct.data.status === constants.INT412) {
                                         var msg = that.oBundle.getText("msgError");
                                         MessageBox.error(msg);
                                     } else {
-                                        var msg = oData.updateTerminal.data.message;
+                                        var msg = oData.updateProduct.data.message;
                                         MessageBox.error(msg);
                                     }
                                 }
@@ -2914,7 +2943,7 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 if (oData.getTerminal.data.status === undefined) {
-                                    debugger;
+                                    
                                     BusyIndicator.hide();
                                     var etag = oData.getTerminal.data.__metadata.etag;
                                     that.getView().getModel("oModel").setProperty("/TerEtag", etag);
@@ -2950,7 +2979,7 @@ sap.ui.define([
                                         success: function (oData) {
                                             BusyIndicator.hide();
                                             if (oData.unbindShipTo.data.message !== undefined) {
-                                                if (oData.unbindShipTo.data.status === 412) {
+                                                if (oData.unbindShipTo.data.status === constants.INT412) {
                                                     var msg = that.oBundle.getText("msgError");
                                                     MessageBox.error(msg);
                                                 } else {
@@ -3012,7 +3041,7 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 if (oData.getTerminal.data.status === undefined) {
-                                    debugger;
+                                    
                                     BusyIndicator.hide();
                                     var etag = oData.getTerminal.data.__metadata.etag;
                                     that.getView().getModel("oModel").setProperty("/TerEtag", etag);
@@ -3049,7 +3078,7 @@ sap.ui.define([
                                         success: function (oData) {
                                             BusyIndicator.hide();
                                             if (oData.unbindShipTo.data.message !== undefined) {
-                                                if (oData.unbindShipTo.data.status === 412) {
+                                                if (oData.unbindShipTo.data.status === constants.INT412) {
                                                     var msg = that.oBundle.getText("msgError");
                                                     MessageBox.error(msg);
                                                 } else {
@@ -3109,7 +3138,7 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 if (oData.getProduct.data.status === undefined) {
-                                    debugger;
+                                    
                                     BusyIndicator.hide();
                                     var etag = oData.getProduct.data.__metadata.etag;
                                     that.getView().getModel("oModel").setProperty("/ProEtag", etag);
@@ -3147,7 +3176,7 @@ sap.ui.define([
                                         success: function (oData) {
                                             BusyIndicator.hide();
                                             if (oData.unbindProdShipTo.data.message !== undefined) {
-                                                if (oData.unbindProdShipTo.data.status === 412) {
+                                                if (oData.unbindProdShipTo.data.status === constants.INT412) {
                                                     var msg = that.oBundle.getText("msgError");
                                                     MessageBox.error(msg);
                                                 } else {
@@ -3207,7 +3236,7 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 if (oData.getProduct.data.status === undefined) {
-                                    debugger;
+                                    
                                     BusyIndicator.hide();
                                     var etag = oData.getProduct.data.__metadata.etag;
                                     that.getView().getModel("oModel").setProperty("/ProEtag", etag);
@@ -3245,7 +3274,7 @@ sap.ui.define([
                                         success: function (oData) {
                                             BusyIndicator.hide();
                                             if (oData.unbindProdShipTo.data.message !== undefined) {
-                                                if (oData.unbindProdShipTo.data.status === 412) {
+                                                if (oData.unbindProdShipTo.data.status === constants.INT412) {
                                                     var msg = that.oBundle.getText("msgError");
                                                     MessageBox.error(msg);
                                                 } else {
@@ -3331,8 +3360,8 @@ sap.ui.define([
                                 var oMin = (dateValue.getMinutes() < constants.INTTEN ? constants.ZERO : '') + dateValue.getMinutes();
                                 var oTime = dateValue.getHours() + constants.DIV + oMin;
                                 this.getView().byId("idTimePickerInputDI").setEnabled(false);
-                                this.getView().byId("idTextIncST").setText(oTime);
-                                this.getView().getModel("oModel").setProperty("/dateValueIn", oTime);
+                                this.getView().byId("idTextIncST").setText(oDateD);
+                                this.getView().getModel("oModel").setProperty("/dateValueIn", oDateD);
                                 //Create Daily Schedule
                                 this.oDataModelT.callFunction("/createSchedule", {
                                     method: constants.httpGet,

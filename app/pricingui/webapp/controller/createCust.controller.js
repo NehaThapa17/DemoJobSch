@@ -48,7 +48,6 @@ sap.ui.define([
             onRouteCustomer: function () {
                 var pvModel = this.getOwnerComponent().getModel("oModel");
                 this.getF4CustomerCreate();
-                // this.getView().getModel("oCustModel").setProperty("/CustValHelp", pvModel.oData.CustValHelp);
                 this.getView().getModel("oCustModel").setProperty("/ProductData", pvModel.oData.ProductData);
                 this.getView().getModel("oCustModel").setProperty("/TerminalData", pvModel.oData.TerminalData);
                 this.getView().byId("idInputCustomerIDAdd").setValue(""),

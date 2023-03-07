@@ -68,7 +68,7 @@ module.exports = cds.service.impl(async function () {
         SuspendActive = "Suspended";
       } else if (sActiveF === false && sActiveT === false) {
         SuspendActive = "Completed";
-      } else if (sActiveF === true && sActiveT === true){
+      } else if (sActiveF === true && sActiveT === true) {
         SuspendActive = true;
       } else {
         SuspendActive = false;
@@ -142,21 +142,8 @@ module.exports = cds.service.impl(async function () {
       for (var i = 0; i < resultJob.length; i++) {
         if (resultJob[i].description === constants.suspendFrom) {
           sSId = resultJob[i].scheduleId;
-          //Coment this block in case of refresh code uncommented Start
-          // var req = {
-          //   jobId: jobID._id,
-          //   scheduleId: sSId
-          // };
-          // scheduler.deleteJobSchedule(req, function (err, result) {
-          //   if (err) {
-          //     return logger.log('Error deleting schedule: %s', err);
-          //   }
-          //   //Schedule deleted successfully
-          //   log.info(constants.LOG_JS_DEL);
-          // });
-          //Coment End
-          //Incase of schedule details needed even after refresh
-          
+//schedule details needed even after refresh
+
           var scJob = {
             jobId: jobID._id,
             scheduleId: sSId,
@@ -166,15 +153,15 @@ module.exports = cds.service.impl(async function () {
           };
           log.info("Suspend Schedule Updated" + JSON.stringify(scJob));
           console.log("Suspend Schedule Updated" + JSON.stringify(scJob));
-          
-            scheduler.updateJobSchedule(scJob, function (err, result) {
-              if (err) {
-                return logger.log('Error deactivating schedule: %s', err);
-              }
-              //Schedule deleted successfully
-              log.info(constants.LOG_SCH_DEL);
-            });
-            
+
+          scheduler.updateJobSchedule(scJob, function (err, result) {
+            if (err) {
+              return logger.log('Error deactivating schedule: %s', err);
+            }
+            //Schedule deleted successfully
+            log.info(constants.LOG_SCH_DEL);
+          });
+
         } else if (resultJob[i].description === constants.suspendTo) {
           sSId = resultJob[i].scheduleId;
           //Coment this block in case of refresh code uncommented Start
@@ -192,7 +179,7 @@ module.exports = cds.service.impl(async function () {
           // });
           //End
           //Incase of schedule details needed even after refresh
-          
+
           var scJob = {
             jobId: jobID._id,
             scheduleId: sSId,
@@ -202,14 +189,14 @@ module.exports = cds.service.impl(async function () {
           };
           log.info("Suspend Schedule Updated" + JSON.stringify(scJob));
           console.log("Suspend Schedule Updated" + JSON.stringify(scJob));
-          
-            scheduler.updateJobSchedule(scJob, function (err, result) {
-              if (err) {
-                return logger.log('Error deactivating schedule: %s', err);
-              }
-              //Schedule deleted successfully
-              log.info(constants.LOG_SCH_DEL);
-            });
+
+          scheduler.updateJobSchedule(scJob, function (err, result) {
+            if (err) {
+              return logger.log('Error deactivating schedule: %s', err);
+            }
+            //Schedule deleted successfully
+            log.info(constants.LOG_SCH_DEL);
+          });
 
           let nRes = await suspendToOperation(resultJob, jobID._id);
           return nRes;
@@ -253,7 +240,7 @@ module.exports = cds.service.impl(async function () {
     if (dFlag === "X") {
       log.info("Schedule Updated" + scJob);
       console.log("Schedule Updated" + scJob);
-      // return new Promise((resolve, reject) => {
+
       scheduler.updateJobSchedule(scJob, function (err, result) {
         if (err) {
           return logger.log('Error deleting schedule: %s', err);
@@ -261,7 +248,7 @@ module.exports = cds.service.impl(async function () {
         //Schedule deleted successfully
         log.info(constants.LOG_SCH_DEL);
       });
-      // })
+
     } else {
       var scJob = {
         jobId: jobID._id,
@@ -276,15 +263,15 @@ module.exports = cds.service.impl(async function () {
           "active": true
         }
       };
-      log.info("Daily Schedule Created" + scJob);
+      log.info( sDesc + "Schedule Created" + scJob);
       console.log("Schedule Created" + JSON.stringify(scJob));
 
       scheduler.createJobSchedule(scJob, function (error, body) {
         if (error) {
-          reject(error.message);
+          log.info(error.message);
         }
         // Job successfully created.
-        resolve('Job successfully created')
+        log.info('Job successfully created')
       });
 
     }
@@ -408,138 +395,68 @@ module.exports = cds.service.impl(async function () {
     let jobID = await getJobId(constants.jobNAME, scheduler);
     let jobDetails = await getJobDetals(jobID, scheduler);
     let sSId;
+    let dFlag = "";
     let resultJob = jobDetails.results;
     if (resultJob) {
       for (var i = 0; i < resultJob.length; i++) {
         if (resultJob[i].description === constants.suspendTo || resultJob[i].description === constants.suspendFrom) {
+          dFlag = "X";
           sSId = resultJob[i].scheduleId;
-          var req = {
-            jobId: jobID._id,
-            scheduleId: sSId
-          };
-          scheduler.deleteJobSchedule(req, function (err, result) {
-            if (err) {
-              return logger.log('Error deleting schedule: %s', err);
-            }
-            //Schedule deleted successfully
-            log.info(constants.LOG_JS_DEL);
-          });
+          for (var j = 0; j < timeArray.length; j++) {
+            if(timeArray[j].Desc === resultJob[i].description){
+            var scJob = {
+              jobId: jobID._id,
+              scheduleId: sSId,
+              schedule: {
+                "time": timeArray[j].time,
+                "description": timeArray[j].Desc,
+                "data": {
+                  "headers": { "Content-Type": "application/json" }
+                },
+                "active": true
+              }
+            };
+            log.info("Suspend Schedule Created" + scJob);
+            log.info("Schedule Updated" + scJob);
+            scheduler.updateJobSchedule(scJob, function (err, result) {
+              if (err) {
+                return logger.log('Error deleting schedule: %s', err);
+              }
+              //Schedule deleted successfully
+              log.info(constants.LOG_SCH_DEL);
+            });
+          }
+          }
         }
       };
     }
-    for (var j = 0; j < timeArray.length; j++) {
-      var scJob = {
-        jobId: jobID._id,
-        schedule: {
-          "time": timeArray[j].time,
-          "description": timeArray[j].Desc,
-          "data": {
-            "headers": { "Content-Type": "application/json" }
-          },
-          "active": true
-        }
-      };
-      log.info("Suspend Schedule Created" + scJob);
+    if (dFlag !== "X") {
+      for (var j = 0; j < timeArray.length; j++) {
+        var scJob = {
+          jobId: jobID._id,
+          schedule: {
+            "time": timeArray[j].time,
+            "description": timeArray[j].Desc,
+            "data": {
+              "headers": { "Content-Type": "application/json" }
+            },
+            "active": true
+          }
+        };
+        log.info("Suspend Schedule Created" + scJob);
+        scheduler.createJobSchedule(scJob, function (error, body) {
+          if (error) {
+            log.info(error.message);
+          }
+          // Job successfully created.
+          log.info('Job successfully created')
+        });
+  
+  
+      }
 
-      scheduler.createJobSchedule(scJob, function (error, body) {
-        if (error) {
-          reject(error.message);
-        }
-        // Job successfully created.
-        resolve('Job successfully created')
-      });
     }
-
   });
-  // this.on('createSuspendSchedule', async (req) => {
-  //   let timeArray = JSON.parse(req.data.time);
-  //   const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
-  //   const options = {
-  //     baseURL: baseURL,
-  //     token: token
-  //   };
-  //   const scheduler = new JobSchedulerClient.Scheduler(options);
-  //   let jobID = await getJobId(constants.jobNAME, scheduler);
-  //   let jobDetails = await getJobDetals(jobID, scheduler);
-  //   let sSId;
-  //   let dFlag = "";
-  //   let resultJob = jobDetails.results;
-  //   if (resultJob) {
-  //     for (var i = 0; i < resultJob.length; i++) {
-  //       if (resultJob[i].description === constants.suspendTo || resultJob[i].description === constants.suspendFrom) {
-  //         dFlag = "X";
-  // for (var j = 0; j < timeArray.length; j++) {
-  //   var scJob = {
-  //     jobId: jobID._id,
-  //     schedule: {
-  //       "time": timeArray[j].time,
-  //       "description": timeArray[j].Desc,
-  //       "data": {
-  //         "headers": { "Content-Type": "application/json" }
-  //       },
-  //       "active": true
-  //     }
-  //   };
-  //   log.info("Suspend Schedule Created" + scJob);
-
-  //   scheduler.createJobSchedule(scJob, function (error, body) {
-  //     if (error) {
-  //       reject(error.message);
-  //     }
-  //     // Job successfully created.
-  //     resolve('Job successfully created')
-  //   });
-  // }
-  //         sSId = resultJob[i].scheduleId;
-  //         var scJob = {
-  //           jobId: jobID._id,
-  //           scheduleId: sSId,
-  //           schedule: {
-  //             "active": true
-  //           }
-  //         };
-  //       }
-  //     };
-  //   }
-  //   if (dFlag === "X") {
-  //     log.info("Schedule Updated" + scJob);
-  //     console.log("Schedule Updated" + scJob);
-  //     // return new Promise((resolve, reject) => {
-  //     scheduler.updateJobSchedule(scJob, function (err, result) {
-  //       if (err) {
-  //         return logger.log('Error deleting schedule: %s', err);
-  //       }
-  //       //Schedule deleted successfully
-  //       log.info(constants.LOG_SCH_DEL);
-  //     });
-  //     // })
-  //   } else {
-  //     var scJob = {
-  //       jobId: jobID._id,
-  //       schedule: {
-  //         "repeatAt": sTime,
-  //         "type": "recurring",
-  //         "description": sDesc,
-  //         "data": {
-  //           "headers": { "Content-Type": "application/json" },
-  //           "suspendStatus": "INACTIVE"
-  //         },
-  //         "active": true
-  //       }
-  //     };
-  //     log.info("Daily Schedule Created" + scJob);
-  //     console.log("Schedule Created" + JSON.stringify(scJob));
-
-  //     scheduler.createJobSchedule(scJob, function (error, body) {
-  //       if (error) {
-  //         reject(error.message);
-  //       }
-  //       // Job successfully created.
-  //       resolve('Job successfully created')
-  //     });
-
-  //   }
-  // });
   /**
 * Function to get Job Details
 */
