@@ -41,11 +41,13 @@
                 <uxap:subSections>
                     <uxap:ObjectPageSubSection title="{i18n>dailyProcessing}" titleUppercase="true">
                         <uxap:blocks>
-                            <forms:SimpleForm labelSpanXL="3" columnsXL="2" columnsL="1" columnsM="1" labelSpanL="2" labelSpanM="3" labelSpanS="12" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
+                            <!-- <l:VerticalLayout class="sapUiSmallMarginEnd"> -->
+                            <forms:SimpleForm  labelSpanXL="3" columnsXL="2" columnsL="1" columnsM="1" labelSpanL="2" labelSpanM="3" labelSpanS="12" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>dailyProcessingStartTime}" required="true"/>
                                 <TimePicker id="idTimePickerInput" displayFormat="hh:mm a" valueFormat="hh:mm a" width="80%" />
                                 <Switch id="idSwitchInput" change="onSwtichChange" />
                             </forms:SimpleForm>
+                            <!-- </l:VerticalLayout> -->
                         </uxap:blocks>
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
@@ -76,11 +78,16 @@
                 <uxap:subSections>
                     <uxap:ObjectPageSubSection title="{i18n>dataInc}" titleUppercase="true">
                         <uxap:blocks>
-                            <forms:SimpleForm labelSpanXL="3" columnsXL="2" columnsL="1" columnsM="1" labelSpanL="1" labelSpanM="2" labelSpanS="12" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
+                            <!-- <l:VerticalLayout class="sapUiSmallMarginEnd"> -->
+                            <!-- <forms:SimpleForm columnsXL="4" columnsL="3" columnsM="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact"> -->
+                            <forms:SimpleForm labelSpanXL="2" columnsXL="1" columnsL="1" columnsM="1" labelSpanL="2" labelSpanM="2" labelSpanS="2" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>dataIncInput}" required="true" />
+                              
                                 <TimePicker id="idTimePickerInputDI" displayFormat="hh:mm a" valueFormat="hh:mm a" width="80%" />
-                                <Switch id="idSwitchInputDataInc" change="onSwtichChangeDataInc" />
+                                <Switch id="idSwitchInputDataInc" change="onSwtichChangeDataInc" /> 
+                                
                             </forms:SimpleForm>
+                             <!-- </l:VerticalLayout> -->
                         </uxap:blocks>
                         <uxap:actions>
                             <Button id="idButtonCCdataInc" text="To" type="Emphasized" press="onEmailCCSelectDialogPressD" />
@@ -108,7 +115,6 @@
                                     change="onhandleDateCheckSusTo"
                                     valueStateText="{i18n>plcErrorDate}"
                                 />
-
                                 <Label />
                                 <Switch id="idSwitchInputSuspend" change="onSwtichChangeSuspend" />
                             </forms:SimpleForm>

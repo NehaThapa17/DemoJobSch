@@ -1012,7 +1012,7 @@ sap.ui.define([
                         //of this component (models, lifecycle)
                         oView.addDependent(oDialog);
                         oDialog.open();
-                        oDialog.setTitle("Add Terminal");
+                        oDialog.setTitle("addTerminal");
                         sap.ui.core.Fragment.byId(oView.getId(), "idTxtShCount").setText(constants.INTZERO);
                     });
                 } else {
@@ -2131,6 +2131,8 @@ sap.ui.define([
                                 success: function (oData) {
                                     BusyIndicator.hide();
                                     MessageBox.information(that.oBundle.getText("turnOffIn"));
+                                    that.getView().byId("idButtonOff").setVisible(false);
+                                    that.getView().byId("idDatePickerOnDemand").setValue("");
                                 },
                                 error: function (err) {
                                     BusyIndicator.hide();
@@ -2269,10 +2271,6 @@ sap.ui.define([
                     }
                 });
             },
-            /**
-              * Method called to handle Edit button for Suspend
-              * @public
-              */
 
             /**
               * Method called to handle Cancel button for Suspend

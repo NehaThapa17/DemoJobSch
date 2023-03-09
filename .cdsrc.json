@@ -1,21 +1,5 @@
 
     {
-    "[development]": {
-      "auth": {
-        "passport": {
-          
-          "users": {
-            "risk.viewer@tester.sap.com": "...",
-            "risk.manager@tester.sap.com": {
-              "password": "initial",
-              "ID": "NThapa@marathonpetroleum.com ",
-              "roles": [
-                "Pricing_Analyst"
-              ]
-            }
-          }
-        }
-      }
-    }
+   
   }
   

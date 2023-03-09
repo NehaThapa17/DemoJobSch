@@ -2131,6 +2131,8 @@ sap.ui.define([
                                 success: function (oData) {
                                     BusyIndicator.hide();
                                     MessageBox.information(that.oBundle.getText("turnOffIn"));
+                                    that.getView().byId("idButtonOff").setVisible(false);
+                                    that.getView().byId("idDatePickerOnDemand").setValue("");
                                 },
                                 error: function (err) {
                                     BusyIndicator.hide();
