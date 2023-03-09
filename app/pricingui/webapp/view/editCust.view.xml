@@ -3,19 +3,19 @@
         <f:SimpleForm editable="true" class="sapUiSizeCompact" layout="ColumnLayout" title="{i18n>editCustomer}" columnsXL="2" columnsL="1" columnsM="1">
             <f:content>
                 <Label text="{i18n>customerID}" required="true" />
-                <Input id="idInputCustomerID" maxLength="10" width="360px" enabled="false" />
+                <Input id="idInputCustomerID" maxLength="10" width="23rem" enabled="false" />
                 <Label text="{i18n>customerName}" required="true" />
-                <Input id="idInputCustomerName" maxLength="40" width="360px" />
+                <Input id="idInputCustomerName" maxLength="40" width="23rem" />
                 <Label text="{i18n>shipToID}" required="true" />
-                <Input id="idInputShipToID" maxLength="10" width="360px" enabled="false" />
+                <Input id="idInputShipToID" maxLength="10" width="23rem" enabled="false" />
                 <Label text="{i18n>shipToName}" required="true" />
-                <Input id="idInputShipToName" maxLength="40" width="360px" />
+                <Input id="idInputShipToName" maxLength="40" width="23rem" />
                 <Label text="{i18n>terminal}"  />
-                <MultiInput id="idMultiComboBoxTerminal" valueHelpOnly="true" valueHelpRequest=".onTerminalValueHelpRequested" width="360px" />
+                <MultiInput id="idMultiComboBoxTerminal" valueHelpOnly="true" valueHelpRequest=".onTerminalValueHelpRequested" width="23rem" />
                 <Label text="{i18n>product}"  />
-                <MultiInput id="idMultiComboBoxProducts" valueHelpOnly="true" valueHelpRequest=".onProductsValueHelpRequested" width="360px" />
+                <MultiInput id="idMultiComboBoxProducts" valueHelpOnly="true" valueHelpRequest=".onProductsValueHelpRequested" width="23rem" />
                 <Label text="{i18n>email}" required="true" />
-                <MultiInput id="idInputEmail" change="onEmailChangeEditCust" showValueHelp="false" width="500px" tokens="{
+                <MultiInput id="idInputEmail" change="onEmailChangeEditCust" showValueHelp="false" width="40rem" tokens="{
 			path: 'detailModel>/items'
 		}">
                     <tokens>

@@ -81,14 +81,14 @@ sap.ui.define([
                             that.getView().byId("idTextDailyST").setText(sTime);
                             that.getView().byId("idSwitchInput").setState(true);
                             that.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
-                            that.getView().byId("idInfoLabel").setText("Active");
+                            that.getView().byId("idInfoLabel").setText(that.oBundle.getText("active"));
                             that.getView().byId("idTimePickerInput").setEnabled(false);
                         } else {
                             that.getView().byId("idTextDailyST").setText(constants.SPACE);
                             that.getView().byId("idTimePickerInput").setValue(constants.SPACE);
                             that.getView().byId("idSwitchInput").setState(false);
                             that.getView().byId("idTimePickerInput").setEnabled(true);
-                            that.getView().byId("idInfoLabel").setText("InActive");
+                            that.getView().byId("idInfoLabel").setText(that.oBundle.getText("inactive"));
                             that.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
                         }
                         if (oDataArr2.ONDEMAND !== undefined) {
@@ -419,6 +419,7 @@ sap.ui.define([
               */
             getF4Terminal: function () {
                 var that = this;
+                BusyIndicator.show();
                 this.oDataModelT.callFunction("/getOnPremTerminalF4", {
                     method: constants.httpGet,
                     success: function (oData) {
@@ -439,6 +440,7 @@ sap.ui.define([
               */
             getF4Product: function () {
                 var that = this;
+                BusyIndicator.show();
                 this.oDataModelT.callFunction("/getOnPremProductF4", {
                     method: constants.httpGet,
                     success: function (oData) {
@@ -678,7 +680,7 @@ sap.ui.define([
 
                 if (oState === false) {
                     this.getView().byId("idTimePickerInput").setEnabled(true);
-                    this.getView().byId("idInfoLabel").setText("InActive");
+                    this.getView().byId("idInfoLabel").setText(this.oBundle.getText("inactive"));
                     this.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
                     //Delete Schedule
                     this.oDataModelT.callFunction("/updateSchedule", {
@@ -713,7 +715,7 @@ sap.ui.define([
                         var oTime = dateValue.getHours() + constants.DIV + oMin;
                         this.getView().byId("idTimePickerInput").setEnabled(false);
                         this.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
-                        this.getView().byId("idInfoLabel").setText("Active");
+                        this.getView().byId("idInfoLabel").setText(this.oBundle.getText("active"));
                         this.getView().byId("idTextDailyST").setText(oDaily);
                         //Create Daily Schedule
                         this.oDataModelT.callFunction("/createSchedule", {
@@ -765,7 +767,7 @@ sap.ui.define([
                         if (oDataArr2.DISPLAY !== undefined) {
 
                             that.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
-                            that.getView().byId("idInfoLabel").setText("Active");
+                            that.getView().byId("idInfoLabel").setText(that.oBundle.getText("active"));
                             // that.getView().byId("idTimePickerInput").setEnabled(false);
                         }
                     },
@@ -1012,12 +1014,12 @@ sap.ui.define([
                         //of this component (models, lifecycle)
                         oView.addDependent(oDialog);
                         oDialog.open();
-                        oDialog.setTitle("Add Terminal");
+                        oDialog.setTitle(that.oBundle.getText("addTerminal"));
                         sap.ui.core.Fragment.byId(oView.getId(), "idTxtShCount").setText(constants.INTZERO);
                     });
                 } else {
                     this.byId("addTerminal").open();
-                    oDialog.setTitle("Add Terminal");
+                    oDialog.setTitle(that.oBundle.getText("addTerminal"));
                 }
             },
             onTerminalClose: function () {
@@ -1862,7 +1864,7 @@ sap.ui.define([
                     }
                 }
                 // create dialog lazily
-                if (!this.byId("addEmailCC")) {
+                if (!this.byId("addEmailTo")) {
                     // load asynchronous XML fragment
                     Fragment.load({
                         id: oView.getId(),
@@ -1892,7 +1894,7 @@ sap.ui.define([
 
                     });
                 } else {
-                    this.byId("addEmailCC").open();
+                    this.byId("addEmailTo").open();
                 }
             },
             /**
@@ -1926,9 +1928,9 @@ sap.ui.define([
                 this.byId("addEmail").close();
                 this.byId("addEmail").destroy();
             },
-            onCCEmailCloseD: function () {
-                this.byId("addEmailCC").close();
-                this.byId("addEmailCC").destroy();
+            onCCEmailCloseDataInc: function () {
+                this.byId("addEmailTo").close();
+                this.byId("addEmailTo").destroy();
             },
             /**
               * Method called to save CCEmails in S/4
@@ -1982,7 +1984,7 @@ sap.ui.define([
                 }
                 BusyIndicator.hide();
             },
-            onCCEmailSaveD: function () {
+            onCCEmailSaveDataInc: function () {
 
                 var oCCEmail = this.getView().byId("multiInputemailD").getTokens(), oCCEmailString = "", that = this;
                 if (oCCEmail.length !== constants.INTZERO) {
@@ -2014,7 +2016,7 @@ sap.ui.define([
                         MessageBox.success(that.oBundle.getText("savedSucc"), {
                             onClose: function (sAction) {
                                 if (sAction === MessageBox.Action.OK) {
-                                    that.onCCEmailCloseD();
+                                    that.onCCEmailCloseDataInc();
                                     that.getCCEmails();
                                 }
                             }
@@ -2102,13 +2104,13 @@ sap.ui.define([
                 this.getView().byId("idButtonSave").setVisible(false);
                 this.getView().byId("idButtonCancel").setVisible(false);
                 this.getView().byId("idButtonEdit").setVisible(true);
-                that.getView().byId("idButtonOff").setVisible(true);
+                this.getView().byId("idButtonOff").setVisible(true);
                 this.getView().byId("idMultiInputCustomer").setEnabled(false);
                 this.getView().byId("idDatePickerOnDemand").setEnabled(false);
                 this.getView().byId("idDatePickerPricingDate").setEnabled(false);
-                this.getView().byId("idMultiInputCustomer").setValueState("None");
-                this.getView().byId("idDatePickerOnDemand").setValueState("None");
-                this.getView().byId("idDatePickerPricingDate").setValueState("None");
+                this.getView().byId("idMultiInputCustomer").setValueState(sap.ui.core.ValueState.None);
+                this.getView().byId("idDatePickerOnDemand").setValueState(sap.ui.core.ValueState.None);
+                this.getView().byId("idDatePickerPricingDate").setValueState(sap.ui.core.ValueState.None);
                 var r = this.getView().getModel("oModel").getProperty("/dateValue");
                 this.getView().byId("idDatePickerOnDemand").setValue(r);
 
@@ -2133,6 +2135,8 @@ sap.ui.define([
                                     MessageBox.information(that.oBundle.getText("turnOffIn"));
                                     that.getView().byId("idButtonOff").setVisible(false);
                                     that.getView().byId("idDatePickerOnDemand").setValue("");
+                                    that.getView().byId("idTextOnDemandST").setText(constants.SPACE);
+                                    that.getView().getModel("oModel").setProperty("/dateValue",constants.SPACE);
                                 },
                                 error: function (err) {
                                     BusyIndicator.hide();
@@ -2166,7 +2170,7 @@ sap.ui.define([
                     });
                 cDate = new Date(cDate);
                 if (dateValue < cDate) {
-                    this.getView().byId("idDatePickerOnDemand").setValueState("Error");
+                    this.getView().byId("idDatePickerOnDemand").setValueState(sap.ui.core.ValueState.Error);
                     MessageBox.error(this.oBundle.getText("dateError"));
                 } else {
                     // Adjust date by 6 hours
@@ -2192,32 +2196,7 @@ sap.ui.define([
                             this.getView().getModel("oModel").setProperty("/dateValue", oDate);
 
                             var oJsonData = this.getPayloadJson(oCust);
-                            this.oDataModelT.callFunction("/createOnDemandSchedule", {
-                                method: constants.httpGet,
-                                urlParameters: {
-                                    time: onDemand,
-                                    desc: constants.onDemand
-                                },
-                                success: function (oData) {
-                                    BusyIndicator.hide();
-                                    if (oData.createOnDemandSchedule) {
-                                        that.updateOndemandData(oJsonData);
-                                        that.onCreatePricingDate(oPricingDateString);
-                                        MessageBox.success(that.oBundle.getText("succJSOD"));
-                                        that.getCustomerDetails();
-                                        that.getTerminalDetails();
-                                    }
-
-                                },
-                                error: function (err) {
-                                    BusyIndicator.hide();
-                                    MessageBox.error(that.oBundle.getText("techError"), {
-                                        details: err
-                                    });
-
-                                }
-                            });
-
+                            this.updateOndemandData(oJsonData,oPricingDateString,onDemand);
                         }
                     } else {
 
@@ -2251,9 +2230,9 @@ sap.ui.define([
               * Method called in onPressSaveOnDemand to update S/4
               * @public
               */
-            updateOndemandData: function (oJsonData) {
+            updateOndemandData: function (oJsonData,oPricingDateString,onDemand) {
                 var that = this;
-                var oPayloadOnD = JSON.stringify(oJsonData)
+                var oPayloadOnD = JSON.stringify(oJsonData,)
                 this.oDataModelT.callFunction("/updateOnDemand", {
                     method: constants.httpPost,
                     urlParameters: {
@@ -2261,35 +2240,43 @@ sap.ui.define([
                     },
                     success: function (oData) {
                         BusyIndicator.hide();
+                        if (oData.updateOnDemand.data.status !== undefined && oData.updateOnDemand.data.status !== 200) {
+                             MessageBox.error(oData.updateOnDemand.data.message); }
+                            else{
+                                that.onCreatePricingDate(oPricingDateString);
+                                
+                                that.oDataModelT.callFunction("/createOnDemandSchedule", {
+                                method: constants.httpGet,
+                                urlParameters: {
+                                    time: onDemand,
+                                    desc: constants.onDemand
+                                },
+                                success: function (oData) {
+                                    if (oData.createOnDemandSchedule) {
+                                        MessageBox.success(that.oBundle.getText("succJSOD"));
+                                        that.getCustomerDetails();
+                                        that.getTerminalDetails();
+                                    }
+
+                                },
+                                error: function (err) {
+                                    MessageBox.error(that.oBundle.getText("techError"), {
+                                        details: err
+                                    });
+
+                                }
+                            });
+                            }
                     },
                     error: function (err) {
                         BusyIndicator.hide();
-                        MessageBox.error(that.oBundle.getText("techError"), {
+                        var msg = err.message;
+                        MessageBox.error(msg, {
                             details: err
-                        });
+                    });
 
                     }
                 });
-            },
-            /**
-              * Method called to handle Edit button for Suspend
-              * @public
-              */
-
-            /**
-              * Method called to handle Cancel button for Suspend
-              * @public
-              */
-            onPressSuspendClear: function () {
-                this.getView().byId("idDatePickerSuspend").setEnabled(false);
-                this.getView().byId("idDatePicker2Suspend").setEnabled(false);
-                this.getView().byId("idDatePicker2Suspend").setValueState("None");
-                this.getView().byId("idDatePicker2Suspend").setValueState("None");
-                var rFrom = this.getView().getModel("oModel").getProperty("/dateValueF"),
-                    rTo = this.getView().getModel("oModel").getProperty("/dateValueT");
-                this.getView().byId("idDatePickerSuspend").setValue(rFrom);
-                this.getView().byId("idDatePicker2Suspend").setValue(rTo);
-
             },
             /**
               * Method called to handle Save button for Suspend
@@ -2315,9 +2302,9 @@ sap.ui.define([
                             var dState = that.getView().byId("idSwitchInput").getState();
                             if (dState === true) {
                                 that.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
-                                that.getView().byId("idInfoLabel").setText("Active");
+                                that.getView().byId("idInfoLabel").setText(that.oBundle.getText("active"));
                             } else {
-                                that.getView().byId("idInfoLabel").setText("InActive");
+                                that.getView().byId("idInfoLabel").setText(that.oBundle.getText("inactive"));
                                 that.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
                             }
                             MessageBox.information(that.oBundle.getText("turnOffSus"));
@@ -2371,7 +2358,7 @@ sap.ui.define([
                     if (ToDate < cDate) {
                         BusyIndicator.hide();
                         that.getView().byId("idSwitchInputSuspend").setState(false);
-                        this.getView().byId("idDatePicker2Suspend").setValueState("Error");
+                        this.getView().byId("idDatePicker2Suspend").setValueState(sap.ui.core.ValueState.Error);
                         MessageBox.error(this.oBundle.getText("dateError"));
                     } else {
                         if ((oDateSuspendTo !== "" && oDateSuspendTo !== constants.SPACE && oDateSuspendTo !== undefined) && (oDateSuspendFrom !== "" && oDateSuspendFrom !== constants.SPACE && oDateSuspendFrom !== undefined)) {
@@ -2447,11 +2434,11 @@ sap.ui.define([
                 var oDateSuspendTo = this.getView().byId("idDatePickerSuspend").getDateValue(),
                     oDateSuspendFrom = this.getView().byId("idDatePicker2Suspend").getDateValue();
                 if (oDateSuspendFrom != null && oDateSuspendFrom <= oDateSuspendTo) {
-                    this.getView().byId("idDatePicker2Suspend").setValueState("Error");
+                    this.getView().byId("idDatePicker2Suspend").setValueState(sap.ui.core.ValueState.Error);
                     this.getView().byId("idDatePicker2Suspend").setValueStateText(this.oBundle.getText("plcErrorDate"));
                 } 
                 else {
-                    this.getView().byId("idDatePicker2Suspend").setValueState("None");
+                    this.getView().byId("idDatePicker2Suspend").setValueState(sap.ui.core.ValueState.None);
                 }
             },
             /**
@@ -2462,14 +2449,14 @@ sap.ui.define([
                 var oDateSuspendTo = this.getView().byId("idDatePickerSuspend").getDateValue(),
                     oDateSuspendFrom = this.getView().byId("idDatePicker2Suspend").getDateValue();
                 if (oDateSuspendFrom <= oDateSuspendTo) {
-                    this.getView().byId("idDatePicker2Suspend").setValueState("Error");
+                    this.getView().byId("idDatePicker2Suspend").setValueState(sap.ui.core.ValueState.Error);
                     this.getView().byId("idDatePicker2Suspend").setValueStateText(this.oBundle.getText("plcErrorDate"));
                 } else if (oDateSuspendTo === null) {
-                    this.getView().byId("idDatePicker2Suspend").setValueState("Error");
+                    this.getView().byId("idDatePicker2Suspend").setValueState(sap.ui.core.ValueState.Error);
                     this.getView().byId("idDatePicker2Suspend").setValueStateText(this.oBundle.getText("timeTo"));
                 }
                 else {
-                    this.getView().byId("idDatePicker2Suspend").setValueState("None");
+                    this.getView().byId("idDatePicker2Suspend").setValueState(sap.ui.core.ValueState.None);
                 }
             },
             onhandleDateCheck: function (oEvent) {
@@ -2484,13 +2471,13 @@ sap.ui.define([
                 cDate = new Date(cDate);
                 if (bValid) {
                     if (selectedDate < cDate) {
-                        oDTP.setValueState("Error");
+                        oDTP.setValueState(sap.ui.core.ValueState.Error);
                         MessageBox.error(this.oBundle.getText("dateError"));
                     } else {
-                        oDTP.setValueState("None");
+                        oDTP.setValueState(sap.ui.core.ValueState.None);
                     }
                 } else {
-                    oDTP.setValueState("Error");
+                    oDTP.setValueState(sap.ui.core.ValueState.Error);
                 }
             },
             onhandleDateCheckSusFrom: function (oEvent) {
@@ -2507,16 +2494,16 @@ sap.ui.define([
                 cDate = new Date(cDate);
                 if (bValid) {
                     if (selectedDate < cDate) {
-                        oDTP.setValueState("Error");
+                        oDTP.setValueState(sap.ui.core.ValueState.Error);
                         oDTP.setValueStateText(this.oBundle.getText("timeCurr"));
                         // MessageBox.error(this.oBundle.getText("dateError"));
                     } else if (oDateSuspendFrom != null && oDateSuspendFrom <= oDateSuspendTo) {
-                        oDTP.setValueState("Error");
+                        oDTP.setValueState(sap.ui.core.ValueState.Error);
                     } else {
-                        oDTP.setValueState("None");
+                        oDTP.setValueState(sap.ui.core.ValueState.None);
                     }
                 } else {
-                    oDTP.setValueState("Error");
+                    oDTP.setValueState(sap.ui.core.ValueState.Error);
                 }
             },
             onhandleDateCheckSusTo: function (oEvent) {
@@ -2533,18 +2520,17 @@ sap.ui.define([
                 cDate = new Date(cDate);
                 if (bValid) {
                     if (selectedDate < cDate) {
-                        oDTP.setValueState("Error");
+                        oDTP.setValueState(sap.ui.core.ValueState.Error);
                         oDTP.setValueStateText(this.oBundle.getText("timeCurr"));
-                        // MessageBox.error(this.oBundle.getText("dateError"));
                     } else if (oDateSuspendTo === null) {
-                        this.getView().byId("idDatePicker2Suspend").setValueState("Error");
+                        this.getView().byId("idDatePicker2Suspend").setValueState(sap.ui.core.ValueState.Error);
                     } else if (oDateSuspendFrom <= oDateSuspendTo) {
-                        oDTP.setValueState("Error");
+                        oDTP.setValueState(sap.ui.core.ValueState.Error);
                     } else {
-                        oDTP.setValueState("None");
+                        oDTP.setValueState(sap.ui.core.ValueState.None);
                     }
                 } else {
-                    oDTP.setValueState("Error");
+                    oDTP.setValueState(sap.ui.core.ValueState.Error);
                 }
             },
             /**
@@ -2552,7 +2538,6 @@ sap.ui.define([
         * @public
         */
             onHandleValueHelpTerminal: function () {
-                BusyIndicator.show();
                 this.getF4Terminal();
                 var oView = this.getView();
                 // create dialog lazily
@@ -2684,7 +2669,6 @@ sap.ui.define([
               * @public
               */
             onHandleValueHelpProduct: function () {
-                BusyIndicator.show();
                 this.getF4Product();
                 var oView = this.getView();
                 // create dialog lazily
@@ -3423,7 +3407,10 @@ sap.ui.define([
 
                                             },
                                             error: function (err) {
-
+                                                var msg= that.oBundle.getText("incError");
+                                                MessageBox.error(msg, {
+                                                    details: err
+                                                });
                                             }
                                         });
                                     }

@@ -1,9 +1,11 @@
 const cfenv = require('cfenv');
 const axios = require('axios');
 const constants = require("./util/constants-util.js");
+const log = require('cf-nodejs-logging-support');
 
 const getClientFromDestination = async (xsuaaService, destinationService, destination) => {
     try {
+        log.info("sap_client.js file has been called");
         const uaa_service = cfenv.getAppEnv().getService(xsuaaService);
         const dest_service = cfenv.getAppEnv().getService(destinationService);
 
@@ -30,6 +32,7 @@ const getClientFromDestination = async (xsuaaService, destinationService, destin
         const sap_client = destDetailsResponse.data.destinationConfiguration['sap-client']
         return sap_client;
     } catch (error) {
+        log.error("sap_client.js" +error);
         return constants.ERROR;
     }
 }

@@ -4,11 +4,7 @@
       <TableSelectDialog noDataText="{i18n>cusPlcHolder}" contentWidth="50%" title="{i18n>customer}" search=".handleSearch" confirm=".handleConfirm" cancel=".handleClose" items="{oCustModel>/CustValHelp}">
             <ColumnListItem>
                 <cells>
-                    <!-- <ObjectIdentifier title="{oCustModel>Customer}" text="{oCustModel>Customer} {oCustModel>CustomerName}" /> -->
-                    <!-- <StandardListItem title="{oCustModel>Customer}" description="{oCustModel>CustomerName}"/> -->
-                    <!-- <Text text="" /> -->
                     <ObjectIdentifier text="{oCustModel>Customer}" title="{oCustModel>CustomerName}"  />
-                    <!-- <ObjectIdentifier title="{oCustModel>Shipto}" text="{oCustModel>ShiptoName}" /> -->
                     <ObjectIdentifier title="{oCustModel>ShiptoName}" text="{oCustModel>Shipto}" />
                 </cells>
             </ColumnListItem>

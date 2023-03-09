@@ -7,8 +7,6 @@ const destService = constants.destService;
 const destination = constants.dest;
 const SapCfAxios = require('sap-cf-axios').default;
 const sapcfaxios= SapCfAxios(destination);
-// const username = require('username');
-// let os = require('os');
 
 /**
 * Function to call the url 
@@ -32,8 +30,7 @@ async function getOnPremCall(req,sUrl) {
         return respSchedule;    
     }
     catch (error) {
-        log.error("getOnPremCall error" +error);
-        // error.message = error.response.data.error.message.value;     
+        log.error("getOnPremCall error" +error);    
         return error;
     }
 }

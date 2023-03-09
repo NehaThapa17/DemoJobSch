@@ -6,9 +6,9 @@
      <f:SimpleForm editable="true" layout="ColumnLayout" title="" columnsXL="2" columnsL="1" columnsM="1">
         <f:content>
             <Label text="{i18n>productID}" required="true"/>
-             <Input id="idInputProductID" maxLength="10" valueHelpRequest="onHandleValueHelpProduct" width="360px" showValueHelp="true" valueHelpOnly="true" />
+             <Input id="idInputProductID" maxLength="10" valueHelpRequest="onHandleValueHelpProduct" width="80%" showValueHelp="true" valueHelpOnly="true" />
             <Label text="{i18n>productName}" />
-            <Input id="idInputProductName"  maxLength="40" width="360px" />
+            <Input id="idInputProductName"  maxLength="40" width="80%" />
             <Label text="{i18n>shipTo}" />
             <Text id="idProdShCount"  />
             

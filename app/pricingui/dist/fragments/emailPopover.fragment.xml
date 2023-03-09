@@ -4,8 +4,8 @@
 	<Popover
 		id="myPopover2"
 		showHeader="false"
-		contentWidth="320px"
-		contentHeight="500px"
+		contentWidth="20rem"
+		contentHeight="15rem"
 		placement="Bottom"
 		ariaLabelledBy="master-title">
 		<NavContainer>

@@ -48,6 +48,7 @@ module.exports = cds.service.impl(async function () {
     let jobDetails = await getJobDetals(jobID, scheduler);
     let sdisplayT, sdemandT, sSuspendT, sSuspendF, sActiveT, sActiveF, SuspendActive, sCheckData;
     let resultJob = jobDetails.results;
+    log.info("getJobDetails called" +JSON.stringify(resultJob));
     if (resultJob) {
       for (var i = 0; i < resultJob.length; i++) {
         if (resultJob[i].description === constants.daily && resultJob[i].active === true) {
@@ -142,7 +143,7 @@ module.exports = cds.service.impl(async function () {
       for (var i = 0; i < resultJob.length; i++) {
         if (resultJob[i].description === constants.suspendFrom) {
           sSId = resultJob[i].scheduleId;
-//schedule details needed even after refresh
+      //schedule details needed even after refresh
 
           var scJob = {
             jobId: jobID._id,
@@ -164,20 +165,7 @@ module.exports = cds.service.impl(async function () {
 
         } else if (resultJob[i].description === constants.suspendTo) {
           sSId = resultJob[i].scheduleId;
-          //Coment this block in case of refresh code uncommented Start
-          // var req = {
-          //   jobId: jobID._id,
-          //   scheduleId: sSId
-          // };
-          // scheduler.deleteJobSchedule(req, function (err, result) {
-          //   if (err) {
-          //     return logger.log('Error deleting schedule: %s', err);
-          //   }
 
-          //   //Schedule deleted successfully
-          //   log.info(constants.LOG_JS_DEL);
-          // });
-          //End
           //Incase of schedule details needed even after refresh
 
           var scJob = {
@@ -750,11 +738,14 @@ module.exports = cds.service.impl(async function () {
             const responseAsJson = JSON.parse(response)
             const jwtToken = responseAsJson.access_token
             if (!jwtToken) {
-              return reject(new Error('Error while fetching JWT token'))
+              log.error("fetchJwtToken Error while fetching JWT token" );
+              return reject(new Error('Error while fetching JWT token'));
             }
             resolve(jwtToken)
           } catch (error) {
-            return reject(new Error('Error while fetching JWT token'))
+            log.error("fetchJwtToken Error while fetching JWT token" );
+            return reject(new Error('Error while fetching JWT token'));
+            
           }
         })
       })

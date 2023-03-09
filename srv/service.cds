@@ -40,5 +40,3 @@ service CatalogService @(requires : 'authenticated-user')
     
   
 }
-
-//@(requires : 'authenticated-user')

@@ -69,7 +69,6 @@ sap.ui.define([
                 this.oDataModel.callFunction("/getOnPremCustomerF4", {
                     method: constants.httpGet,
                     success: function (oData) {
-                        debugger;
                         var data = oData.getOnPremCustomerF4.data;
                         data.sort(function (a, b) {
                             return a.Customer.localeCompare(b.Customer) || b.Shipto - a.Shipto;

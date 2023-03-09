@@ -3,14 +3,11 @@
         <f:SimpleForm editable="true" layout="ColumnLayout" title="" columnsXL="2" columnsL="1" columnsM="1">
             <f:content>
                 <Label text="{i18n>terminalID}" required="true" />
-                <Input id="idInputTerminalID" maxLength="10" valueHelpRequest="onHandleValueHelpTerminal" width="360px" showValueHelp="true" valueHelpOnly="true" />
+                <Input id="idInputTerminalID" maxLength="10" valueHelpRequest="onHandleValueHelpTerminal" width="80%" showValueHelp="true" valueHelpOnly="true" />
                 <Label text="{i18n>terminalName}" required="true" />
-                <Input id="idInputTerminalName" maxLength="40" width="360px" />
+                <Input id="idInputTerminalName" maxLength="40" width="80%" />
                 <Label text="{i18n>shipTo}" />
                 <Text id="idTxtShCount"  />
-                <!-- <CheckBox id="idCheckBoxDaily" enabled="true" /> -->
-                <!-- <Label text="{i18n>onDemandlbl}" />
-                <CheckBox id="idCheckBoxOnDemand" enabled="true" /> -->
             </f:content>
         </f:SimpleForm>
         <beginButton>

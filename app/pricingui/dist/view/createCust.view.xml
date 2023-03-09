@@ -14,19 +14,19 @@
         <f:SimpleForm id="SimpleFormChangeColumn_oneGroup" class="sapUiSizeCompact" editable="true" layout="ColumnLayout" title="{i18n>addCustomer}" columnsXL="2" columnsL="1" columnsM="1">
             <f:content>
                 <Label text="{i18n>customerID}" required="true" />
-                <Input id="idInputCustomerIDAdd" maxLength="10" valueHelpRequest=".onValueHelpRequestedcust" width="360px" showValueHelp="true" valueHelpOnly="true" />
+                <Input id="idInputCustomerIDAdd" maxLength="10" valueHelpRequest=".onValueHelpRequestedcust" width="23rem" showValueHelp="true" valueHelpOnly="true" />
                 <Label text="{i18n>customerName}" required="true" />
-                <Input id="idInputCustomerNameAdd" maxLength="40" value="" width="360px" change="onChange" />
+                <Input id="idInputCustomerNameAdd" maxLength="40" value="" width="23rem" change="onChange" />
                 <Label text="{i18n>shipToID}" required="true" />
-                <Input id="idInputSHAdd" maxLength="10" value="" width="360px" enabled="false" />
+                <Input id="idInputSHAdd" maxLength="10" value="" width="23rem" enabled="false" />
                 <Label text="{i18n>shipToName}" required="true" />
-                <Input id="idInputSHNameAdd" value="" maxLength="40" width="360px" />
+                <Input id="idInputSHNameAdd" value="" maxLength="40" width="23rem" />
                 <Label text="{i18n>terminal}" />
-                <MultiInput id="idMultiComboBoxTerminalAdd" valueHelpOnly="true" valueHelpRequest=".onTerminalValueHelpRequestedAdd" width="360px" />
+                <MultiInput id="idMultiComboBoxTerminalAdd" valueHelpOnly="true" valueHelpRequest=".onTerminalValueHelpRequestedAdd" width="23rem" />
                 <Label text="{i18n>product}" />
-                <MultiInput id="idMultiComboBoxProductsAdd" valueHelpOnly="true" valueHelpRequest=".onProductsValueHelpRequestedAdd" width="360px" />
+                <MultiInput id="idMultiComboBoxProductsAdd" valueHelpOnly="true" valueHelpRequest=".onProductsValueHelpRequestedAdd" width="23rem" />
                 <Label text="{i18n>email}" required="true" />
-                <MultiInput id="idInputEmailAdd" width="500px" showValueHelp="false" change="onEmailChangeAddCust" />
+                <MultiInput id="idInputEmailAdd" width="40rem" showValueHelp="false" change="onEmailChangeAddCust" />
                 <Label text="{i18n>daily}" />
                 <CheckBox id="daily_distribution" enabled="true" />
                 <Label text="{i18n>onDemandlbl}" />

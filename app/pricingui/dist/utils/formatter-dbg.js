@@ -14,7 +14,7 @@ sap.ui.define(
     if(sNum === true){
         return "sap-icon://accept";
     } else {
-        return ""
+        return "";
     }
 },
 

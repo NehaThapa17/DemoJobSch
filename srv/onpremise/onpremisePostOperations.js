@@ -77,7 +77,6 @@ let createonPremCall = async (req,sUrl) => {
             error.message = error.response.data.error.message.value;
         }
         return error;
-        // req.error({ message: error.response.data.error.innererror.errordetails[0].message });
        
     }
 }
@@ -121,7 +120,7 @@ let editcustonPremCall = async (req,sUrl) => {
             error.message = error.response.data.error.message.value;
         }
         return error;
-        // req.error({ message: error.response.data.error.innererror.errordetails[0].message });
+        
        
     }
 }
@@ -163,7 +162,7 @@ let updateonPremCall = async (req,sUrl) => {
             error.message = error.response.data.error.message.value;
         }
         return error;
-        // req.error({ message: error.response.data.error.innererror.errordetails[0].message });
+        
     }
 }
 
@@ -197,7 +196,7 @@ let deleteonPremCall = async (req,sUrl) => {
     catch (error) {
         log.error("deleteonPremCall error" +error);
         error.message = error.response.data.error.message.value;
-        // req.error({ message: error.response.data.error.message.value });
+        
         return error;
     }
 }
