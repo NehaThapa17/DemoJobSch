@@ -40,12 +40,14 @@ sap.ui.define([
       * @public
       */
             onRouteEditCustomer: function () {
+                BusyIndicator.show();
                 var oModel = new JSONModel(),that=this;
                 var fgModel = this.getOwnerComponent().getModel("oModel");
                 var aArray = fgModel.oData.selectedRow;
                 
                 this.oDataModelE.callFunction("/getCustomer", {
                     method: constants.httpGet,
+                    async:false,
                     urlParameters: {
                         customer: aArray[constants.INTZERO].Customer,
                         shipTo: aArray[constants.INTZERO].ShipTo

@@ -469,6 +469,7 @@ sap.ui.define([
                     var oItems = oTableData;
                     that.oDataModelT.callFunction("/getCustomer", {
                         method: constants.httpGet,
+                        async: false,
                         urlParameters: {
                             customer: oItems.Customer,
                             shipTo: oItems.ShipTo
@@ -556,6 +557,7 @@ sap.ui.define([
                     var oItems = oTableData;
                     that.oDataModelT.callFunction("/getCustomer", {
                         method: constants.httpGet,
+                        async: false,
                         urlParameters: {
                             customer: oItems.Customer,
                             shipTo: oItems.ShipTo
@@ -1031,8 +1033,9 @@ sap.ui.define([
               * @public
               */
             handleEditTerminalSelectDialogPress: function () {
+                BusyIndicator.show();
                 var oTable = this.getView().byId("idTableTerminal"), that = this;
-                // var oIdx = oTable.getSelectedContextPaths()[0];
+               
                 var oTableData = this.getView().getModel("oModel").getProperty("/TerminalData");
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 if (itemIndex !== constants.INTNEGONE) {
@@ -1058,6 +1061,7 @@ sap.ui.define([
                     }
                     that.oDataModelT.callFunction("/getTerminal", {
                         method: constants.httpGet,
+                        async: false,
                         urlParameters: {
                             terminal: oItems.Terminal
                         },
@@ -1071,11 +1075,13 @@ sap.ui.define([
 
                         },
                         error: function (err) {
+                            BusyIndicator.hide();
                             MessageBox.error(err.message);
                         }
                     })
                 }
                 else {
+                    BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("selectTerminal"));
                 }
             },
@@ -1084,6 +1090,7 @@ sap.ui.define([
               * @public
               */
             handleEditTerminalPopout: function () {
+                BusyIndicator.show();
                 var oTable = this.getView().byId("idTerTablePopout"), that = this;
                 var oIdx = oTable.getSelectedContextPaths()[0];
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
@@ -1111,24 +1118,26 @@ sap.ui.define([
                     }
                     that.oDataModelT.callFunction("/getTerminal", {
                         method: constants.httpGet,
+                        async: false,
                         urlParameters: {
                             terminal: oItems.Terminal
                         },
                         success: function (oData) {
+                            BusyIndicator.hide();
                             if (oData.getTerminal.data.status === undefined) {
-                                
-                                BusyIndicator.hide();
                                 var etag = oData.getTerminal.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/TerEtag", etag);
                             }
 
                         },
                         error: function (err) {
+                            BusyIndicator.hide();
                             MessageBox.error(err.message);
                         }
                     })
                 }
                 else {
+                    BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("selectTerminal"));
                 }
             },
@@ -1163,6 +1172,7 @@ sap.ui.define([
                * @public
                */
             handleEditProductSelectDialogPress: function () {
+                BusyIndicator.show();
                 var oTable = this.getView().byId("producttbl"), that = this;
                 var oTableData = this.getView().getModel("oModel").getProperty("/ProductData");
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
@@ -1195,6 +1205,7 @@ sap.ui.define([
                             product: lineData.Product
                         },
                         success: function (oData) {
+                            BusyIndicator.hide();
                             if (oData.getProduct.data.status === undefined) {
                                 
                                 BusyIndicator.hide();
@@ -1204,10 +1215,12 @@ sap.ui.define([
 
                         },
                         error: function (err) {
+                            BusyIndicator.hide();
                         }
                     })
                 }
                 else {
+                    BusyIndicator.hide();
                     MessageBox.error(this.oBundle.getText("selectProduct"));
                 }
             },
@@ -1216,6 +1229,7 @@ sap.ui.define([
                * @public
                */
             handleEditProductPopout: function () {
+                BusyIndicator.show();
                 var oTable = this.getView().byId("idProdTablePopout"), that = this;
                 var oIdx = oTable.getSelectedContextPaths()[0];
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
@@ -1251,6 +1265,7 @@ sap.ui.define([
                     }
                     that.oDataModelT.callFunction("/getProduct", {
                         method: constants.httpGet,
+                        async: false,
                         urlParameters: {
                             product: lineData.Product
                         },
@@ -1264,10 +1279,12 @@ sap.ui.define([
 
                         },
                         error: function (err) {
+                            BusyIndicator.hide();
                         }
                     })
                 }
                 else {
+                    BusyIndicator.hide();
                     MessageBox.error(this.oBundle.getText("selectProduct"));
                 }
             },
@@ -1489,6 +1506,7 @@ sap.ui.define([
                     var oItems = oTableData[itemIndex];
                     that.oDataModelT.callFunction("/getTerminal", {
                         method: constants.httpGet,
+                        async: false,
                         urlParameters: {
                             terminal: oItems.Terminal
                         },
@@ -1655,6 +1673,7 @@ sap.ui.define([
                     // var oItems = oTableData[itemIndex];
                     that.oDataModelT.callFunction("/getTerminal", {
                         method: constants.httpGet,
+                        async: false,
                         urlParameters: {
                             terminal: oItems.Terminal
                         },
@@ -1736,6 +1755,7 @@ sap.ui.define([
                     
                     that.oDataModelT.callFunction("/getProduct", {
                         method: constants.httpGet,
+                        async: false,
                         urlParameters: {
                             product: oItems.Product
                         },
@@ -2924,6 +2944,7 @@ sap.ui.define([
                     if (oData.ShiptoCount !== constants.INTZERO) {
                         that.oDataModelT.callFunction("/getTerminal", {
                             method: constants.httpGet,
+                            async: false,
                             urlParameters: {
                                 terminal: oData.Terminal
                             },
@@ -2998,13 +3019,15 @@ sap.ui.define([
                             }
                         });
                     } else {
+                        BusyIndicator.hide();
                         MessageBox.error(that.oBundle.getText("checkSH", [oData.Terminal, oData.TerminalName]));
                     }
                 }
                 else {
+                    BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }
-                BusyIndicator.hide();
+                
             },
             /**
                     * Method called on press Event of Terminal Popout Table to unbind Terminal ship-to. 
@@ -3018,10 +3041,11 @@ sap.ui.define([
                 var Index = oTable.getSelectedContextPaths()[0];
                 if (itemIndex !== constants.INTNEGONE) {
                     var oData = this.getView().getModel("oModel").getProperty(Index);
-                    // oData = oPath[itemIndex];
+                    
                     if (oData.ShiptoCount !== constants.INTZERO) {
                         that.oDataModelT.callFunction("/getTerminal", {
                             method: constants.httpGet,
+                            async: false,
                             urlParameters: {
                                 terminal: oData.Terminal
                             },
@@ -3095,13 +3119,15 @@ sap.ui.define([
                             }
                         });
                     } else {
+                        BusyIndicator.hide();
                         MessageBox.error(that.oBundle.getText("checkSH", [oData.Terminal, oData.TerminalName]));
                     }
                 }
                 else {
+                    BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }
-                BusyIndicator.hide();
+                
             },
             /**
                     * Method called on press Event of btnunbindproduct to unbind Product ship-to. 
@@ -3119,6 +3145,7 @@ sap.ui.define([
                     if (oData.ShiptoCount !== constants.INTZERO) {
                         that.oDataModelT.callFunction("/getProduct", {
                             method: constants.httpGet,
+                            async: false,
                             urlParameters: {
                                 product: oData.Product
                             },
@@ -3193,13 +3220,15 @@ sap.ui.define([
                             }
                         });
                     } else {
+                        BusyIndicator.hide();
                         MessageBox.error(that.oBundle.getText("checkProdSH", [oData.Product, oData.ProductName]));
                     }
                 }
                 else {
+                    BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }
-                BusyIndicator.hide();
+               
             },
             /**
                     * Method called on press Event of Product Popout Table to unbind Product ship-to. 
@@ -3217,6 +3246,7 @@ sap.ui.define([
                     if (oData.ShiptoCount !== constants.INTZERO) {
                         that.oDataModelT.callFunction("/getProduct", {
                             method: constants.httpGet,
+                            async: false,
                             urlParameters: {
                                 product: oData.Product
                             },
@@ -3291,13 +3321,15 @@ sap.ui.define([
                             }
                         });
                     } else {
+                        BusyIndicator.hide();
                         MessageBox.error(that.oBundle.getText("checkProdSH", [oData.Product, oData.ProductName]));
                     }
                 }
                 else {
+                    BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }
-                BusyIndicator.hide();
+                
             },
             /**
                      * Method called on change Event of idSwitchInputDataInc to handle creation of Data Inconsistency Schedule. 
