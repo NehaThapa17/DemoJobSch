@@ -5,7 +5,9 @@ sap.ui.getCore().attachInit(function () {
 	"use strict";
 
 	sap.ui.require([
-		"marathonpp/pricingui/test/unit/AllTests"
+		"marathonpetroleum/hsc/pricingui/test/unit/AllTests",
+		"sap/ui/thirdparty/sinon",
+	    "sap/ui/thirdparty/sinon-qunit"
 	], function () {
 		QUnit.start();
 	});

@@ -20,6 +20,7 @@ sap.ui.define([
     "marathonpetroleum/hsc/pricingui/utils/formatter",
     "marathonpetroleum/hsc/pricingui/utils/constants",
     "sap/m/SearchField"
+    // "sap/ui/qunit/QUnitUtils"
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
@@ -2067,6 +2068,7 @@ sap.ui.define([
                     success: function (oData) {
                     },
                     error: function (err) {
+                        MessageBox.error(err.message);
                     }
                 });
             },
