@@ -505,5 +505,21 @@ sap.ui.define([
             onValueHelpAfterClose: function () {
                 this._oValueHelpDialog.destroy();
             },
+                                    /**
+             * retrieve data from JSON model
+            * async-Promise-style for Qunit
+            *
+            * @return {Promise}
+            */
+                                    getTodosViaPromise: function () {
+                                        return new Promise(function (fnResolve, fnReject) {
+                                            var oModel = this.getView().getModel();
+                                            if (!oModel) {
+                                                fnReject("couldn't load the application model")
+                                            } else {
+                                                fnResolve(oModel.getProperty("/todos"));
+                                            }
+                                        }.bind(this))
+                                    }
         });
     });

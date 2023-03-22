@@ -52,6 +52,22 @@ sap.ui.define([
                 this.getCCEmails();
             },
             /**
+             * retrieve data from JSON model
+            * async-Promise-style for Qunit
+            *
+            * @return {Promise}
+            */
+            getTodosViaPromise: function () {
+                return new Promise(function (fnResolve, fnReject) {
+                    var oModel = this.getView().getModel();
+                    if (!oModel) {
+                        fnReject("couldn't load the application model")
+                    } else {
+                        fnResolve(oModel.getProperty("/todos"));
+                    }
+                }.bind(this))
+            },
+            /**
               * Method called on init() to get Job Schedule Time.
               * @public
               */
@@ -479,7 +495,7 @@ sap.ui.define([
                             BusyIndicator.hide();
                             var oDataCust = oData.getCustomer.data;
                             if (oDataCust) {
-                                
+
 
                                 var etag = oData.getCustomer.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/CusEtag", etag);
@@ -567,7 +583,7 @@ sap.ui.define([
                             BusyIndicator.hide();
                             var oDataCust = oData.getCustomer.data;
                             if (oDataCust) {
-                                
+
 
                                 var etag = oData.getCustomer.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/CusEtag", etag);
@@ -1036,7 +1052,7 @@ sap.ui.define([
             handleEditTerminalSelectDialogPress: function () {
                 BusyIndicator.show();
                 var oTable = this.getView().byId("idTableTerminal"), that = this;
-               
+
                 var oTableData = this.getView().getModel("oModel").getProperty("/TerminalData");
                 var itemIndex = oTable.indexOfItem(oTable.getSelectedItem());
                 if (itemIndex !== constants.INTNEGONE) {
@@ -1068,7 +1084,7 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             if (oData.getTerminal.data.status === undefined) {
-                                
+
                                 BusyIndicator.hide();
                                 var etag = oData.getTerminal.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/TerEtag", etag);
@@ -1208,7 +1224,7 @@ sap.ui.define([
                         success: function (oData) {
                             BusyIndicator.hide();
                             if (oData.getProduct.data.status === undefined) {
-                                
+
                                 BusyIndicator.hide();
                                 var etag = oData.getProduct.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/ProEtag", etag);
@@ -1272,7 +1288,7 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             if (oData.getProduct.data.status === undefined) {
-                                
+
                                 BusyIndicator.hide();
                                 var etag = oData.getProduct.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/ProEtag", etag);
@@ -1595,7 +1611,7 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             if (oData.getProduct.data.status === undefined) {
-                                
+
                                 BusyIndicator.hide();
                                 var etag = oData.getProduct.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/ProEtag", etag);
@@ -1680,7 +1696,7 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             if (oData.getTerminal.data.status === undefined) {
-                                
+
                                 BusyIndicator.hide();
                                 var etag = oData.getTerminal.data.__metadata.etag;
                                 that.getView().getModel("oModel").setProperty("/TerEtag", etag);
@@ -1753,7 +1769,7 @@ sap.ui.define([
 
                 if (itemIndex !== constants.INTNEGONE) {
                     var oItems = this.getView().getModel("oModel").getProperty(Index);
-                    
+
                     that.oDataModelT.callFunction("/getProduct", {
                         method: constants.httpGet,
                         async: false,
@@ -2158,7 +2174,7 @@ sap.ui.define([
                                     that.getView().byId("idButtonOff").setVisible(false);
                                     that.getView().byId("idDatePickerOnDemand").setValue("");
                                     that.getView().byId("idTextOnDemandST").setText(constants.SPACE);
-                                    that.getView().getModel("oModel").setProperty("/dateValue",constants.SPACE);
+                                    that.getView().getModel("oModel").setProperty("/dateValue", constants.SPACE);
                                 },
                                 error: function (err) {
                                     BusyIndicator.hide();
@@ -2218,7 +2234,7 @@ sap.ui.define([
                             this.getView().getModel("oModel").setProperty("/dateValue", oDate);
 
                             var oJsonData = this.getPayloadJson(oCust);
-                            this.updateOndemandData(oJsonData,oPricingDateString,onDemand);
+                            this.updateOndemandData(oJsonData, oPricingDateString, onDemand);
                         }
                     } else {
 
@@ -2252,7 +2268,7 @@ sap.ui.define([
               * Method called in onPressSaveOnDemand to update S/4
               * @public
               */
-            updateOndemandData: function (oJsonData,oPricingDateString,onDemand) {
+            updateOndemandData: function (oJsonData, oPricingDateString, onDemand) {
                 var that = this;
                 var oPayloadOnD = JSON.stringify(oJsonData,)
                 this.oDataModelT.callFunction("/updateOnDemand", {
@@ -2263,11 +2279,12 @@ sap.ui.define([
                     success: function (oData) {
                         BusyIndicator.hide();
                         if (oData.updateOnDemand.data.status !== undefined && oData.updateOnDemand.data.status !== 200) {
-                             MessageBox.error(oData.updateOnDemand.data.message); }
-                            else{
-                                that.onCreatePricingDate(oPricingDateString);
-                                
-                                that.oDataModelT.callFunction("/createOnDemandSchedule", {
+                            MessageBox.error(oData.updateOnDemand.data.message);
+                        }
+                        else {
+                            that.onCreatePricingDate(oPricingDateString);
+
+                            that.oDataModelT.callFunction("/createOnDemandSchedule", {
                                 method: constants.httpGet,
                                 urlParameters: {
                                     time: onDemand,
@@ -2288,14 +2305,14 @@ sap.ui.define([
 
                                 }
                             });
-                            }
+                        }
                     },
                     error: function (err) {
                         BusyIndicator.hide();
                         var msg = err.message;
                         MessageBox.error(msg, {
                             details: err
-                    });
+                        });
 
                     }
                 });
@@ -2458,7 +2475,7 @@ sap.ui.define([
                 if (oDateSuspendFrom != null && oDateSuspendFrom <= oDateSuspendTo) {
                     this.getView().byId("idDatePicker2Suspend").setValueState(sap.ui.core.ValueState.Error);
                     this.getView().byId("idDatePicker2Suspend").setValueStateText(this.oBundle.getText("plcErrorDate"));
-                } 
+                }
                 else {
                     this.getView().byId("idDatePicker2Suspend").setValueState(sap.ui.core.ValueState.None);
                 }
@@ -2952,7 +2969,7 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 if (oData.getTerminal.data.status === undefined) {
-                                    
+
                                     BusyIndicator.hide();
                                     var etag = oData.getTerminal.data.__metadata.etag;
                                     that.getView().getModel("oModel").setProperty("/TerEtag", etag);
@@ -3029,7 +3046,7 @@ sap.ui.define([
                     BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }
-                
+
             },
             /**
                     * Method called on press Event of Terminal Popout Table to unbind Terminal ship-to. 
@@ -3043,7 +3060,7 @@ sap.ui.define([
                 var Index = oTable.getSelectedContextPaths()[0];
                 if (itemIndex !== constants.INTNEGONE) {
                     var oData = this.getView().getModel("oModel").getProperty(Index);
-                    
+
                     if (oData.ShiptoCount !== constants.INTZERO) {
                         that.oDataModelT.callFunction("/getTerminal", {
                             method: constants.httpGet,
@@ -3053,7 +3070,7 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 if (oData.getTerminal.data.status === undefined) {
-                                    
+
                                     BusyIndicator.hide();
                                     var etag = oData.getTerminal.data.__metadata.etag;
                                     that.getView().getModel("oModel").setProperty("/TerEtag", etag);
@@ -3129,7 +3146,7 @@ sap.ui.define([
                     BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }
-                
+
             },
             /**
                     * Method called on press Event of btnunbindproduct to unbind Product ship-to. 
@@ -3153,7 +3170,7 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 if (oData.getProduct.data.status === undefined) {
-                                    
+
                                     BusyIndicator.hide();
                                     var etag = oData.getProduct.data.__metadata.etag;
                                     that.getView().getModel("oModel").setProperty("/ProEtag", etag);
@@ -3230,7 +3247,7 @@ sap.ui.define([
                     BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }
-               
+
             },
             /**
                     * Method called on press Event of Product Popout Table to unbind Product ship-to. 
@@ -3254,7 +3271,7 @@ sap.ui.define([
                             },
                             success: function (oData) {
                                 if (oData.getProduct.data.status === undefined) {
-                                    
+
                                     BusyIndicator.hide();
                                     var etag = oData.getProduct.data.__metadata.etag;
                                     that.getView().getModel("oModel").setProperty("/ProEtag", etag);
@@ -3331,7 +3348,7 @@ sap.ui.define([
                     BusyIndicator.hide();
                     MessageBox.error(that.oBundle.getText("delCheck"));
                 }
-                
+
             },
             /**
                      * Method called on change Event of idSwitchInputDataInc to handle creation of Data Inconsistency Schedule. 
@@ -3441,7 +3458,7 @@ sap.ui.define([
 
                                             },
                                             error: function (err) {
-                                                var msg= that.oBundle.getText("incError");
+                                                var msg = that.oBundle.getText("incError");
                                                 MessageBox.error(msg, {
                                                     details: err
                                                 });
