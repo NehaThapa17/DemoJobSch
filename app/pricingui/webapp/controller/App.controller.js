@@ -5,7 +5,7 @@ sap.ui.define(
     function(BaseController) {
       "use strict";
   
-      return BaseController.extend("marathonpetroleum.hsc.pricingui.controller.App", {
+      return BaseController.extend("demo.app.controller.App", {
         onInit() {
         }
       });

@@ -5,12 +5,12 @@
 sap.ui.define([
         "sap/ui/core/UIComponent",
         "sap/ui/Device",
-        "marathonpetroleum/hsc/pricingui/model/models"
+        "demo/app/model/models"
     ],
     function (UIComponent, Device, models) {
         "use strict";
 
-        return UIComponent.extend("marathonpetroleum.hsc.pricingui.Component", {
+        return UIComponent.extend("demo.app.Component", {
             metadata: {
                 manifest: "json"
             },

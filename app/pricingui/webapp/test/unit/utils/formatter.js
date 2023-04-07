@@ -1,7 +1,7 @@
 /*global QUnit*/
 
 sap.ui.define([
-	"marathonpetroleum/hsc/pricingui/utils/formatter",
+	"demo/app/utils/formatter",
     "sap/ui/thirdparty/sinon",
 	"sap/ui/thirdparty/sinon-qunit"
 ], function (formatter) {

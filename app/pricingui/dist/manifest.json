@@ -1,7 +1,7 @@
 {
     "_version": "1.42.0",
     "sap.app": {
-        "id": "marathonpetroleum.hsc.pricingui",
+        "id": "demo.app",
         "type": "application",
         "i18n": "i18n/i18n.properties",
         "applicationVersion": {
@@ -17,7 +17,7 @@
         },
         "dataSources": {
             "mainService": {
-                "uri": "pricingNotificationV2-srv-api/v2/catalog/",
+                "uri": "dempJobSch-srv-api/v2/catalog/",
                 "type": "OData",
                 "settings": {
                     "annotations": [],
@@ -33,7 +33,7 @@
                         "parameters": {},
                         "additionalParameters": "allowed"
                     },
-                    "semanticObject": "zpricingnotifV2SemObj",
+                    "semanticObject": "zDemoSemObj",
                     "action": "manage",
                     "title": "{{flpTitle}}",
                     "subTitle": "",
@@ -81,7 +81,7 @@
             "i18n": {
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": {
-                    "bundleName": "marathonpetroleum.hsc.pricingui.i18n.i18n"
+                    "bundleName": "demo.app.i18n.i18n"
                 }
             },
             "": {
@@ -102,7 +102,7 @@
                 "routerClass": "sap.m.routing.Router",
                 "viewType": "XML",
                 "async": true,
-                "viewPath": "marathonpetroleum.hsc.pricingui.view",
+                "viewPath": "demo.app.view",
                 "controlAggregation": "pages",
                 "controlId": "app",
                 "clearControlAggregation": false
@@ -114,20 +114,6 @@
                     "target": [
                         "TargetcontrolView"
                     ]
-                },
-                {
-                    "name": "RoutecreateView",
-                    "pattern": "RoutecreateView",
-                    "target": [
-                        "TargetcreateView"
-                    ]
-                },
-                {
-                    "name": "RouteEditView",
-                    "pattern": "RouteEditView/{Data}",
-                    "target": [
-                        "TargeteditView"
-                    ]
                 }
             ],
             "targets": {
@@ -137,37 +123,14 @@
                     "clearControlAggregation": false,
                     "viewId": "controlView",
                     "viewName": "controlView"
-                },
-                "TargetcreateView": {
-                    "viewType": "XML",
-                    "transition": "slide",
-                    "clearControlAggregation": false,
-                    "viewId": "createCust",
-                    "viewName": "createCust"
-                },
-                "TargeteditView": {
-                    "viewType": "XML",
-                    "transition": "slide",
-                    "clearControlAggregation": false,
-                    "viewId": "editCust",
-                    "viewName": "editCust"
                 }
             }
         },
         "rootView": {
-            "viewName": "marathonpetroleum.hsc.pricingui.view.App",
+            "viewName": "demo.app.view.App",
             "type": "XML",
             "async": true,
             "id": "App"
         }
-    },
-    "sap.cloud": {
-        "public": true,
-        "service": "PricingNotification"
-    },
-    "sap.platform.cf": {
-        "oAuthScopes": [
-            "$XSAPPNAME.pricinganalyst"
-        ]
     }
 }

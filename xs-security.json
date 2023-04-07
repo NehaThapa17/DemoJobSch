@@ -1,5 +1,5 @@
 {
-  "xsappname": "pricingNotificationV2-srv",
+  "xsappname": "dempJobSch-srv",
   "tenant-mode": "shared",
   "description": "Security profile of called application",
   "scopes": [
@@ -9,14 +9,10 @@
     },
     {
       "name": "$XSAPPNAME.scopeformyapp",
-      "description": "scope for pricingNotificationV2 App",
+      "description": "scope for dempJobSch App",
       "grant-as-authority-to-apps": [
-        "$XSSERVICENAME(JS_PricingNotification)"
+        "$XSSERVICENAME(dev_job_scheduler)"
       ]
-    },
-    {
-      "name": "$XSAPPNAME.pricinganalyst",
-      "description": "Pricing Analyst"
     }
   ],
   "role-templates": [
@@ -25,13 +21,6 @@
       "description": "UAA",
       "scope-references": [
         "uaa.user"
-      ]
-    },
-    {
-      "name": "Pricing_Analyst",
-      "description": "Pricing Analyst Role",
-      "scope-references": [
-        "$XSAPPNAME.pricinganalyst"
       ]
     }
   ]

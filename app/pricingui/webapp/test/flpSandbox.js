@@ -61,7 +61,7 @@ sap.ui.define([
 								},
 								"resolutionResult": {
 									"applicationType": "SAPUI5",
-									"additionalInformation": "SAPUI5.Component=marathonpetroleum.hsc.pricingui",
+									"additionalInformation": "SAPUI5.Component=demo.app",
 									"url": sap.ui.require.toUrl("marathon/pp/pricingui")
 								}
 							}

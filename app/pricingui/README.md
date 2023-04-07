@@ -9,8 +9,8 @@
 |**Service Type**<br>Local Cap|
 |**Service URL**<br>http://localhost:4004/catalog/
 |**Module Name**<br>pricingui|
-|**Application Title**<br>Pricing Notification Control Panel|
-|**Namespace**<br>marathonpetroleum.hsc.pricingui|
+|**Application Title**<br>Sample Job Scheduler|
+|**Namespace**<br>demo.app|
 |**UI5 Theme**<br>sap_horizon|
 |**UI5 Version**<br>1.102.1|
 |**Enable Code Assist Libraries**<br>False|

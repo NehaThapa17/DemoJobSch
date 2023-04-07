@@ -1,1 +1,1 @@
-sap.ui.define(["sap/ui/core/mvc/Controller"],function(e){"use strict";return e.extend("marathonpetroleum.hsc.pricingui.controller.App",{onInit(){}})});
+sap.ui.define(["sap/ui/core/mvc/Controller"],function(e){"use strict";return e.extend("demo.app.controller.App",{onInit(){}})});

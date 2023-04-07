@@ -1,7 +1,7 @@
 _schema-version: "3.1"
-ID: pricingNotificationV2
+ID: dempJobSch
 version: 1.0.0
-description: "A CAP project for Pricing Notification "
+description: "A CAP project for sample "
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
@@ -11,7 +11,7 @@ build-parameters:
       commands:
         - npx -p @sap/cds-dk cds build --production
 modules:
-- name: pricingNotificationV2-srv
+- name: dempJobSch-srv
   type: nodejs
   path: gen/srv
   properties:
@@ -25,46 +25,45 @@ modules:
     properties:
       srv-url: ${default-url}         
   requires:
-  - name: uaa_pricingNotificationV2
-  - name: pricingNotificationV2-destination-service
-  - name: pricingNotificationV2-connectivity
-  - name: JS_PricingNotification
-  - name: AL_PricingNotification
-- name: pricingNotificationV2-destination-content
+  - name: uaa_dempJobSch
+  - name: dempJobSch-destination-service
+  - name: dempJobSch-connectivity
+  - name: dev_job_scheduler
+- name: dempJobSch-destination-content
   type: com.sap.application.content
   requires:
-  - name: pricingNotificationV2-destination-service
+  - name: dempJobSch-destination-service
     parameters:
       content-target: true
-  - name: pricingNotificationV2_html_repo_host
+  - name: dempJobSch_html_repo_host
     parameters:
       service-key:
-        name: pricingNotificationV2_html_repo_host-key
-  - name: uaa_pricingNotificationV2
+        name: dempJobSch_html_repo_host-key
+  - name: uaa_dempJobSch
     parameters:
       service-key:
-        name: uaa_pricingNotificationV2-key
+        name: uaa_dempJobSch-key
   parameters:
     content:
       instance:
         destinations:
-        - Name: PricingNotification_pricingNotificationV2_html_repo_host
-          ServiceInstanceName: pricingNotificationV2-html5-app-host-service
-          ServiceKeyName: pricingNotificationV2_html_repo_host-key
+        - Name: PricingNotification_dempJobSch_html_repo_host
+          ServiceInstanceName: dempJobSch-html5-app-host-service
+          ServiceKeyName: dempJobSch_html_repo_host-key
           sap.cloud.service: PricingNotification
         - Authentication: OAuth2UserTokenExchange
-          Name: PricingNotification_uaa_pricingNotificationV2
-          ServiceInstanceName: pricingNotificationV2-xsuaa-service
-          ServiceKeyName: uaa_pricingNotificationV2-key
+          Name: PricingNotification_uaa_dempJobSch
+          ServiceInstanceName: dempJobSch-xsuaa-service
+          ServiceKeyName: uaa_dempJobSch-key
           sap.cloud.service: PricingNotification
         existing_destinations_policy: update
   build-parameters:
     no-source: true
-- name: pricingNotificationV2-app-content
+- name: dempJobSch-app-content
   type: com.sap.application.content
   path: .
   requires:
-  - name: pricingNotificationV2_html_repo_host
+  - name: dempJobSch_html_repo_host
     parameters:
       content-target: true
   build-parameters:
@@ -85,7 +84,7 @@ modules:
     - npm run build:cf
     supported-platforms: []
 resources:
-- name: pricingNotificationV2-destination-service
+- name: dempJobSch-destination-service
   type: org.cloudfoundry.managed-service
   parameters:
     config:
@@ -96,7 +95,7 @@ resources:
           - Authentication: NoAuthentication
             HTML5.DynamicDestination: true
             HTML5.ForwardAuthToken: true
-            Name: pricingNotificationV2-srv-api
+            Name: dempJobSch-srv-api
             ProxyType: Internet
             Type: HTTP
             URL: '~{srv-api/srv-url}'
@@ -106,40 +105,35 @@ resources:
           existing_destinations_policy: update
       version: 1.0.0
     service: destination
-    service-name: pricingNotificationV2-destination-service
+    service-name: dempJobSch-destination-service
     service-plan: lite
   requires:
   - name: srv-api
-- name: pricingNotificationV2_html_repo_host
+- name: dempJobSch_html_repo_host
   type: org.cloudfoundry.managed-service
   parameters:
     service: html5-apps-repo
-    service-name: pricingNotificationV2-html5-app-host-service
+    service-name: dempJobSch-html5-app-host-service
     service-plan: app-host
-- name: uaa_pricingNotificationV2
+- name: uaa_dempJobSch
   type: org.cloudfoundry.managed-service
   parameters:
     path: ./xs-security.json
     service: xsuaa
-    service-name: pricingNotificationV2-xsuaa-service
+    service-name: dempJobSch-xsuaa-service
     service-plan: application
-- name: pricingNotificationV2-connectivity
+- name: dempJobSch-connectivity
   type: org.cloudfoundry.managed-service
   parameters:
     service: connectivity
-    service-name: pricingNotificationV2-connectivity-service
+    service-name: dempJobSch-connectivity-service
     service-plan: lite
-- name: JS_PricingNotification
+- name: dev_job_scheduler
   type: org.cloudfoundry.managed-service
   parameters:
     config:
         enable-xsuaa-support: true
     service: jobscheduler
-    service-name: JS_PricingNotification
+    service-name: dev_job_scheduler
     service-plan: standard
-- name: AL_PricingNotification
-  type:  org.cloudfoundry.existing-service
-  parameters: 
-   service: application-logs
-   service-plan: lite
 

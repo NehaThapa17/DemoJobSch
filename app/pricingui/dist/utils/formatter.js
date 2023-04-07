@@ -1,1 +1,1 @@
-sap.ui.define(["marathonpetroleum/hsc/pricingui/utils/constants","marathonpetroleum/hsc/pricingui/utils/formatter"],function(t){"use strict";return{getIconOrder:function(t){if(t===true){return"sap-icon://accept"}else{return""}},getFirstEmail:function(t){var r=t.split(";");return r[0]},getStatus:function(t){if(parseInt(t)===0){return false}else{return true}}}});
+sap.ui.define(["demo/app/utils/constants","demo/app/utils/formatter"],function(t){"use strict";return{}});

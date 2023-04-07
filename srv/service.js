@@ -1,10 +1,12 @@
 const constants = require("./util/constants-util.js");
-const log = require('cf-nodejs-logging-support');
+
 const cds = require('@sap/cds');
 const express = require('express');
 const passport = require('passport');
 const xsenv = require('@sap/xsenv');
 const JWTStrategy = require('@sap/xssec').JWTStrategy;
+const cfenv = require("cfenv");
+const appEnv = cfenv.getAppEnv();
 //configure passport
 const xsuaaService = xsenv.getServices({ myXsuaa: { tag: 'xsuaa' } });
 const xsuaaCredentials = xsuaaService.myXsuaa;
@@ -16,22 +18,26 @@ app.use(passport.initialize());
 app.use(passport.authenticate('JWT', { session: false }));
 const https = require('https');
 const LG_SERVICE = 'Service: ';
+let OA_CLIENTID, OA_SECRET, OA_ENDPOINT,baseURL;
+
+if (appEnv.isLocal) {
+    //update this variables if you are checking it locally clientid and clientsecret
+    CLIENTID = constants.CLIENT_ID;
+    CLIENTSECRET = constants.CLIENT_SECRET;
+    CLIENTURL = constants.CLIENT_URL;   
+} else {
 // access credentials from environment variable (alternatively use xsenv)
 const VCAP_SERVICES = JSON.parse(process.env.VCAP_SERVICES)
 const CREDENTIALS = VCAP_SERVICES.jobscheduler[0].credentials
 // oauth
-const UAA = CREDENTIALS.uaa;
-const baseURL = CREDENTIALS.url;
-const OA_CLIENTID = UAA.clientid;
-const OA_SECRET = UAA.clientsecret;
-const OA_ENDPOINT = UAA.url;
-const SapCfAxios = require('sap-cf-axios').default;
-const SapCfAxiosObj = SapCfAxios('CPI');
+ UAA = CREDENTIALS.uaa;
+ baseURL = CREDENTIALS.url;
+ OA_CLIENTID = UAA.clientid;
+ OA_SECRET = UAA.clientsecret;
+ OA_ENDPOINT = UAA.url;
+}
 const JobSchedulerClient = require('@sap/jobs-client');
-//Function referance to onpremiseGetOperations.js
-const { getOnPremDetails, getOnPremCall } = require('./onpremise/onpremiseGetOperations.js');
-//Function referance to onpremisePostOperations.js
-const { createonPremCall, updateonPremCall, deleteonPremCall, clearOnDemandFlag, editcustonPremCall } = require('./onpremise/onpremisePostOperations.js');
+
 
 module.exports = cds.service.impl(async function () {
   /**
@@ -46,9 +52,9 @@ module.exports = cds.service.impl(async function () {
     const scheduler = new JobSchedulerClient.Scheduler(options);
     let jobID = await getJobId(constants.jobNAME, scheduler);
     let jobDetails = await getJobDetals(jobID, scheduler);
-    let sdisplayT, sdemandT, sSuspendT, sSuspendF, sActiveT, sActiveF, SuspendActive, sCheckData;
+    let sdisplayT, sdemandT, sSuspendT, sSuspendF, sActiveT, sActiveF, SuspendActive;
     let resultJob = jobDetails.results;
-    log.info("getJobDetails called" +JSON.stringify(resultJob));
+    console.log("getJobDetails called" +JSON.stringify(resultJob));
     if (resultJob) {
       for (var i = 0; i < resultJob.length; i++) {
         if (resultJob[i].description === constants.daily && resultJob[i].active === true) {
@@ -61,9 +67,7 @@ module.exports = cds.service.impl(async function () {
         } else if (resultJob[i].description === constants.suspendFrom) {
           sSuspendF = resultJob[i].time;
           sActiveF = resultJob[i].active;
-        } else if (resultJob[i].description === constants.checkData && resultJob[i].active === true) {
-          sCheckData = resultJob[i].repeatAt
-        }
+        } 
       };
       if (sActiveF === false && sActiveT === true) {
         SuspendActive = "Suspended";
@@ -78,7 +82,6 @@ module.exports = cds.service.impl(async function () {
     let msg = {
       "DISPLAY": sdisplayT,
       "ONDEMAND": sdemandT,
-      "CHECKDATA": sCheckData,
       "SUSPENDTo": sSuspendT,
       "SUSPENDFrom": sSuspendF,
       "sActive": SuspendActive
@@ -116,7 +119,7 @@ module.exports = cds.service.impl(async function () {
               return logger.log('Error deleting schedule: %s', err);
             }
             //Schedule deleted successfully
-            log.info(constants.LOG_JS_DEL);
+            console.log(constants.LOG_JS_DEL);
           });
           break;
         }
@@ -152,7 +155,7 @@ module.exports = cds.service.impl(async function () {
               "active": false
             }
           };
-          log.info("Suspend Schedule Updated" + JSON.stringify(scJob));
+          console.log("Suspend Schedule Updated" + JSON.stringify(scJob));
           console.log("Suspend Schedule Updated" + JSON.stringify(scJob));
 
           scheduler.updateJobSchedule(scJob, function (err, result) {
@@ -160,7 +163,7 @@ module.exports = cds.service.impl(async function () {
               return logger.log('Error deactivating schedule: %s', err);
             }
             //Schedule deleted successfully
-            log.info(constants.LOG_SCH_DEL);
+            console.log(constants.LOG_SCH_DEL);
           });
 
         } else if (resultJob[i].description === constants.suspendTo) {
@@ -175,7 +178,7 @@ module.exports = cds.service.impl(async function () {
               "active": false
             }
           };
-          log.info("Suspend Schedule Updated" + JSON.stringify(scJob));
+          console.log("Suspend Schedule Updated" + JSON.stringify(scJob));
           console.log("Suspend Schedule Updated" + JSON.stringify(scJob));
 
           scheduler.updateJobSchedule(scJob, function (err, result) {
@@ -183,7 +186,7 @@ module.exports = cds.service.impl(async function () {
               return logger.log('Error deactivating schedule: %s', err);
             }
             //Schedule deleted successfully
-            log.info(constants.LOG_SCH_DEL);
+            console.log(constants.LOG_SCH_DEL);
           });
 
           let nRes = await suspendToOperation(resultJob, jobID._id);
@@ -226,7 +229,7 @@ module.exports = cds.service.impl(async function () {
       };
     }
     if (dFlag === "X") {
-      log.info("Schedule Updated" + scJob);
+      console.log("Schedule Updated" + scJob);
       console.log("Schedule Updated" + scJob);
 
       scheduler.updateJobSchedule(scJob, function (err, result) {
@@ -234,7 +237,7 @@ module.exports = cds.service.impl(async function () {
           return logger.log('Error deleting schedule: %s', err);
         }
         //Schedule deleted successfully
-        log.info(constants.LOG_SCH_DEL);
+        console.log(constants.LOG_SCH_DEL);
       });
 
     } else {
@@ -251,23 +254,20 @@ module.exports = cds.service.impl(async function () {
           "active": true
         }
       };
-      log.info( sDesc + "Schedule Created" + scJob);
+      console.log( sDesc + "Schedule Created" + scJob);
       console.log("Schedule Created" + JSON.stringify(scJob));
 
       scheduler.createJobSchedule(scJob, function (error, body) {
         if (error) {
-          log.info(error.message);
+          console.log(error.message);
         }
         // Job successfully created.
-        log.info('Job successfully created')
+        console.log('Job successfully created')
       });
 
     }
   });
-  this.on('sendInconEmail', async (req) => {
-    let resultR = await triggerCPI();
-    return resultR;
-  });
+
   /**
 * Function to deactivate Daily Schedule
 */
@@ -294,7 +294,7 @@ module.exports = cds.service.impl(async function () {
               "active": false
             }
           };
-          log.info("Schedule Updated" + JSON.stringify(scJob));
+          console.log("Schedule Updated" + JSON.stringify(scJob));
           console.log("Schedule Updated" + JSON.stringify(scJob));
 
           scheduler.updateJobSchedule(scJob, function (err, result) {
@@ -302,7 +302,7 @@ module.exports = cds.service.impl(async function () {
               return logger.log('Error deleting schedule: %s', err);
             }
             //Schedule deleted successfully
-            log.info(constants.LOG_SCH_DEL);
+            console.log(constants.LOG_SCH_DEL);
           });
 
         }
@@ -338,7 +338,7 @@ module.exports = cds.service.impl(async function () {
               return logger.log('Error deleting schedule: %s', err);
             }
             //Schedule deleted successfully
-            log.info(constants.LOG_JS_DEL);
+            console.log(constants.LOG_JS_DEL);
           });
           break;
         }
@@ -357,7 +357,7 @@ module.exports = cds.service.impl(async function () {
         "active": true
       }
     };
-    log.info("OnDemand Schedule Created" + scJob);
+    console.log("OnDemand Schedule Created" + scJob);
     return new Promise((resolve, reject) => {
       scheduler.createJobSchedule(scJob, function (error, body) {
         if (error) {
@@ -404,14 +404,14 @@ module.exports = cds.service.impl(async function () {
                 "active": true
               }
             };
-            log.info("Suspend Schedule Created" + scJob);
-            log.info("Schedule Updated" + scJob);
+            console.log("Suspend Schedule Created" + scJob);
+            console.log("Schedule Updated" + scJob);
             scheduler.updateJobSchedule(scJob, function (err, result) {
               if (err) {
                 return logger.log('Error deleting schedule: %s', err);
               }
               //Schedule deleted successfully
-              log.info(constants.LOG_SCH_DEL);
+              console.log(constants.LOG_SCH_DEL);
             });
           }
           }
@@ -431,13 +431,13 @@ module.exports = cds.service.impl(async function () {
             "active": true
           }
         };
-        log.info("Suspend Schedule Created" + scJob);
+        console.log("Suspend Schedule Created" + scJob);
         scheduler.createJobSchedule(scJob, function (error, body) {
           if (error) {
-            log.info(error.message);
+            console.log(error.message);
           }
           // Job successfully created.
-          log.info('Job successfully created')
+          console.log('Job successfully created')
         });
   
   
@@ -507,9 +507,9 @@ module.exports = cds.service.impl(async function () {
   /**
 * Function for Job schedule ENDPOINT
 */
-  this.on('MasterUpload', async (req) => {
+  this.on('MasterEndpoint', async (req) => {
     try {
-      log.info("Job Schedular Endpoint hit successfully");
+      console.log("Job Schedular Endpoint hit successfully");
       const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
       const options = {
         baseURL: baseURL,
@@ -529,27 +529,27 @@ module.exports = cds.service.impl(async function () {
     }
     catch (error) {
 
-      log.error("Error in MasterUpload Enpoint" + error);
+      console.log("Error in MasterEndpoint" + error);
     }
   });
   const handleAsyncJob = async function (headers, req, oDesc, resultJob, job_Id) {
     try {
       let result = await operationTriggerEndpoint(req, oDesc, resultJob, job_Id)
       if ((typeof result !== 'undefined') && (result !== null)) {
-        log.info("Update Job status");
+        console.log("Update Job status");
         await doUpdateStatus(headers, true, result)
         return result;
       }
     } catch (error) {
-      log.error("handleAsyncJob Catch" + error);
+      console.log("handleAsyncJob Catch" + error);
 
       doUpdateStatus(headers, false, error.message)
         .then(() => {
           console.log(constants.LOG_JS_API);
-          log.error(constants.LOG_JS_API);
+          console.log(constants.LOG_JS_API);
         }).catch((error) => {
           console.log(constants.LOG_JS_ERR + error);
-          log.error(constants.LOG_JS_ERR + error);
+          console.log(constants.LOG_JS_ERR + error);
         })
     }
   }
@@ -558,7 +558,7 @@ module.exports = cds.service.impl(async function () {
   */
   const operationTriggerEndpoint = async function (req, oDesc, resultJob, job_Id) {
     try {
-      log.info("Schedule Description" + oDesc);
+      console.log("Schedule Description" + oDesc);
       let suspendStatus;
       for (var q = 0; q < resultJob.length; q++) {
         if (resultJob[q].description === oDesc) {
@@ -566,56 +566,15 @@ module.exports = cds.service.impl(async function () {
           suspendStatus = test.suspendStatus;
         }
       }
-      log.info(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
-      log.info("suspendStatus " + suspendStatus + "for " + oDesc);
+      console.log(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
+      console.log("suspendStatus " + suspendStatus + "for " + oDesc);
       if (suspendStatus === constants.inactive && (oDesc === constants.daily || oDesc === constants.onDemand)) {
 
-        log.info("Call for Data inconsistency check for" + oDesc);
-        let resultR = await triggerCPI();
-        log.info("Result for Data inconsistency check" + resultR);
-        let top = constants.TOP;
-        let response;
-        let sUrl = constants.CPI_DATA_URL + oDesc + "'&$skip=0&$top=0&$format=json";
-        let responseData = await getOnPremDetails(sUrl);
-        let count = responseData.data.d.__count;
-        log.info("CPI No. of records: " + count);
-        for (var a = constants.INTZERO; a < count;) {
-          let sUrl = constants.CPI_DATA_URL + oDesc + "'&$skip=" + a + "&$top=" + top + "&$format=json";
-          let responseData = await getOnPremDetails(sUrl);
-          log.info(" CPI Mail Body" + a + "SKIP" + responseData.data.d);
-          a = a + constants.TOP;
-          if (responseData.data.d.results.length !== constants.INTZERO) {
-            log.info("CPI with Data:" + oDesc + "/" + responseData.data.d.results.length + "/" + responseData.data.d);
-            response = await SapCfAxiosObj({
-              method: constants.httpPost,
-              url: constants.CPI_ENDPOINT,
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              data: responseData.data
-            }).then(res => {
-              log.info("CPI execution was Successful " + res);
-              return constants.SUCCESS;
-            }).catch(async (error) => {
-              log.error("Error in CPI call" + error);
-              return error;
-            })
-
-            log.info("CPI response" + oDesc + "/" + a + "SKIP" + response);
-          } else {
-            log.info("CPI No Data:" + oDesc + "/" + responseData.data.d.results.length + "/" + responseData.data.d);
-          }
-        }
-        if (oDesc === constants.onDemand && response === "Mail sent Successfully") {
-          let oUrl = constants.URL_CLRPOST;
-          let oStatus = await clearOnDemandFlag(oUrl);
-          log.info("clearOnDemandFlag output" + JSON.stringify(oStatus));
-        }
-
-        return response;
+      
+      
 
       } else if (oDesc === constants.suspendFrom) {
-        log.info(oDesc + " Triggered");
+        console.log(oDesc + " Triggered");
         if (resultJob) {
           const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
           const options = {
@@ -641,26 +600,23 @@ module.exports = cds.service.impl(async function () {
                   return logger.log('Error deleting schedule: %s', err);
                 }
                 //Schedule deleted successfully
-                log.info(constants.LOG_SCH_DEL);
+                console.log(constants.LOG_SCH_DEL);
               });
             }
           }
         }
       } else if (oDesc === constants.suspendTo) {
-        log.info(oDesc + " Triggered");
+        console.log(oDesc + " Triggered");
         if (resultJob) {
           let iRes = await suspendToOperation(resultJob, job_Id);
           return iRes;
         }
-      } else if (oDesc === constants.checkData) {
-        log.info(oDesc + " Triggered");
-        let resultR = await triggerCPI();
-      }
-      log.info("operationTriggerEndpoint - Out of IF condition");
+      } 
+      console.log("operationTriggerEndpoint - Out of IF condition");
     }
     catch (error) {
       req.error({ code: constants.ERR, message: error.message });
-      log.error(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", error.message);
+      console.log(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", error.message);
     }
   }
   const suspendToOperation = async function (resultJob, job_Id) {
@@ -689,33 +645,13 @@ module.exports = cds.service.impl(async function () {
             return logger.log('Error deleting schedule: %s', err);
           }
           //Schedule deleted successfully
-          log.info(constants.LOG_SCH_DEL);
+          console.log(constants.LOG_SCH_DEL);
         });
       }
     }
 
   }
-  const triggerCPI = async function () {
-    let sUrl = constants.URL_Check;
-    let responseData = await getOnPremDetails(sUrl);
-    log.info(" CPI Data Inconsistency Mail Body" + responseData.data.d);
-    if (responseData.data.d.results[0].DataCheck.results.length !== constants.INTZERO) {
-      response = await SapCfAxiosObj({
-        method: constants.httpPost,
-        url: constants.CPI_DATA_ENDPOINT,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: responseData.data
-      }).then(res => {
-        log.info("CPI execution was Successful " + res);
-        return constants.SUCCESS;
-      }).catch(async (error) => {
-        log.error("Error in CPI call" + error);
-        return error;
-      })
-    }
-  }
+
 
   /********************Get Dynamic token for Jobscheduler***********************/
   const fetchJwtToken = function (clientId, clientSecret) {
@@ -727,6 +663,7 @@ module.exports = cds.service.impl(async function () {
           Authorization: constants.preURL + Buffer.from(clientId + ':' + clientSecret).toString("base64")
         }
       }
+
       https.get(options, res => {
         res.setEncoding('utf8')
         let response = ''
@@ -738,19 +675,19 @@ module.exports = cds.service.impl(async function () {
             const responseAsJson = JSON.parse(response)
             const jwtToken = responseAsJson.access_token
             if (!jwtToken) {
-              log.error("fetchJwtToken Error while fetching JWT token" );
+              console.log("fetchJwtToken Error while fetching JWT token" );
               return reject(new Error('Error while fetching JWT token'));
             }
             resolve(jwtToken)
           } catch (error) {
-            log.error("fetchJwtToken Error while fetching JWT token" );
+            console.log("fetchJwtToken Error while fetching JWT token" );
             return reject(new Error('Error while fetching JWT token'));
             
           }
         })
       })
         .on("error", (error) => {
-          log.info("Error JWT token function" + error);
+          console.log("Error JWT token function" + error);
           return reject({ error: error })
         });
     })
@@ -793,442 +730,10 @@ module.exports = cds.service.impl(async function () {
           req.end()
         })
         .catch((error) => {
-          log.error("doUpdateStatus function error" + error);
+          console.log("doUpdateStatus function error" + error);
 
           reject(error)
         })
     })
   }
-
-
-  /**
-* Function to get Terminal Details
-*/
-  this.on('getTerminalDetails', async (req) => {
-    try {
-
-      let sUrl = constants.URL_TerDetails;
-      let response = await getOnPremCall(req, sUrl);
-      let resultData = {
-        data: response.data.d.results
-      }
-      log.info("getTerminalDetails success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("getTerminalDetails Error" + error);
-      return error
-    }
-  });
-  /**
-* Function to get Terminal Entity Details
-*/
-  this.on('getTerminal', async (req) => {
-    try {
-      let m = req.data.terminal;
-      let sUrl = constants.URL_Ter + "('" + m + "')";
-      let response = await getOnPremCall(req, sUrl);
-      let resultData = {
-        data: response.data.d
-      }
-      log.info("getTerminal success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("getTerminal Error" + error);
-      return error
-    }
-  });
-  /**
-* Function to get Product Entity Details
-*/
-  this.on('getProduct', async (req) => {
-    try {
-      let m = req.data.product;
-      let sUrl = constants.URL_Prod + "('" + m + "')";
-      let response = await getOnPremCall(req, sUrl);
-      let resultData = {
-        data: response.data.d
-      }
-      log.info("getProduct success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("getProduct Error" + error);
-      return error
-    }
-  });
-  /**
-* Function to get Customer Entity Details
-*/
-  this.on('getCustomer', async (req) => {
-    try {
-      let m = req.data.customer;
-      let n = req.data.shipTo;
-      let sUrl = constants.URL_Cust + "(Customer='" + m + "',ShipTo='" + n + "')";
-      let response = await getOnPremCall(req, sUrl);
-      let resultData = {
-        data: response.data.d
-      }
-      log.info("getCustomer success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("getCustomer Error" + error);
-      return error
-    }
-  });
-  /**
-* Function to get Customer Details
-*/
-  this.on('getCustomerDetails', async (req) => {
-    try {
-      let sUrl = constants.URL_CustDetails;
-      let response = await getOnPremCall(req, sUrl);
-      let resultData = {
-        data: response.data.d.results
-      }
-      log.info("getCustomerDetails success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("getCustomerDetails error" + error);
-      return error
-    }
-  });
-  /**
-* Function to get Product Details
-*/
-  this.on('getOnPremProductDetails', async (req) => {
-    try {
-      let sUrl = constants.URL_ProdDetails;
-      let response = await getOnPremCall(req, sUrl);
-      let resultData = {
-        data: response.data.d.results
-      }
-      log.info("getOnPremProductDetails success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("getOnPremProductDetails error" + error);
-      return error
-    }
-  });
-  /**
-* Function to get data Inconsistency data
-*/
-  this.on('dataInconCheck', async (req) => {
-    try {
-      let sUrl = constants.URL_Check;
-      let response = await getOnPremCall(req, sUrl);
-      let resultData = {
-        data: response.data.d.results
-      }
-      log.info("dataInconCheck success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("dataInconCheck error" + error);
-      return error
-    }
-  });
-  /**
-* Function to get Customer F4 help data
-*/
-  this.on('getOnPremCustomerF4', async (req) => {
-    try {
-      let sUrl = constants.URL_F4cust;
-      let response = await getOnPremCall(req, sUrl);
-      let resultData = {
-        data: response.data.d.results
-      }
-      log.info("getOnPremCustomerF4 success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("getOnPremCustomerF4 error" + error);
-      return error
-    }
-  });
-  /**
-* Function to get Terminal F4 help data
-*/
-  this.on('getOnPremTerminalF4', async (req) => {
-    try {
-      let sUrl = constants.URL_F4Ter;
-      let response = await getOnPremCall(req, sUrl);
-      let resultData = {
-        data: response.data.d.results
-      }
-      log.info("getOnPremTerminalF4 success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("getOnPremTerminalF4 error" + error);
-      return error
-    }
-  });
-  /**
-  * Function to get Product F4 Details
-  */
-  this.on('getOnPremProductF4', async (req) => {
-    try {
-      let sUrl = constants.URL_F4Prod;
-      let response = await getOnPremCall(req, sUrl);
-      let resultData = {
-        data: response.data.d.results
-      }
-      log.info("getOnPremProductF4 success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("getOnPremProductF4 error" + error);
-      return error;
-    }
-  });
-  /**
-  * Function to get CCEmails
-  */
-  this.on('getOnCCEmail', async (req) => {
-    try {
-      let sUrl = constants.URL_CC;
-      let response = await getOnPremCall(req, sUrl);
-      let resultData = {
-        data: response.data.d.results
-      }
-      log.info("getOnCCEmail success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("getOnCCEmail error" + error);
-      return error;
-    }
-  });
-  /**
-  * Function to create/update CCEmails
-  */
-  this.on("createCCEmail", async (req) => {
-    try {
-      let sUrl = constants.URL_CCCreate;
-      let response = await createonPremCall(req, sUrl);
-      let resultData = { data: response };
-      log.info("createCCEmail success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("createCCEmail error" + error);
-      return error;
-    }
-  });
-  /**
-* Function to delete Customer Details
-*/
-  this.on("deleteCustomer", async (req) => {
-    try {
-      let m = req.data.customer;
-      let n = req.data.shipTo;
-      let sUrl = "/CustomerShipToDetailSet(Customer='" + m + "',ShipTo='" + n + "')";
-      let response = await deleteonPremCall(req, sUrl);
-      let resultData = { data: response };
-      log.info("deleteCustomer success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("deleteCustomer error" + error);
-      // return req.error({ message: error.message });
-      return error;
-    }
-  });
-  /**
-  * Function to delete Terminal Details
-  */
-  this.on("deleteTerminal", async (req) => {
-    try {
-      let m = req.data.terminal;
-      let sUrl = "/TerminalDetailSet('" + m + "')";
-      let response = await deleteonPremCall(req, sUrl);
-      // let response = await  deleteTerminalDetail(req, m);
-      let resultData = { data: response };
-      log.info("deleteTerminal success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("deleteTerminal error" + error);
-      // return req.error({ message: error.message });
-      return error;
-    }
-  });
-  /**
-  * Function to delete Product Details
-  */
-  this.on("deleteProduct", async (req) => {
-    try {
-      let m = req.data.product;
-      let sUrl = "/ProductDetailSet('" + m + "')";
-      let response = await deleteonPremCall(req, sUrl);
-      let resultData = { data: response };
-      log.info("deleteProduct success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("deleteProduct error" + error);
-
-      return error;
-    }
-  });
-  /**
-  * Function to create Product Details
-  */
-  this.on("createProduct", async (req) => {
-    try {
-      let sUrl = constants.URL_ProdCreate;
-      let response = await createonPremCall(req, sUrl);
-      let resultData = { data: response };
-      log.info("createProduct success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("createProduct error" + error);
-      return error;
-    }
-  });
-  /**
-  * Function to create Terminal Details
-  */
-  this.on("createTerminal", async (req) => {
-    try {
-      let sUrl = constants.URL_TerCreate;
-      let response = await createonPremCall(req, sUrl);
-      let resultData = { data: response };
-      log.info("createTerminal success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("createTerminal error" + error);
-      return error;
-
-    }
-  });
-  /**
-  * Function to create Customer Details
-  */
-  this.on("createCustomer", async (req) => {
-    try {
-      // let response = await  createCustomerDetail(req);
-      let sUrl = constants.URL_CusCreate;
-      let response = await createonPremCall(req, sUrl);
-      let resultData = { data: response };
-      log.info("createCustomer success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("createCustomer error" + error);
-      return error;
-      // return req.error({ message: error.message });
-    }
-  });
-  /**
-  * Function to update customer/shipto selected at On-Demand Prosessing 
-  */
-  this.on("updateOnDemand", async (req) => {
-    try {
-      let sUrl = constants.URL_DPCreate;
-      let response = await createonPremCall(req, sUrl);
-      let resultData = { data: response };
-      log.info("updateOnDemand success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("updateOnDemand error" + error);
-      return error;
-    }
-  });
-  /**
-  * Function to update Terminal Details
-  */
-  this.on("updateTerminal", async (req) => {
-    try {
-      let m = req.data.terminal;
-
-      let sUrl = "/TerminalDetailSet('" + m + "')";
-      let response = await updateonPremCall(req, sUrl);
-      let resultData = { data: response };
-      log.info("updateTerminal success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("updateTerminal error" + error);
-      return error;
-      // return req.error({ message: error.message });
-    }
-  });
-  /**
-  * Function to update Customer Details
-  */
-  this.on("updateCustomer", async (req) => {
-    try {
-      // let response = await  updateCustomerDetail(req);
-      let sUrl = constants.URL_CusCreate;
-      let response = await editcustonPremCall(req, sUrl);
-      let resultData = { data: response };
-      log.info("updateCustomer success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("updateCustomer error" + error);
-      return error;
-    }
-  });
-  /**
-  * Function to update Product Details
-  */
-  this.on("updateProduct", async (req) => {
-    try {
-      let m = req.data.product;
-      let sUrl = "/ProductDetailSet('" + m + "')";
-      let response = await updateonPremCall(req, sUrl);
-      // let response = await  updateProductDetail(req, m);
-      let resultData = { data: response };
-      log.info("updateProduct success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("updateProduct error" + error);
-      return error;
-    }
-  });
-  /**
-  * Function to unbind Terminal Ship-to
-  */
-  this.on("unbindShipTo", async (req) => {
-    try {
-      let m = req.data.terminal;
-      let sUrl = "/TerminalDetailSet('" + m + "')";
-      let response = await updateonPremCall(req, sUrl);
-      let resultData = { data: response };
-      log.info("unbindShipTo success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("unbindShipTo error" + error);
-      return error;
-    }
-  });
-  /**
-  * Function to unbind Product Ship-to
-  */
-  this.on("unbindProdShipTo", async (req) => {
-    try {
-      let m = req.data.product;
-      let sUrl = "/ProductDetailSet('" + m + "')";
-      let response = await updateonPremCall(req, sUrl);
-      let resultData = { data: response };
-      log.info("unbindProdShipTo success");
-      return resultData;
-    }
-    catch (error) {
-      log.error("unbindProdShipTo error" + error);
-      return error;
-    }
-  });
 });

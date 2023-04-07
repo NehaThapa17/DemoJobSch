@@ -3,7 +3,7 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
 	"sap/ui/model/json/JSONModel",
-	"marathonpetroleum/hsc/pricingui/controller/controlView.controller",
+	"demo/app/controller/controlView.controller",
 	"sap/ui/base/ManagedObject",
 	"sap/ui/thirdparty/sinon",
 	"sap/ui/thirdparty/sinon-qunit"

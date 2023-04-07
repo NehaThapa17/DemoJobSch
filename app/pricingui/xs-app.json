@@ -3,19 +3,11 @@
   "authenticationMethod": "route",
   "routes": [
     {
-      "source": "^/pricingNotificationV2-srv-api/(.*)$", 
+      "source": "^/dempJobSch-srv-api/(.*)$", 
       "target": "$1",
-      "destination": "pricingNotificationV2-srv-api",
+      "destination": "dempJobSch-srv-api",
       "authenticationType": "xsuaa",
-      "csrfProtection": true,
-      "scope":{
-        "GET":["$XSAPPNAME.pricinganalyst"],
-        "PATCH":["$XSAPPNAME.pricinganalyst"],
-        "POST":["$XSAPPNAME.pricinganalyst"],
-        "PUT":["$XSAPPNAME.pricinganalyst"],
-        "DELETE":["$XSAPPNAME.pricinganalyst"],
-        "default":["$XSAPPNAME.pricinganalyst"]
-      }
+      "csrfProtection": true
     },
     {
       "source": "^/resources/(.*)$",
