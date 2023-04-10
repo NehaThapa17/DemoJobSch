@@ -58,14 +58,14 @@ sap.ui.define([
                                 minutes = oDataArr2.RECURSIVE.substring(index + constants.INTONE);
                             date.setHours(hours);
                             date.setMinutes(minutes);
-
-                            var sTime = date.toLocaleString('en-US', {
+                            var finalDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                            var sTime = finalDate.toLocaleString('en-US', {
                                 hour: 'numeric',
                                 minute: 'numeric',
                                 hour12: true
                             });
 
-                            that.getView().byId("idTimePickerInput").setDateValue(date);
+                            that.getView().byId("idTimePickerInput").setDateValue(finalDate);
                             that.getView().byId("idTextDailyST").setText(sTime);
                             that.getView().byId("idSwitchInput").setState(true);
                             that.getView().byId("idTimePickerInput").setEnabled(false);
@@ -77,28 +77,33 @@ sap.ui.define([
                         }
                         if (oDataArr2.ONDEMAND !== undefined) {
                             var date = new Date(oDataArr2.ONDEMAND);
-                            var sTime = date.toLocaleString('en-US', {
+                            var date2 = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                            var sTime = date2.toLocaleString('en-US', {
                                 hour: 'numeric',
                                 minute: 'numeric',
                                 hour12: true
                             });
                             // replace first nonspace combination along with whitespace
-                            var dDate = date.toDateString().replace(/^\S+\s/, ''),
+                            var dDate = date2.toDateString().replace(/^\S+\s/, ''),
                                 finalDate = dDate + constants.SPACE + sTime;
                             that.getView().byId("idTextOnDemandST").setText(finalDate);
                             that.getView().byId("idDatePickerOnDemand").setValue(finalDate);
+                            that.getView().byId("idSwitchInputD").setState(true);
                             that.getView().byId("idDatePickerOnDemand").setEnabled(false);
                             that.getView().getModel("oModel").setProperty("/dateValue", finalDate);
 
                         } else {
                             that.getView().byId("idTextOnDemandST").setText(constants.SPACE);
+                            that.getView().byId("idSwitchInputD").setState(false);
+                            that.getView().byId("idDatePickerOnDemand").setEnabled(true);
                             that.getView().getModel("oModel").setProperty("/dateValue", constants.SPACE);
 
                         }
                         if (oDataArr2.SUSPENDTo !== undefined && oDataArr2.SUSPENDFrom !== undefined) {
                             var dateTo = new Date(oDataArr2.SUSPENDTo);
                             var dateFrom = new Date(oDataArr2.SUSPENDFrom);
-                            dateFrom = new Date(dateFrom.getTime() - ((constants.INTONE * constants.INTSIXTY * constants.INTSIXTY * constants.INTTHOUS) * constants.INTSIX));
+                            dateFrom = new Date(dateFrom.getTime() - dateFrom.getTimezoneOffset() * 60000);
+                            dateTo = new Date(dateTo.getTime() - dateTo.getTimezoneOffset() * 60000);
                             var sTime = dateFrom.toLocaleString('en-US', {
                                 hour: 'numeric',
                                 minute: 'numeric',
@@ -119,6 +124,9 @@ sap.ui.define([
                                 that.getView().byId("idDatePickerSuspend").setEnabled(false);
                                 that.getView().byId("idDatePicker2Suspend").setEnabled(false);
                                 that.getView().byId("idSwitchInputSuspend").setState(true);
+                                that.getView().byId("idInfoLabelSuspend").setVisible(true);
+                                that.getView().byId("idInfoLabelSuspend").setText(constants.suspended);
+                                that.getView().byId("idInfoLabelSuspend").setColorScheme(2);
                             }
                             if (oDataArr2.sActive === true) {
                                 that.getView().byId("idDatePickerSuspend").setEnabled(false);
@@ -193,6 +201,8 @@ sap.ui.define([
                             that.getView().byId("idDatePickerSuspend").setEnabled(false);
                             that.getView().byId("idDatePicker2Suspend").setEnabled(false);
                             that.getView().byId("idSwitchInputSuspend").setState(true);
+                            that.getView().byId("idInfoLabelSuspend").setText(constants.suspended);
+                            that.getView().byId("idInfoLabelSuspend").setColorScheme(2);
                             MessageBox.error(that.oBundle.getText("susCheck"));
                         } else {
                             BusyIndicator.hide();
@@ -208,6 +218,7 @@ sap.ui.define([
                     }
                 });
             },
+
             executeSchDaily: function (oState, oDaily) {
                 var that = this;
 
@@ -242,8 +253,9 @@ sap.ui.define([
                         now.setHours(dateH);
                         now.setMinutes(dateM);
                         //Convert to UTC
-                        var nowUTC = now.toUTCString();
-                        var dateValue = new Date(nowUTC);
+                        // var nowUTC = now.toUTCString();
+                        // var dateValue = new Date(nowUTC);
+                        var dateValue = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
                         var oMin = (dateValue.getMinutes() < 10 ? 0 : '') + dateValue.getMinutes();
                         var oTime = dateValue.getHours() + ":" + oMin;
                         this.getView().byId("idTimePickerInput").setEnabled(false);
@@ -274,42 +286,80 @@ sap.ui.define([
                 }
             },
             /**
-              * Method called to handle Turn-off button for OnDemand Processing
+              * Method called to handle switch button for OnDemand Job
               * @public
-              */
-            onPressOffOnDemand: function () {
+              */    
+            onSwtichChangeD: function (oEvent) {
+                BusyIndicator.show();
+                var oState = oEvent.getSource().getState(),
+                    oValue = this.getView().byId("idDatePickerOnDemand").getValue();
+                this.getJSStatusOnDemand(oState, oValue);
+            },         
+            getJSStatusOnDemand: function (oState, oValue) {
                 var that = this;
-                MessageBox.confirm(that.oBundle.getText("offconfirm"), {
-                    onClose: function (oAction) {
-                        if (oAction === constants.actionOK) {
-                            BusyIndicator.show();
-                            that.oDataModelT.callFunction("/deleteSchedule", {
-                                method: constants.httpGet,
-                                urlParameters: {
-                                    desc: constants.onDemand
-                                },
-                                success: function (oData) {
-                                    BusyIndicator.hide();
-                                    MessageBox.information(that.oBundle.getText("turnOffIn"));
-
-                                    that.getView().byId("idDatePickerOnDemand").setValue("");
-                                    that.getView().byId("idTextOnDemandST").setText(constants.SPACE);
-                                    that.getView().getModel("oModel").setProperty("/dateValue", constants.SPACE);
-                                },
-                                error: function (err) {
-                                    BusyIndicator.hide();
-                                    MessageBox.error(that.oBundle.getText("techError"), {
-                                        details: err
-                                    });
-                                }
-                            });
+                this.oDataModelT.callFunction("/getJobDetails", {
+                    method: constants.httpGet,
+                    success: function (oData) {
+                        BusyIndicator.hide();
+                        var oDataArr2 = JSON.parse(oData.getJobDetails);
+                        if (oDataArr2.sActive === constants.suspended) {
+                            if (oState === false) {
+                                that.getView().byId("idSwitchInputD").setState(true);
+                            } else {
+                                that.getView().byId("idSwitchInputD").setState(false);
+                            }
+                            that.getView().byId("idInfoLabelSuspend").setText(constants.suspended);
+                            that.getView().byId("idInfoLabelSuspend").setColorScheme(2);
+                            MessageBox.error(that.oBundle.getText("susCheck"));
+                        } else {
+                            
+                            that.executeSchOnDemand(oState);
                         }
+                    },
+                    error: function (err) {
+                        BusyIndicator.hide();
+                        MessageBox.error(that.oBundle.getText("techError"), {
+                            details: err
+                        });
+
                     }
                 });
+            },   
+            executeSchOnDemand: function (oState) {
+                var that = this;
 
-            },
+                if (oState === false) {
+                    that.getView().byId("idDatePickerOnDemand").setEnabled(true);
+
+                    //Delete Schedule
+                    that.oDataModelT.callFunction("/deleteSchedule", {
+                        method: constants.httpGet,
+                        urlParameters: {
+                            desc: constants.onDemand
+                        },
+                        success: function (oData) {
+                            BusyIndicator.hide();
+                            MessageBox.information(that.oBundle.getText("turnOffIn"));
+
+                            that.getView().byId("idDatePickerOnDemand").setValue("");
+                            that.getView().byId("idTextOnDemandST").setText(constants.SPACE);
+                            that.getView().getModel("oModel").setProperty("/dateValue", constants.SPACE);
+                        },
+                        error: function (err) {
+                            BusyIndicator.hide();
+                            MessageBox.error(that.oBundle.getText("techError"), {
+                                details: err
+                            });
+                        }
+                    });
+                } else {
+                    that.onPressSaveOnDemand();
+                }
+            },                     
+
+
             /**
-              * Method called to handle Save button for OnDemand Processing
+              * Method called to handle creation for OnDemand Job
               * @public
               */
             onPressSaveOnDemand: function () {
@@ -325,10 +375,7 @@ sap.ui.define([
                 } else {
 
                     //Convert to UTC
-                    var nowUTC = now.toUTCString();
-                    var dateValue = new Date(nowUTC);
-                    // var oMin = (dateValue.getMinutes() < 10 ? 0 : '') + dateValue.getMinutes();
-                    // var oTime = dateValue.getHours() + ":" + oMin;
+                    var dateValue = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
                     var xTime = dateValue.toLocaleString('en-US', {
                         hour: 'numeric',
                         minute: 'numeric',
@@ -423,10 +470,8 @@ sap.ui.define([
                         FromDate = new Date(oDateSuspendFrom),
                         ToDate = new Date(oDateSuspendTo),
                       //Convert to UTC
-                     FromUTC = FromDate.toUTCString(),
-                     ToUTC = ToDate.toUTCString(),
-                     oSusFrom = new Date(FromUTC),
-                     oSusTo = new Date(ToUTC);
+                     oSusFrom =  new Date(FromDate.getTime() + FromDate.getTimezoneOffset() * 60000), 
+                     oSusTo = new Date(ToDate.getTime() + ToDate.getTimezoneOffset() * 60000);
 
                     var xSuspendTo = oSusTo.toLocaleString('en-US', {
                         hour: 'numeric',
@@ -497,7 +542,7 @@ sap.ui.define([
 
                                     }
                                 });
-                                // setTimeout(that.getJSTime(),4000);
+                                
                             } else {
                                 BusyIndicator.hide();
                                 that.getView().byId("idSwitchInputSuspend").setState(false);

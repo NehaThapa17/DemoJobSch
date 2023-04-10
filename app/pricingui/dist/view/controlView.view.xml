@@ -5,6 +5,9 @@
                 <uxap:heading>
                     <tnt:InfoLabel id="idInfoLabel" text="This is a sample application" colorScheme="1" />
                 </uxap:heading>
+                <uxap:actions>
+                   <tnt:InfoLabel id="idInfoLabelSuspend"  colorScheme="1" visible="false"/>
+                </uxap:actions>
             </uxap:ObjectPageDynamicHeaderTitle>
         </uxap:headerTitle>
         <uxap:headerContent>
@@ -33,7 +36,7 @@
                           
                             <forms:SimpleForm  labelSpanXL="3" columnsXL="2" columnsL="1" columnsM="1" labelSpanL="2" labelSpanM="3" labelSpanS="12" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>recurProcessingStartTime}" required="true"/>
-                                <TimePicker id="idTimePickerInput" displayFormat="hh:mm a" valueFormat="hh:mm a" width="80%" />
+                                <TimePicker id="idTimePickerInput" displayFormat="hh:mm a" valueFormat="hh:mm a" />
                                 <Switch id="idSwitchInput" change="onSwtichChange" />
                             </forms:SimpleForm>
                         
@@ -48,7 +51,7 @@
                            <forms:SimpleForm  labelSpanXL="3" columnsXL="2" columnsL="1" columnsM="1" labelSpanL="2" labelSpanM="3" labelSpanS="12" editable="true" layout="ColumnLayout" class="sapUiSizeCompact">
                                 <Label text="{i18n>onDemandStartTime}" required="true" />
                                 <DateTimePicker id="idDatePickerOnDemand" displayFormat="MMM dd YYYY hh:mm a" change="onhandleDateCheck"   placeholder="Enter Date and Time" class="sapUiSmallMarginBottom" />
-                            <Switch id="idSwitchInputD" change="onPressSaveOnDemand" />
+                            <Switch id="idSwitchInputD" change="onSwtichChangeD" />
                             </forms:SimpleForm>
                         </uxap:blocks>
                         <uxap:actions/>

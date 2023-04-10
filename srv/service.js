@@ -80,7 +80,7 @@ module.exports = cds.service.impl(async function () {
       }
     }
     let msg = {
-      "DISPLAY": sdisplayT,
+      "RECURSIVE": sdisplayT,
       "ONDEMAND": sdemandT,
       "SUSPENDTo": sSuspendT,
       "SUSPENDFrom": sSuspendF,
