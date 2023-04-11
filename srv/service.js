@@ -91,7 +91,7 @@ module.exports = cds.service.impl(async function () {
 
   });
   /**
-* Function to delete Schedule
+* Function to delete Fixed Period Schedule
 */
   this.on('deleteSchedule', async (req) => {
     const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
@@ -196,7 +196,7 @@ module.exports = cds.service.impl(async function () {
     }
   });
   /**
-* Function to create Daily Schedule
+* Function to create Recursive Schedule
 */
   this.on('createSchedule', async (req) => {
     const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
@@ -269,7 +269,7 @@ module.exports = cds.service.impl(async function () {
   });
 
   /**
-* Function to deactivate Daily Schedule
+* Function to deactivate Recursive Schedule
 */
   this.on('updateSchedule', async (req) => {
     const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
@@ -310,7 +310,7 @@ module.exports = cds.service.impl(async function () {
     }
   });
   /**
-* Function to create On-Demand Schedule
+* Function to create Fixed Period Schedule
 */
   this.on('createOnDemandSchedule', async (req) => {
     const token = await fetchJwtToken(OA_CLIENTID, OA_SECRET);
@@ -554,7 +554,7 @@ module.exports = cds.service.impl(async function () {
     }
   }
   /**
-  * Function is the endpoint of the Job Schedules which sends Emails by calling the CPI endpoint
+  * Function is the endpoint of the Job Schedules 
   */
   const operationTriggerEndpoint = async function (req, oDesc, resultJob, job_Id) {
     try {
@@ -565,6 +565,7 @@ module.exports = cds.service.impl(async function () {
           let test = JSON.parse(resultJob[q].data);
           suspendStatus = test.suspendStatus;
         }
+        return "Job has been successfully run";
       }
       console.log(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
       console.log("suspendStatus " + suspendStatus + "for " + oDesc);

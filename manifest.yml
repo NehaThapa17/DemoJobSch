@@ -12,12 +12,5 @@ applications:
   path: gen/srv
   memory: 1024M
   buildpack: nodejs_buildpack
-  services:
-    - dempJobSch-xsuaa-service
-    - dev_job_scheduler
-  env:
-    SAP_JWT_TRUST_ACL: >
-        [
-          {"clientid":"*", "identityzone":"*"}
-        ]    
+ 
 

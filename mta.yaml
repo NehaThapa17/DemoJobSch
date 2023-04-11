@@ -14,8 +14,6 @@ modules:
 - name: dempJobSch-srv
   type: nodejs
   path: gen/srv
-  properties:
-    SAP_JWT_TRUST_ACL: '[{"clientid":"*","identityzone":"*"}]' 
   parameters:
     buildpack: nodejs_buildpack  
   build-parameters:

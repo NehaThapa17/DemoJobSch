@@ -286,7 +286,7 @@ sap.ui.define([
                 }
             },
             /**
-              * Method called to handle switch button for OnDemand Job
+              * Method called to handle switch button for Fixed Period Job
               * @public
               */    
             onSwtichChangeD: function (oEvent) {
