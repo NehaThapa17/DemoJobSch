@@ -565,7 +565,7 @@ module.exports = cds.service.impl(async function () {
           let test = JSON.parse(resultJob[q].data);
           suspendStatus = test.suspendStatus;
         }
-        return "Job has been successfully run";
+        
       }
       console.log(`${LG_SERVICE}${__filename}`, "operationTriggerEndpoint", constants.LOG_RETRIVING_RESPONSE);
       console.log("suspendStatus " + suspendStatus + "for " + oDesc);
@@ -584,7 +584,7 @@ module.exports = cds.service.impl(async function () {
           };
           const scheduler = new JobSchedulerClient.Scheduler(options);
           for (var k = 0; k < resultJob.length; k++) {
-            if (resultJob[k].description === constants.daily) { //|| resultJob[k].description === constants.onDemand
+            if (resultJob[k].description === constants.daily || resultJob[k].description === constants.onDemand) { //
               sSId = resultJob[k].scheduleId;
               var scJob = {
                 jobId: job_Id,
@@ -614,6 +614,7 @@ module.exports = cds.service.impl(async function () {
         }
       } 
       console.log("operationTriggerEndpoint - Out of IF condition");
+      return "Job has been successfully run";
     }
     catch (error) {
       req.error({ code: constants.ERR, message: error.message });
@@ -629,7 +630,7 @@ module.exports = cds.service.impl(async function () {
     };
     const scheduler = new JobSchedulerClient.Scheduler(options);
     for (var k = 0; k < resultJob.length; k++) {
-      if (resultJob[k].description === constants.daily) { //|| resultJob[k].description === constants.onDemand
+      if (resultJob[k].description === constants.daily || resultJob[k].description === constants.onDemand) { 
         sSId = resultJob[k].scheduleId;
         var scJob = {
           jobId: job_Id,

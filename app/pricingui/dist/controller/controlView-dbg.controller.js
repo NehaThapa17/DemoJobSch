@@ -16,7 +16,7 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, MessageBox, JSONModel, BusyIndicator,  constants) {
+    function (Controller, MessageBox, JSONModel, BusyIndicator, constants) {
         "use strict";
         return Controller.extend("demo.app.controller.controlView", {
             /**
@@ -288,13 +288,13 @@ sap.ui.define([
             /**
               * Method called to handle switch button for Fixed Period Job
               * @public
-              */    
+              */
             onSwtichChangeD: function (oEvent) {
                 BusyIndicator.show();
                 var oState = oEvent.getSource().getState(),
                     oValue = this.getView().byId("idDatePickerOnDemand").getValue();
                 this.getJSStatusOnDemand(oState, oValue);
-            },         
+            },
             getJSStatusOnDemand: function (oState, oValue) {
                 var that = this;
                 this.oDataModelT.callFunction("/getJobDetails", {
@@ -312,7 +312,7 @@ sap.ui.define([
                             that.getView().byId("idInfoLabelSuspend").setColorScheme(2);
                             MessageBox.error(that.oBundle.getText("susCheck"));
                         } else {
-                            
+
                             that.executeSchOnDemand(oState);
                         }
                     },
@@ -324,7 +324,7 @@ sap.ui.define([
 
                     }
                 });
-            },   
+            },
             executeSchOnDemand: function (oState) {
                 var that = this;
 
@@ -355,7 +355,7 @@ sap.ui.define([
                 } else {
                     that.onPressSaveOnDemand();
                 }
-            },                     
+            },
 
 
             /**
@@ -383,32 +383,32 @@ sap.ui.define([
                     }),
                         onDemand = dateValue.toDateString() + constants.SPACE + xTime;
 
-                    if ((oDate !== "" && oDate !== constants.SPACE && oDate !== undefined) ) {
-                       
-                            this.getView().byId("idDatePickerOnDemand").setEnabled(false);
-                            this.getView().byId("idTextOnDemandST").setText(onDemand);
-                            this.getView().getModel("oModel").setProperty("/dateValue", oDate);
+                    if ((oDate !== "" && oDate !== constants.SPACE && oDate !== undefined)) {
 
-                            this.oDataModelT.callFunction("/createOnDemandSchedule", {
-                                method: constants.httpGet,
-                                urlParameters: {
-                                    time: onDemand,
-                                    desc: constants.onDemand
-                                },
-                                success: function (oData) {
-                                    if (oData.createOnDemandSchedule) {
-                                        MessageBox.success(that.oBundle.getText("succJSOD"));
-                                    }
+                        this.getView().byId("idDatePickerOnDemand").setEnabled(false);
+                        this.getView().byId("idTextOnDemandST").setText(onDemand);
+                        this.getView().getModel("oModel").setProperty("/dateValue", oDate);
 
-                                },
-                                error: function (err) {
-                                    MessageBox.error(that.oBundle.getText("techError"), {
-                                        details: err
-                                    });
-
+                        this.oDataModelT.callFunction("/createOnDemandSchedule", {
+                            method: constants.httpGet,
+                            urlParameters: {
+                                time: onDemand,
+                                desc: constants.onDemand
+                            },
+                            success: function (oData) {
+                                if (oData.createOnDemandSchedule) {
+                                    MessageBox.success(that.oBundle.getText("succJSOD"));
                                 }
-                            });
-                        
+
+                            },
+                            error: function (err) {
+                                MessageBox.error(that.oBundle.getText("techError"), {
+                                    details: err
+                                });
+
+                            }
+                        });
+
                     } else {
 
                         MessageBox.error(that.oBundle.getText("errormsgrequired"));
@@ -438,14 +438,7 @@ sap.ui.define([
                         },
                         success: function (oData) {
                             BusyIndicator.hide();
-                            // var dState = that.getView().byId("idSwitchInput").getState();
-                            // if (dState === true) {
-                            //     that.getView().byId("idInfoLabel").setColorScheme(constants.INTSEVEN);
-                            //     that.getView().byId("idInfoLabel").setText(that.oBundle.getText("active"));
-                            // } else {
-                            //     that.getView().byId("idInfoLabel").setText(that.oBundle.getText("inactive"));
-                            //     that.getView().byId("idInfoLabel").setColorScheme(constants.INTONE);
-                            // }
+                            that.getView().byId("idInfoLabelSuspend").setVisible(true);                           
                             MessageBox.information(that.oBundle.getText("turnOffSus"));
                         },
                         error: function (err) {
@@ -469,9 +462,9 @@ sap.ui.define([
                         oArr = [], that = this,
                         FromDate = new Date(oDateSuspendFrom),
                         ToDate = new Date(oDateSuspendTo),
-                      //Convert to UTC
-                     oSusFrom =  new Date(FromDate.getTime() + FromDate.getTimezoneOffset() * 60000), 
-                     oSusTo = new Date(ToDate.getTime() + ToDate.getTimezoneOffset() * 60000);
+                        //Convert to UTC
+                        oSusFrom = new Date(FromDate.getTime() + FromDate.getTimezoneOffset() * 60000),
+                        oSusTo = new Date(ToDate.getTime() + ToDate.getTimezoneOffset() * 60000);
 
                     var xSuspendTo = oSusTo.toLocaleString('en-US', {
                         hour: 'numeric',
@@ -520,15 +513,12 @@ sap.ui.define([
                                     },
                                     success: function (oData) {
                                         BusyIndicator.hide();
-                                        // var now = new Date(),
-                                        //     curr = now.toLocaleString("en-US", {
-                                        //         timeZone: constants.timezone,
-                                        //     });
-                                        // curr = new Date(curr);
-                                        // if (FromDate < curr) {
-                                        //     that.getView().byId("idInfoLabel").setText(constants.suspended);
-                                        //     that.getView().byId("idInfoLabel").setColorScheme(2);
-                                        // }
+                                        var now = new Date();
+                                        if (FromDate < now) {
+                                            that.getView().byId("idInfoLabelSuspend").setVisible(true);
+                                            that.getView().byId("idInfoLabelSuspend").setText(constants.suspended);
+                                            that.getView().byId("idInfoLabelSuspend").setColorScheme(2);
+                                        }
                                         MessageBox.success(that.oBundle.getText("succJSSus"));
                                     },
                                     error: function (err) {
@@ -542,7 +532,7 @@ sap.ui.define([
 
                                     }
                                 });
-                                
+
                             } else {
                                 BusyIndicator.hide();
                                 that.getView().byId("idSwitchInputSuspend").setState(false);
@@ -596,13 +586,9 @@ sap.ui.define([
                     sValue = oEvent.getParameter("value"),
                     bValid = oEvent.getParameter("valid");
                 var selectedDate = new Date(sValue);
-                var now = new Date(),
-                    cDate = now.toLocaleString("en-US", {
-                        timeZone: constants.timezone,
-                    });
-                cDate = new Date(cDate);
+                var now = new Date();
                 if (bValid) {
-                    if (selectedDate < cDate) {
+                    if (selectedDate < now) {
                         oDTP.setValueState(sap.ui.core.ValueState.Error);
                         MessageBox.error(this.oBundle.getText("dateError"));
                     } else {

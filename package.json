@@ -79,8 +79,5 @@
         }
       }
     }
-  },
-  "sapux": [
-    "app/pricingui"
-  ]
+  }
 }

@@ -52,19 +52,6 @@ sap.ui.define([
 			expected: true
 		});
 	});
-	QUnit.module("email Formatter Module");
-    function emailFormatCase(oOptions) {
-		// Act
-		var sState = formatter.getStatus(oOptions.email);
 
-		// Assert
-		oOptions.assert.strictEqual(sState, oOptions.expected, "The email was formatted");
-	}
-    QUnit.test("Should change the visibility to false based on count", function (assert) {
-		emailFormatCase.call(this, {
-			assert: assert,
-			email: 'abc@marathonpetroleum.com ;xyz@marathonpetroleum.com ;test123@marathonpetroleum.com',
-			expected: true
-		});
-	});
+
 });

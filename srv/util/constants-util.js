@@ -1,7 +1,7 @@
 module.exports=Object.freeze({
-    CLIENT_ID: 'sb-8b2b68fb-114d-482b-8bcf-26f7972bbc33!b118812|sap-jobscheduler!b1',
-    CLIENT_SECRET: '618f5a05-1546-4ef8-9766-c32ffa2c616d$EWpa238SwXlfdJRiJpKoMlhNhY9nMeIiufNxXV9IVto=',
-    CLIENT_URL:'https://mpcdev.authentication.us10.hana.ondemand.com',
+    CLIENT_ID: '',
+    CLIENT_SECRET: '',
+    CLIENT_URL:'',
     ERROR: "Error",
     NONE: "None",
     onDemand:'ONDEMAND',
